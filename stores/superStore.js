@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import champions from '../constants/champions'
+import champions from '@/constants/champions'
 // import axios from 'axios'
 
 export const superStore = defineStore('super', {

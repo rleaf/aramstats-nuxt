@@ -1,27 +1,41 @@
-<script setup lang="ts">
+<script setup>
+import { useTemplateRef, onMounted, onBeforeMount } from 'vue'
 import Experience from '~/experience/Experience'
 
 onBeforeMount(() => {
-   // if (!localStorage.getItem('experience')) {
-   //    localStorage.setItem('experience', 1)
-   // }
+   if (!localStorage.getItem('experience')) {
+      localStorage.setItem('experience', 1)
+   }
 })
 
 onMounted(() => {
-   const experience = new Experience(document.querySelector('.webgl'), false)
-   // if (+localStorage.getItem('experience') === 1) {
-   //    renderExperience()
-   // } else {
-   //    $refs.check.setAttribute('checked', '')
-   // }
+   if (+localStorage.getItem('experience') === 1) {
+      experience = new Experience(document.querySelector('.webgl'), false)
+   }
 })
+
+let experience
+const ref = useTemplateRef('check')
+
+function toggleExperience() {
+   if (+localStorage.getItem('experience') === 1) {
+      ref.value.setAttribute('checked', '')
+      localStorage.setItem('experience', 0)
+      experience.remove()
+      experience = null
+   } else {
+      ref.value.removeAttribute('checked')
+      localStorage.setItem('experience', 1)
+      experience = new Experience(document.querySelector('.webgl'), false)
+   }
+}
 
 </script>
 
 <template>
    <canvas class="webgl"></canvas>
    <div class="experience-toggle">
-      <!-- <input ref="check" id='one' type='checkbox' @click="toggleExperience()" /> -->
+      <input ref="check" id='one' type='checkbox' @click="toggleExperience" />
       <label for='one'>
          <span></span>
          Disable experience

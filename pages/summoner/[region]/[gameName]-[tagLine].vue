@@ -1,4 +1,7 @@
-<script setup lang="ts">
+<script setup>
+
+const route = useRoute()
+console.log(route)
 </script>
 
 <template>

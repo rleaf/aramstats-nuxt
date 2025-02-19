@@ -2,7 +2,7 @@ import * as THREE from 'three'
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js'
 import Experience from '../Experience'
 import vertexIndices from '@/constants/vertexIndices.js'
-import model from '../assets/MAIN.glb'
+import model from '@/assets/three/MAIN.glb'
 
 
 export default class Map {

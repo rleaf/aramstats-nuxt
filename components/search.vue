@@ -1,14 +1,22 @@
-<script setup lang="ts">
+<script setup>
 const store = superStore()
-console.log(store)
-console.log('toads')
+
+onBeforeMount(() => {
+   if (!localStorage.getItem('experience')) {
+      localStorage.setItem('experience', 1)
+   }
+})
+
+onMounted(() => {
+   localStorage.setItem('region', 'na')
+})
 </script>
 
 <template>
    <div>
       <input type="text">
    </div>
-   <!-- <div class="search-main">
+   <div class="search-main">
       <img src="../assets/svg/logo.svg" class="logo" alt="">
       <div ref="container" class="container" :class="{ focus: containerFocus }">
          <div>
@@ -49,7 +57,7 @@ console.log('toads')
          </div>
       </div>
    </div>
-   <div class="back" @click="containerFocus = false" v-if="containerFocus"></div> -->
+   <div class="back" @click="containerFocus = false" v-if="containerFocus"></div>
 </template>
 
 <style scoped>

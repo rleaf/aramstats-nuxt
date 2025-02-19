@@ -1,10 +1,9 @@
-<script setup lang="ts">
+<script setup>
 
 </script>
 
 <template>
    <div>
-      <h1>HOME</h1>
       <Search />
       <Experience />
    </div>
