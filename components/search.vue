@@ -1,5 +1,11 @@
 <script setup>
 const store = superStore()
+const step = ref(-1)
+const input = ref('')
+const region = ref('RG')
+const inputRef = useTemplateRef('inputBind')
+const championsRef = useTemplateRef('champions')
+const filteredChamps = useChampionFilter(step, input)
 
 onBeforeMount(() => {
    if (!localStorage.getItem('experience')) {
@@ -9,19 +15,106 @@ onBeforeMount(() => {
 
 onMounted(() => {
    localStorage.setItem('region', 'na')
+   window.addEventListener('keydown', eventHandler)
 })
+
+onUnmounted(() => {
+   window.removeEventListener('keydown', eventHandler)
+})
+
+function regionSelect() {
+   localStorage.setItem('region', region.value)
+   inputRef.value.focus()
+}
+
+function getImage(name) {
+   const path = `/assets/champion_icons/${name}.png`
+   const modules = import.meta.glob("@/assets/champion_icons/**", { eager: true })
+   const mod = modules[path]
+   return mod.default
+}
+
+function blurInput() {
+   inputRef.value.blur()
+   input.value = ''
+   store.navContainerFocus = false
+}
+
+async function summonerSearch() {
+   if (!input.value) return
+   if (filteredChamps.value[step.value]) {
+      await navigateTo({ name: 'champions-champion', params: { champion: filteredChamps.value[step.value].back } })
+      store.navContainerFocus = false
+      return
+   }
+
+   if (region.value === 'RG') {
+      regionButtonRef.value.classList.add('shake')
+      setTimeout(() => {
+         regionButtonRef.value.classList.remove('shake')
+      }, 1000)
+      return
+   }
+
+   const identifiers = input.value.split('#')
+   let _gameName = identifiers[0]
+   let _tagLine = (identifiers.length === 2) ? identifiers[1] : store.searchRegions[region.value]
+   await navigateTo({
+      name: `summoner-region-gameName-tagLine`, params: {
+         region: region.value,
+         gameName: _gameName,
+         tagLine: _tagLine
+      }
+   })
+
+   store.navContainerFocus = false
+   input.value = ''
+   inputRef.value.blur()
+}
+
+function eventHandler(e) {
+   if (e.ctrlKey && e.key === 'k') {
+      e.preventDefault()
+      inputRef.value.focus()
+      return
+   }
+   if (!(e.key === 'ArrowDown' || e.key === 'ArrowUp') || !store.navContainerFocus) return
+   e.preventDefault()
+   if (filteredChamps.value.length) {
+      if (!championsRef.value.children || !championsRef.value.children[step.value]) step.value = -1
+      if (step.value !== -1) championsRef.value.children[step.value].classList.remove('active')
+
+      if (e.key === 'ArrowDown') {
+         if (championsRef.value.children[step.value + 1]) {
+            step.value++
+         } else {
+            step.value = 0
+            championsRef.value.children[step.value]
+         }
+      }
+
+      if (e.key === 'ArrowUp') {
+         if (championsRef.value.children[step.value - 1]) {
+            step.value--
+         } else {
+            step.value = filteredChamps.value.length - 1
+            championsRef.value.children[filteredChamps.value.length - 1]
+         }
+      }
+
+      if (step.value !== -1) championsRef.value.children[step.value].classList.add('active')
+   }
+}
+
 </script>
 
 <template>
-   <div>
-      <input type="text">
-   </div>
    <div class="search-main">
       <img src="../assets/svg/logo.svg" class="logo" alt="">
-      <div ref="container" class="container" :class="{ focus: containerFocus }">
+      <div ref="container" class="container" :class="{ focus: store.navContainerFocus }">
          <div>
-            <input class="main-input" ref="input" type="text" spellcheck="false" autocomplete="off"
-               @focus="containerFocus = true" @keyup.esc="blurInput()" @keyup.enter="summonerSearch"
+            <input class="main-input" ref="inputBind" type="text" spellcheck="false" autocomplete="off"
+               @focus="store.navContainerFocus = true" @keyup.esc="blurInput()" @keyup.enter="summonerSearch"
                v-model="input">
             <span class="placeholder" v-show="!input">
                Summoner or Champion
@@ -38,7 +131,7 @@ onMounted(() => {
                region.toUpperCase() }}</option>
          </select>
       </div>
-      <div class="champion-search" v-show="containerFocus && filteredChamps.length > 0">
+      <div class="champion-search" v-show="store.navContainerFocus && filteredChamps.length > 0">
          <div class="search-ux">
             <div>
                <kbd>↑</kbd> up <kbd>↓</kbd> down <kbd>Enter</kbd> search
@@ -48,16 +141,17 @@ onMounted(() => {
             </div>
          </div>
          <div ref="champions">
-            <router-link :to="{ name: 'champions', params: { champion: champ.back } }" v-for="champ in filteredChamps">
+            <NuxtLink :to="{ name: 'champions-champion', params: { champion: champ.back } }" v-for="champ in filteredChamps" :key="champ">
                <div class="img-wrapper">
                   <img :src="getImage(champ.image)" alt="" srcset="" rel="preload">
+                  <!-- <img src="@/assets/champion_icons/ahri.png" alt="" srcset="" rel="preload"> -->
                </div>
                {{ champ.front }}
-            </router-link>
+            </NuxtLink>
          </div>
       </div>
    </div>
-   <div class="back" @click="containerFocus = false" v-if="containerFocus"></div>
+   <div class="back" @click="store.navContainerFocus = false" v-if="store.navContainerFocus"></div>
 </template>
 
 <style scoped>

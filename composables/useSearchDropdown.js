@@ -1,8 +1,18 @@
 import { superStore } from "@/stores/superStore";
 export const useSearchDropdown = (step, filteredChamps, input, inputRef, championsRef) => {
    const store = superStore()
+   onMounted(() => {
+      window.addEventListener('keydown', eventHandler)
+      console.log('initializing')
+   })
 
-   window.addEventListener('keydown', (e) => {
+   onUnmounted(() => {
+      window.removeEventListener('keydown', eventHandler)
+      console.log('breaking')
+   })
+
+   function eventHandler(e) {
+      console.log('turkeys')
       if (e.ctrlKey && e.key === 'k') {
          e.preventDefault()
          input.value = ''
@@ -35,8 +45,8 @@ export const useSearchDropdown = (step, filteredChamps, input, inputRef, champio
          }
 
          if (step.value !== -1) championsRef.value.children[step.value].classList.add('active')
-      }
-   })
+      }  
+   }
 
    return step.value
 
