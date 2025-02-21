@@ -27,6 +27,7 @@ const REGION_GROUPS = {
 export default defineEventHandler(async (e) => {
    // let puuid
    let conn
+   return 'toads'
    const testPUUID = '1drRAqWmygSD5609hYrHETGKzme8QG_UXH8sgw0ViCm4pLLWR2SzS4acNH8x4yrwRTIz7rn5gFFIFw'
    try {
       console.log(e.context.params)
@@ -34,12 +35,9 @@ export default defineEventHandler(async (e) => {
       // return puuid
       
       conn = await SummonerModel.findOne({ _id: testPUUID })
-      // const summoner = await summonerSchema.findOne({_id: puuid})
-      // console.log(summoner, 'summoner')
-      // return summoner
    } catch (e) { 
       console.log('error', e)
    }
+
    return conn
-   // return puuid
 })

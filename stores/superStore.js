@@ -52,7 +52,7 @@ export const superStore = defineStore('super', {
             // Items
             try {
                const url = `https://ddragon.leagueoflegends.com/cdn/${this.patches[0]}/data/en_US/item.json`
-               this.items = (await axios.get(url)).data.data
+               this.items = (await $fetch(url)).data.data
             } catch (e) {
                if (e instanceof Error) console.log(e)
             }
@@ -74,23 +74,6 @@ export const superStore = defineStore('super', {
          }
       },
 
-      /* 
-         Old championCDN data, pulled from Meraki.
-         Used to also include ARAM changes
-      */
-      // async initChampion(champ) {
-      //    try {
-      //       const url = `https://cdn.jsdelivr.net/gh/rleaf/aramstats@latest/cdn/${champ}.json`
-      //       this.championCDN = (await axios.get(url)).data
-      //    } catch (e) {
-      //       if (e instanceof Error) console.log(e)
-      //    }
-      // },
-
-      // Champion CDN Data. Alternatives to Meraki
-      // CDragon: https://cdn.communitydragon.org/14.22.1/champion/Aatrox/data.json
-      // DDragon: https://ddragon.leagueoflegends.com/cdn/${this.patches[0]}/data/en_US/champion/${champ}.json
-      // DDragon: https://ddragon.leagueoflegends.com/cdn/14.22.1/data/en_US/champion.json
       async initChampion(champ) {
          if (!this.patches) await this.initPatches()
 
@@ -103,12 +86,11 @@ export const superStore = defineStore('super', {
          }
       },
 
-      // Last 10 patches
       async initPatches() {
          if (!this.patches) {
             try {
                const url = 'https://ddragon.leagueoflegends.com/api/versions.json'
-               this.patches = (await axios.get(url)).data.slice(0, 5)
+               this.patches = (await $fetch(url)).slice(0, 5)
             } catch (e) {
                if (e instanceof Error) console.log(e)
             }
@@ -148,7 +130,7 @@ export const superStore = defineStore('super', {
    },
 
    getters: {
-      cleanPatch: (state) => {
+      recentCleanPatch: (state) => {
          if (!state.patches) return
          return state.patches[0].split('.').slice(0, 2).join('.')
       },
