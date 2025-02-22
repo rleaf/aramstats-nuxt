@@ -69,7 +69,7 @@
    --font-main: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
    --header-font: 'Thestral';
 
-   --theme-icon: url('@/assets/svg/solari.svg');
+   --theme-icon: url('/svg/solari.svg');
    --theme-mask-size: 100%;
 
    --red-side: #AD5757;
@@ -141,7 +141,7 @@
    --shadow: rgb(0 0 0);
    --scrim: rgb(0 0 0);
 
-   --theme-icon: url('@/assets/svg/lunari.svg');
+   --theme-icon: url('/svg/lunari.svg');
    --theme-mask-size: 80%;
 
    --win: rgba(58, 184, 216, 0.45);

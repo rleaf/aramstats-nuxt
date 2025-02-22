@@ -1,0 +1,96 @@
+.section-header {
+   display: flex;
+   align-items: center;
+   gap: 20px;
+   color: var(--color-font);
+   padding: 1.25rem 0;
+}
+
+.section-header h1 {
+   font-family: 'Thestral';
+   margin: 0;
+   font-size: 2rem;
+}
+
+.section {
+   padding-bottom: 13vh;
+}
+
+.sub-section-header {
+   display: flex;
+   justify-content: space-between;
+   align-items: center;
+   padding-bottom: 0.3rem;
+   margin-bottom: 0.8rem;
+   border-bottom: 1px solid var(--outline-variant);
+}
+
+.sub-section-header img {
+   cursor: pointer;
+   -webkit-touch-callout: none; /* iOS Safari */
+   -webkit-user-select: none; /* Safari */
+   -khtml-user-select: none; /* Konqueror HTML */
+   -moz-user-select: none; /* Old versions of Firefox */
+   -ms-user-select: none; /* Internet Explorer/Edge */
+   user-select: none; /* Non-prefixed version, currently supported by Chrome, Edge, Opera and Firefox */
+}
+
+.sub-rhs {
+   display: flex;
+   align-items: center;
+}
+
+.misc {
+   margin-right: 1rem;
+   display: flex;
+   align-items: center;
+}
+
+.misc div {
+   display: flex;
+   align-items: center;
+   padding-left: 20px;
+}
+
+.misc div h3:nth-child(2) {
+   color: var(--color-font);
+}
+
+.misc img {
+   width: 18px;
+}
+
+.misc h3 {
+   display: inline-block;
+   font-weight: normal;
+   font-size: 0.75rem;
+   text-align: center;
+   margin: 0;
+
+}
+
+.misc h3:not(:first-child) {
+   color: var(--color-font-faded);
+   font-style: italic;
+   margin-left: 0.4rem;
+}
+
+.sub-section-header .title {
+   font-family: 'Thestral';
+   margin: 0;
+   font-size: 1.3rem;
+   color: var(--color-font);
+}
+.sub-section-header a {
+   text-decoration: none;
+   transition: 0.15s ease-in-out;
+   border-radius: 3px;
+   cursor: pointer;
+}
+.sub-section-header a:hover {
+   color: var(--color-font-focus);
+}
+.sub-section-header .misc {
+   padding-left: 15px;
+   color: var(--color-font);
+}

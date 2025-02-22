@@ -1,4 +1,10 @@
- export default {
+export const _flex = [
+   ['5008', '5005', '5007'], // Offense
+   ['5008', '5010', '5001'], // Flex
+   ['5011', '5013', '5001']  // Defense
+]
+
+export const _runes = {
    '8000': [ // Precision
       [
          8005, // Press The Attack

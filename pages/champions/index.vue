@@ -1,10 +1,9 @@
 <script setup>
 import { superStore } from '@/stores/superStore'
-import champions from '@/constants/champions'
+import { championNames } from '~/constants/championNames'
 
 const store = superStore()
-await useStoreInit()
-
+const queryPatch = ref(useRoute().query.patch || store.recentCleanPatch)
 const sort = ref(1)
 const descending = ref(false)
 const winrates = reactive({
@@ -13,16 +12,22 @@ const winrates = reactive({
    delta: 0
 })
 
-const { data: championData } = await useFetch('/api/champions', {
-   method: 'GET',
-   query: {
-      patch: useRoute().query.patch || store.recentCleanPatch
+await useStoreInit()
+const { data: championData, status } = await useAsyncData(
+   () => $fetch('/api/champions', {
+      query: {
+         patch: queryPatch.value
+      }
+   }), {
+      watch: [queryPatch]
    }
+)
+
+watch(status, n => {
+   if (n === 'success') computeWinrates()
 })
 
-onMounted(() => {
-   computeWinrates()
-})
+computeWinrates()
 
 function computeWinrates() {
    for (const i in championData.value) {
@@ -54,20 +59,13 @@ function computeSampleVariance(games, x, xx) {
    return Math.round(Math.sqrt(((xx) - ((x ** 2) / games)) / (games - 1)))
 }
 
-
 function cleanPatch(patch) {
    return patch.split('.').slice(0, 2).join('.')
 }
 
 async function patchChange(patch) {
-   championData.value = await $fetch('/api/champions', {
-      method: 'GET',
-      query: {
-         patch: cleanPatch(patch)
-      }
-   })
-   computeWinrates()
-   navigateTo({ path: '/champions', query: { patch: cleanPatch(patch) } })
+   queryPatch.value = cleanPatch(patch)
+   navigateTo({ name: 'champions', query: { patch: queryPatch.value } })
 }
 
 function headerSort(o) {
@@ -98,11 +96,11 @@ function headersExtended(val) {
 }
 
 function championRoute(id) {
-   return (id === 62) ? 'wukong' : champions[id][0]
+   return (id === 62) ? 'wukong' : championNames[id][0]
 }
 
 function champIcon(id) {
-   return `https://ddragon.leagueoflegends.com/cdn/${store.patches[0]}/img/champion/${champions[id][0]}.png`
+   return `https://ddragon.leagueoflegends.com/cdn/${store.patches[0]}/img/champion/${championNames[id][0]}.png`
 }
 
 function computeColor(g) {
@@ -131,8 +129,8 @@ const getChampionsList = computed(() => {
    if (championData.value) {
       switch (true) {
          case sort.value === 0:
-            return (descending.value) ? championData.value.sort((a, b) => champions[b._id][1].localeCompare(champions[a._id][1])) :
-               championData.value.sort((a, b) => champions[a._id][1].localeCompare(champions[b._id][1]))
+            return (descending.value) ? championData.value.sort((a, b) => championNames[b._id][1].localeCompare(championNames[a._id][1])) :
+               championData.value.sort((a, b) => championNames[a._id][1].localeCompare(championNames[b._id][1]))
          case sort.value === 1:
             return (descending.value) ? championData.value.sort((a, b) => (a.winrate) - (b.winrate)) :
                championData.value.sort((a, b) => (b.winrate) - (a.winrate))
@@ -167,7 +165,7 @@ const getChampionsList = computed(() => {
             return (descending.value) ? championData.value.sort((a, b) => (a.gpm.v) - (b.gpm.v)) :
                championData.value.sort((a, b) => (b.gpm.v) - (a.gpm.v))
          default:
-            return championData.value.sort((a, b) => champions[a._id][1].localeCompare(champions[b._id][1]))
+            return championData.value.sort((a, b) => championNames[a._id][1].localeCompare(championNames[b._id][1]))
       }
    }
 })
@@ -176,7 +174,7 @@ const getChampionsList = computed(() => {
 
 <template>
 
-   <div v-if="championData" class="champ-list-main">
+   <div class="champ-list-main">
       <div class="utilities">
 
          <div class="patch-wrapper">
@@ -232,7 +230,7 @@ const getChampionsList = computed(() => {
                </div>
             </div>
          </div>
-         <div :class="{ 'o': i % 2 === 0 }" class="champion" v-for="(champ, i) in getChampionsList" :key="i">
+         <div v-if="status === 'success'" :class="{ 'o': i % 2 === 0 }" class="champion" v-for="(champ, i) in getChampionsList" :key="i">
             <div class="index">
                {{ i + 1 }}
             </div>
@@ -242,7 +240,7 @@ const getChampionsList = computed(() => {
                      <img rel="preload" :src="champIcon(champ._id)" alt="">
                   </div>
                   <div>
-                     <span class="name">{{ champions[champ._id][1] }}</span>
+                     <span class="name">{{ championNames[champ._id][1] }}</span>
                   </div>
                </NuxtLink>
             </div>
@@ -272,10 +270,10 @@ const getChampionsList = computed(() => {
                <span>{{ (champ.gpm) ? champ.gpm.v : '-' }}</span>
             </div>
          </div>
+         <div v-else class="loading-champ-list">
+            <Loading />
+         </div>
       </div>
-   </div>
-   <div v-else class="loading-champ-list">
-      <Loading />
    </div>
 
 </template>
@@ -426,7 +424,7 @@ const getChampionsList = computed(() => {
       /* Same width as .champion:nth-child(1) */
       border-bottom: 1px solid var(--outline-variant);
       padding-bottom: 10px;
-      margin-bottom: 5px;
+      /* margin-bottom: 5px; */
    }
 
    .image-wrapper {
@@ -632,9 +630,28 @@ const getChampionsList = computed(() => {
    .loading-champ-list {
       display: flex;
       justify-content: center;
-      margin-top: 20vh;
-      color: var(--color-font);
       width: 100%;
+      color: var(--color-font);
       text-align: center;
    }
+
+   /* Look into improving loading UX eventually */
+   /* .loading-champ-list {
+      background: linear-gradient(to right, var(--surface) 30%, var(--surface-container) 50%, var(--surface) 80%);
+      background-size: 200% auto;
+      background-position: 0 100%;
+      animation: gradient 3s infinite;
+      animation-fill-mode: forwards;
+      animation-timing-function: linear;
+   }
+
+   @keyframes gradient {
+      0% {
+         background-position: 0 0;
+      }
+
+      100% {
+         background-position: -200% 0;
+      }
+   } */
 </style>

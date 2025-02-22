@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import champions from '@/constants/champions'
+import { championNames } from '@/constants/championNames'
 // import axios from 'axios'
 
 export const superStore = defineStore('super', {
@@ -46,44 +46,39 @@ export const superStore = defineStore('super', {
    actions: {
       // Items
       async initItems() {
-         if (!this.items) {
-            if (!this.patches) await this.initPatches()
-               
-            // Items
-            try {
-               const url = `https://ddragon.leagueoflegends.com/cdn/${this.patches[0]}/data/en_US/item.json`
-               this.items = (await $fetch(url)).data.data
-            } catch (e) {
-               if (e instanceof Error) console.log(e)
-            }
+         if (this.items) return
+         if (!this.patches) await this.initPatches()
+         try {
+            const url = `https://ddragon.leagueoflegends.com/cdn/${this.patches[0]}/data/en_US/item.json`;
+            this.items = (await useFetch(url)).data
+            this.items = this.items.data // reactivity funk
+         } catch (e) {
+            if (e instanceof Error) console.log(e)
          }
       },
 
       // Summoner Spells
       async initSpells() {
-         if (!this.spells) {
-            // if (!this.patches) await this.initPatches()
-               
-            try {
-               // const url = `https://ddragon.leagueoflegends.com/cdn/${this.patches[0]}/data/en_US/summoner.json`
-               const url = `https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/summoner-spells.json`
-               this.spells = (await axios.get(url)).data
-            } catch (e) {
-               if (e instanceof Error) console.log(e)
-            }
+         if (this.spells) return
+         try {
+            // const url = `https://ddragon.leagueoflegends.com/cdn/${this.patches[0]}/data/en_US/summoner.json`
+            const url = `https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/summoner-spells.json`
+            this.spells = (await useFetch(url)).data
+         } catch (e) {
+            if (e instanceof Error) console.log(e)
          }
       },
 
-      async initChampion(champ) {
+      async getDataDragonChampion(champ) {
+         if (this.championCDN) return
          if (!this.patches) await this.initPatches()
-
          try {
-            const url = `https://cdn.communitydragon.org/${this.patches[0]}/champion/${champ}/data.json`
-            this.championCDN = (await axios.get(url)).data
+            const url = `https://cdn.communitydragon.org/${this.patches[0]}/champion/${champ}/data.json`;
+            ({ data: this.championCDN } = await useFetch(url))
          } catch (e) {
-
             if (e instanceof Error) console.log(e)
          }
+         // return this.championCDN
       },
 
       async initPatches() {
@@ -99,16 +94,14 @@ export const superStore = defineStore('super', {
 
       // Runes
       async initRunes() {
-         if (!this.runes) {
-            if (!this.patches) await this.initPatches()
-
-            try {
-               // const url = `https://ddragon.leagueoflegends.com/cdn/${this.patches[0]}/data/en_US/runesReforged.json`
-               const url = `https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/perks.json`
-               this.runes = (await axios.get(url)).data
-            } catch (e) {
-               if (e instanceof Error) console.log(e)
-            }
+         if (this.runes) return
+         if (!this.patches) await this.initPatches()
+         try {
+            // const url = `https://ddragon.leagueoflegends.com/cdn/${this.patches[0]}/data/en_US/runesReforged.json`
+            const url = `https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/perks.json`;
+            ({ data: this.runes} = await useFetch(url))
+         } catch (e) {
+            if (e instanceof Error) console.log(e)
          }
       },
 
@@ -137,13 +130,13 @@ export const superStore = defineStore('super', {
 
       nameToId: () => {
          const ret = {}
-         Object.keys(champions).forEach(k => ret[champions[k][0].toLowerCase()] = k)
+         Object.keys(championNames).forEach(k => ret[championNames[k][0].toLowerCase()] = k)
          return ret
       },
 
       idToRoute: () => {
          const o = []
-         for (const champion of Object.values(champions)) {
+         for (const champion of Object.values(championNames)) {
             o.push({
                back: (champion === 62) ? 'wukong' : champion[0].toLowerCase(),
                front: champion[1],

@@ -2,9 +2,12 @@ import { superStore } from '@/stores/superStore'
 
 export const useStoreInit = async () => {
    const store = superStore()
-   return await useAsyncData('patches', () => store.initPatches().then(() => true))
+   store.initPatches()
+   store.initItems()
+   store.initRunes()
+   store.initSpells()
+   // await useAsyncData('patches', () => store.initPatches().then(() => true))
    // await useAsyncData('items', () => store.initItems().then(() => true))
-   // onMounted(async () => {
-
-   // })
+   // return await useAsyncData('champions', () => store.initChampion().then(() => true))
+   
 }

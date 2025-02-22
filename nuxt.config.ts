@@ -4,9 +4,10 @@ export default defineNuxtConfig({
   devtools: {
     enabled: true
   },
-  modules: [
-    '@pinia/nuxt',
+  components: [
+    { path: '~/components', pathPrefix: false },
   ],
+  modules: ['@pinia/nuxt'],
   vite: {
     assetsInclude: ['**/*.glb'],
   },

@@ -29,13 +29,6 @@ function regionSelect() {
    inputRef.value.focus()
 }
 
-function getImage(name) {
-   const path = `/assets/champion_icons/${name}.png`
-   const modules = import.meta.glob("@/assets/champion_icons/**", { eager: true })
-   const mod = modules[path]
-   return mod.default
-}
-
 function eventHandler(e) {
    if (e.ctrlKey && e.key === 'k') {
       e.preventDefault()
@@ -141,7 +134,7 @@ async function summonerSearch() {
             <NuxtLink :to="{ name: 'champions-champion', params: { champion: champ.back } }" @click="blurInput()"
                v-for="champ in filteredChamps">
                <div class="img-wrapper">
-                  <img :src="getImage(champ.image)" alt="" srcset="" rel="preload">
+                  <img :src="`/champion_icons/${champ.image}.png`" alt="" srcset="" rel="preload">
                </div>
                {{ champ.front }}
             </NuxtLink>
@@ -339,7 +332,7 @@ select {
    line-height: 0.7rem;
    background: transparent;
    background: var(--surface-container-highest);
-   background-image: url('../assets/svg/arrow3.svg');
+   background-image: url('/svg/arrow3.svg');
    background-repeat: no-repeat;
    background-position: right 10px center;
    cursor: pointer;

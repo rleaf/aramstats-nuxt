@@ -1,5 +1,5 @@
 import { RiotApi } from 'twisted'
-import { RegionGroups, Regions } from 'twisted/dist/constants'
+import { RegionGroups } from 'twisted/dist/constants'
 import { SummonerModel } from '~/server/models/summoner_model'
 import mongoose from 'mongoose'
 

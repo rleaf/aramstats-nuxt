@@ -27,13 +27,6 @@ function regionSelect() {
    inputRef.value.focus()
 }
 
-function getImage(name) {
-   const path = `/assets/champion_icons/${name}.png`
-   const modules = import.meta.glob("@/assets/champion_icons/**", { eager: true })
-   const mod = modules[path]
-   return mod.default
-}
-
 function blurInput() {
    inputRef.value.blur()
    input.value = ''
@@ -110,7 +103,7 @@ function eventHandler(e) {
 
 <template>
    <div class="search-main">
-      <img src="../assets/svg/logo.svg" class="logo" alt="">
+      <img src="/svg/logo.svg" class="logo" alt="">
       <div ref="container" class="container" :class="{ focus: store.navContainerFocus }">
          <div>
             <input class="main-input" ref="inputBind" type="text" spellcheck="false" autocomplete="off"
@@ -143,8 +136,7 @@ function eventHandler(e) {
          <div ref="champions">
             <NuxtLink :to="{ name: 'champions-champion', params: { champion: champ.back } }" v-for="champ in filteredChamps" :key="champ">
                <div class="img-wrapper">
-                  <img :src="getImage(champ.image)" alt="" srcset="" rel="preload">
-                  <!-- <img src="@/assets/champion_icons/ahri.png" alt="" srcset="" rel="preload"> -->
+                  <img :src="`/champion_icons/${champ.image}.png`" alt="" srcset="" rel="preload">
                </div>
                {{ champ.front }}
             </NuxtLink>
@@ -269,7 +261,7 @@ select {
    font-size: 0.75rem;
    background: transparent;
    background: var(--surface-container-highest);
-   background-image: url('../assets/svg/arrow3.svg');
+   background-image: url('/svg/arrow3.svg');
    background-repeat: no-repeat;
    background-position: right 10px center;
    border-radius: 15px;

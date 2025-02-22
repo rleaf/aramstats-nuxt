@@ -3,16 +3,13 @@ export const useSearchDropdown = (step, filteredChamps, input, inputRef, champio
    const store = superStore()
    onMounted(() => {
       window.addEventListener('keydown', eventHandler)
-      console.log('initializing')
    })
 
    onUnmounted(() => {
       window.removeEventListener('keydown', eventHandler)
-      console.log('breaking')
    })
 
    function eventHandler(e) {
-      console.log('turkeys')
       if (e.ctrlKey && e.key === 'k') {
          e.preventDefault()
          input.value = ''
