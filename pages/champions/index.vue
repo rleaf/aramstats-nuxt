@@ -12,7 +12,7 @@ const winrates = reactive({
    delta: 0
 })
 
-await useStoreInit()
+await store.initPatches()
 const { data: championData, status } = await useAsyncData(
    () => $fetch('/api/champions', {
       query: {

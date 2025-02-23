@@ -5,18 +5,13 @@ import { _runes, _flex } from '@/constants/runes'
 
 const coreFocus = ref(0)
 const organizedCore = ref([])
-const config = championStore
+const config = championStore()
 const maxWinrate = ref(0)
 const minWinrate = ref(2)
 
 const store = superStore()
 const props = defineProps(['championData'])
 const { championData } = toRefs(props)
-
-watch(championData, () => {
-   organizedCore.value = []
-   sortCore()
-})
 
 sortCore()
 function sortCore() {
@@ -185,13 +180,13 @@ const levels = computed(() => {
    <div class="tldr-main">
       <div class="section-header">
          <h1>Overview</h1>
-         <!-- <TldrModal /> -->
+         <TldrModal />
       </div>
       <div class="section">
          <div class="core-selection">
             <div class="combination-tooltip">
                <p>Select a <b>combination</b></p>
-               <!-- <UXTooltip :tip="'core'" /> -->
+               <UXTooltip :tip="'core'" />
             </div>
             <div class="combinations">
                <div class="core" :class="{ 'core-focus': coreFocus === i }" @click="coreFocus = i"
@@ -213,7 +208,7 @@ const levels = computed(() => {
                   <div class="sub-lhs">
                      <a @click="$emit('scroll', 'items')" class="title">Items</a>
                   </div>
-                  <!-- <UXTooltip :tip="'items'" /> -->
+                  <UXTooltip :tip="'items'" />
                </div>
                <div class="items-wrapper">
 
@@ -238,7 +233,7 @@ const levels = computed(() => {
                            <h3>{{ filteredWinrate(startingItems[2] / startingItems[1]) }}</h3>
                            <h3>{{ startingItems[1] }}</h3>
                         </div>
-                        <!-- <UXTooltip :tip="'starting'" /> -->
+                        <UXTooltip :tip="'starting'" />
                      </div>
                   </div>
                   <img v-if="(typeof startingItems[0] === 'string')" v-for="(i, j) in startingItems[0].split('_')"
@@ -254,7 +249,7 @@ const levels = computed(() => {
                            <h3>{{ filteredWinrate(startingSpells[2] / startingSpells[1]) }}</h3>
                            <h3>{{ startingSpells[1] }}</h3>
                         </div>
-                        <!-- <UXTooltip :tip="'spells'" /> -->
+                        <UXTooltip :tip="'spells'" />
                      </div>
                   </div>
                   <img class="starting-image" v-for="(id, i) in startingSpells[0].split('_')"
@@ -280,7 +275,7 @@ const levels = computed(() => {
                            <h3>{{ secondaryRunes[1] }}</h3>
                         </div>
                      </div> -->
-                     <!-- <UXTooltip :align="'right'" :tip="'runes'" /> -->
+                     <UXTooltip :align="'right'" :tip="'runes'" />
                   </div>
                </div>
                <div class="runes-wrapper">
@@ -320,7 +315,7 @@ const levels = computed(() => {
                         <h3>{{ filteredWinrate(levels[2] / levels[1]) }}</h3>
                         <h3>{{ levels[1] }}</h3>
                      </div>
-                     <!-- <UXTooltip :align="'right'" :tip="'levels'" /> -->
+                     <UXTooltip :align="'right'" :tip="'levels'" />
                   </div>
                </div>
                <div class="level-wrapper">
@@ -337,7 +332,7 @@ const levels = computed(() => {
 </template>
 
 <style scoped>
-@import url('../../assets/css/championComponent.css');
+@import url('@/assets/css/championComponent.css');
 
 .no-data {
    color: var(--color-font-faded);

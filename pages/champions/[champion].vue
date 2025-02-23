@@ -3,16 +3,19 @@ import { championNames, nameToId } from '~/constants/championNames';
 
 const route = useRoute()
 const store = superStore()
-// await useStoreInit()
 
-await store.initPatches()
-await store.initRunes()
-await store.initItems()
-await store.initSpells()
-await store.getDataDragonChampion(route.params.champion)
+await store.initPatches() // Prereq for the other store inits
+await Promise.all([
+   store.initRunes(),
+   store.initItems(),
+   store.initSpells(),
+   store.getChampionDragon(route.params.champion)
+])
+
 const queryPatch = ref(route.query.patch || store.recentCleanPatch)
 const championId = ref(nameToId[route.params.champion.toLowerCase()])
-const { data: championData, status, error } = await useAsyncData('championData',
+
+const { data: championData, status, error } = await useAsyncData(
    () => $fetch(`/api/champion/${route.params.champion}`, {
       params: {
          patch: queryPatch.value,
@@ -22,10 +25,6 @@ const { data: championData, status, error } = await useAsyncData('championData',
       watch: [queryPatch]
    }
 )
-
-// watch(status, n => {
-//    if (n === 'success') {}
-// })
 
 function scrollTo(el) {
    return
@@ -168,9 +167,9 @@ const aramModifiers = computed(() => {
 
       <div class="champion-body">
          <Tldr @scroll="scrollTo" :champion-data="championData" />
-         <!-- <Items :champion="this.champion" :patch="store.patches[0]" :itemData="this.itemData" /> -->
-         <!-- <Runes :champion="this.champion" :patch="store.patches[0]" /> -->
-         <!-- <StartingSpells :champion="this.champion" :patch="store.patches[0]" :abilities="this.abilities" /> -->
+         <Items :champion-data="championData" :patch="store.patches[0]" />
+         <Runes :champion-data="championData" />
+         <StartingSpells :champion-data="championData" />
       </div>
    </div>
 </template>

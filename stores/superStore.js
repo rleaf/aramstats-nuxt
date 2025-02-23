@@ -44,14 +44,14 @@ export const superStore = defineStore('super', {
       }
    },
    actions: {
-      // Items
+      /*  
+         Get data dragon item data. Make sure to call patches prior since I'm not checking it here.
+      */
       async initItems() {
          if (this.items) return
-         if (!this.patches) await this.initPatches()
          try {
             const url = `https://ddragon.leagueoflegends.com/cdn/${this.patches[0]}/data/en_US/item.json`;
-            this.items = (await useFetch(url)).data
-            this.items = this.items.data // reactivity funk
+            ({ data: this.items } = await useFetch(url).then(res => res.data.value))
          } catch (e) {
             if (e instanceof Error) console.log(e)
          }
@@ -69,33 +69,33 @@ export const superStore = defineStore('super', {
          }
       },
 
-      async getDataDragonChampion(champ) {
-         if (this.championCDN) return
-         if (!this.patches) await this.initPatches()
+      /* 
+         Fired after initPatches is called. Dont need conditional check because needs to be refreshed when clicking between champs.
+      */
+      async getChampionDragon(champ) {
          try {
             const url = `https://cdn.communitydragon.org/${this.patches[0]}/champion/${champ}/data.json`;
             ({ data: this.championCDN } = await useFetch(url))
          } catch (e) {
             if (e instanceof Error) console.log(e)
          }
-         // return this.championCDN
       },
 
       async initPatches() {
-         if (!this.patches) {
-            try {
-               const url = 'https://ddragon.leagueoflegends.com/api/versions.json'
-               this.patches = (await $fetch(url)).slice(0, 5)
-            } catch (e) {
-               if (e instanceof Error) console.log(e)
-            }
+         if (this.patches) return
+         try {
+            const url = 'https://ddragon.leagueoflegends.com/api/versions.json';
+            this.patches = await useFetch(url).then(res => res.data.value.slice(0, 5))
+         } catch (e) {
+            if (e instanceof Error) console.log(e)
          }
       },
 
-      // Runes
+      /* 
+         Fired after initPatches is called.
+      */
       async initRunes() {
          if (this.runes) return
-         if (!this.patches) await this.initPatches()
          try {
             // const url = `https://ddragon.leagueoflegends.com/cdn/${this.patches[0]}/data/en_US/runesReforged.json`
             const url = `https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/perks.json`;
