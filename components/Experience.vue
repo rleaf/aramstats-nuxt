@@ -2,6 +2,9 @@
 import { useTemplateRef, onMounted, onBeforeMount } from 'vue'
 import Experience from '~/experience/Experience'
 
+let experience
+const ref = useTemplateRef('check')
+
 onBeforeMount(() => {
    if (!localStorage.getItem('experience')) {
       localStorage.setItem('experience', 1)
@@ -11,11 +14,11 @@ onBeforeMount(() => {
 onMounted(() => {
    if (+localStorage.getItem('experience') === 1) {
       experience = new Experience(document.querySelector('.webgl'), false)
+   } else {
+      ref.value.setAttribute('checked', '')
    }
 })
 
-let experience
-const ref = useTemplateRef('check')
 
 function toggleExperience() {
    if (+localStorage.getItem('experience') === 1) {

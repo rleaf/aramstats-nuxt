@@ -8,13 +8,13 @@ const championsRef = useTemplateRef('champions')
 const filteredChamps = useChampionFilter(step, input)
 
 onBeforeMount(() => {
+   if (localStorage.getItem('region')) region.value = localStorage.getItem('region')
    if (!localStorage.getItem('experience')) {
       localStorage.setItem('experience', 1)
    }
 })
 
 onMounted(() => {
-   localStorage.setItem('region', 'na')
    window.addEventListener('keydown', eventHandler)
 })
 
