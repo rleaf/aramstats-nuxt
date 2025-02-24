@@ -1,6 +1,5 @@
 <script setup>
 import about from '@/constants/about'
-
 </script>
 
 <template>

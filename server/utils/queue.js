@@ -1,7 +1,16 @@
 import mongodb from 'mongodb'
 
+let instance = null
+
 export class Queue {
    constructor() {
+
+      if (instance) {
+         return instance
+      }
+
+      instance = this
+
       this.name = 'queue'
       this.inactiveRegions = new Set([
          'na',
