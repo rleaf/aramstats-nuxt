@@ -1,6 +1,6 @@
 // const mongoose = require("mongoose")
 import mongoose from 'mongoose'
-import { championEmbedSchema } from './championEmbed_schema'
+import { championEmbedSchema } from './championEmbedSchema'
 
 const challengeSchema = new mongoose.Schema({
    _id: false,
@@ -30,4 +30,4 @@ const summonerSchema = new mongoose.Schema({
    championData: [championEmbedSchema]
 }, { versionKey: false })
 
-export const SummonerModel = mongoose.model('test_summoners', summonerSchema)
+export const SummonerModel = mongoose.model('nuxt_test_summoners', summonerSchema)

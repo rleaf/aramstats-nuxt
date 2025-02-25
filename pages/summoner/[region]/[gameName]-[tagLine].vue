@@ -10,7 +10,7 @@ const { data: summonerData, status, error } = await useFetch(`/api/summoner/${ro
 //    }
 // })
 async function queueSummoner() {
-   await $fetch(`/api/summoner/queue`, {
+   await $fetch(`/api/summoner/queueSummoner`, {
       method: 'POST',
       body: {
          region: route.params.region,
@@ -27,13 +27,19 @@ async function queueSummoner() {
       <button @click="queueSummoner()">
          Queue Test
       </button>
+      {{ summonerData, 'yerr' }}
       <div v-if="status === 'success'">
+         <!-- Summoner SUCCESS -->
          {{ summonerData.gameName }}
          {{ summonerData.tagLine }}
          {{ summonerData.region }}
-         
       </div>
-      <div v-else>
+      <!-- <div v-else-if="">
+         {{ summonerData, 'toads' }}
+         
+      </div> -->
+      <div v-if="status === 'error'">
+         <!-- Summoner DNE -->
          <h1>Summoner</h1>
          {{ status, 'status' }}
          {{ error, 'error' }}

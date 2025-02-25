@@ -1,4 +1,4 @@
-const mongoose = require("mongoose")
+import mongoose from 'mongoose'
 
 /* 
    Match-level data for each champion for every summoner. 
@@ -39,4 +39,4 @@ const summonerMatchesSchema = new mongoose.Schema({
    tId: Number,         // teamId
 })
 
-export const SummonerMatchesModel = mongoose.model('test_summoner_summoners', summonerMatchesSchema)
+export const SummonerMatchesModel = mongoose.model('nuxt_summoner_matches', summonerMatchesSchema)

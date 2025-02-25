@@ -1,5 +1,5 @@
 import { MongoClient } from 'mongodb'
-import { SummonerModel } from "~/server/models/summoner_model"
+import { SummonerModel } from "~/server/models/summonerModel"
 
 export const utilLoadChampionCollection = async (patch) => {
       const db = generateConnections()

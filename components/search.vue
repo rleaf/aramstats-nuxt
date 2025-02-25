@@ -7,14 +7,11 @@ const inputRef = useTemplateRef('inputBind')
 const championsRef = useTemplateRef('champions')
 const filteredChamps = useChampionFilter(step, input)
 
-onBeforeMount(() => {
+onMounted(() => {
    if (localStorage.getItem('region')) region.value = localStorage.getItem('region')
    if (!localStorage.getItem('experience')) {
       localStorage.setItem('experience', 1)
    }
-})
-
-onMounted(() => {
    window.addEventListener('keydown', eventHandler)
 })
 
@@ -115,7 +112,7 @@ function eventHandler(e) {
             </span>
             <div class="shadow" v-show="input && region !== 'RG' && !input.includes('#')">
                <p>{{ `${input}` }}</p>
-               <p>#{{ store.searchRegions[region] }}</p>
+               <p>{{ `#${store.searchRegions[region]}` }}</p>
             </div>
          </div>
          <select ref="regionButton" v-model="region" @change="regionSelect()">

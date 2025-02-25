@@ -1,5 +1,5 @@
-import { SummonerModel } from "../models/summoner_model"
-import { SummonerMatchesModel } from "../models/summonerMatches_model"
+import { SummonerModel } from "../models/summonerModel"
+import { SummonerMatchesModel } from "../models/summonerMatchesModel"
 
 export async function getSummonerStatus(gameName, tagLine, region) {
    let summoner
@@ -7,11 +7,10 @@ export async function getSummonerStatus(gameName, tagLine, region) {
       summoner = await findSummoner(gameName, tagLine, region)
    } catch (e) {
       throw e
-      throw (e.status === 404) ? config.SUMMONER_DNE : e.body.status.message
+      throw (e.status === 404) ? config.SUMMONER_DNE.code : e.body.status.message
    }
-   // console.log(summoner)
    summoner = await SummonerModel.findById(summoner.puuid, { _id: 1, parse: 1 })
-   return summoner || config.SUMMONER_UNPARSED
+   return summoner || { parse: { status: config.STATUS_UNPARSED.code}}
 }
 
 export async function findSummoner(gameName, tagLine, region) {
@@ -21,7 +20,6 @@ export async function findSummoner(gameName, tagLine, region) {
 
       return { ...riotId, ...summoner, region: region }
    } catch (e) {
-      // console.log(e.status, 'YERR2')
       if (e instanceof Error) throw e
    }
 }
@@ -41,7 +39,7 @@ export async function findSummoner(gameName, tagLine, region) {
 //    summoner = await summonerModel.findById(summoner.puuid)
 
 //    util.deleteSummoner(summoner)
-//    res.status(200).send(config.SUMMONER_DELETED)
+//    res.status(200).send(config.SUMMONER_DELETED.code)
 // }
 
 export async function initialParse(summonerDoc, updateMatchlist) {
@@ -55,7 +53,7 @@ export async function initialParse(summonerDoc, updateMatchlist) {
    ])
    summonerDoc.challenges = challenges
    summonerDoc.parse.total = matchlist.length
-   summonerDoc.parse.status = config.STATUS_PARSING
+   summonerDoc.parse.status = config.STATUS_PARSING.code
    await summonerDoc.save()
 
    for (let i = 0; i < matchlist.length; i += 50) {
@@ -283,7 +281,7 @@ async function parseMatchlist(summonerDocument, match, timeline, items) {
    return player.championId
 }
 
-parseTimeline(timeline, playerIndex, playerTeam, items) {
+function parseTimeline(timeline, playerIndex, playerTeam, items) {
    const CONTIGUITY = 5000
    const AVG_TEAMFIGHT_DISTANCE = 1300
    const BUILDING_KILL_WINDOW = 30000
@@ -522,7 +520,7 @@ async function computeChampionAverages(summonerDocument, championIds) {
       if (championIds) champion.avg = proxy
    }
 
-   summonerDocument.parse.status = config.STATUS_COMPLETE
+   summonerDocument.parse.status = config.STATUS_COMPLETE.code
    summonerDocument.updated = Date.now()
    await summonerDocument.save()
 }

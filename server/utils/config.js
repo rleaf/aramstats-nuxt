@@ -15,15 +15,17 @@ class Config {
    CHAMPION_PREFIX = `${this.prefix}/champion/:champion`
    CHAMPIONS_LIST_PREFIX = `${this.prefix}/championsList` // change to 'tier'? more catchy?
 
-   STATUS_COMPLETE = 'Complete'
-   STATUS_PARSING = 'Parsing summoner...'
-   STATUS_CHAMPION_AVERAGES = 'Computing champion averages...'
-   STATUS_IN_QUEUE = 'In queue...'
+   /* Statuses */
+   STATUS_COMPLETE = { code: 1, msg: 'Complete'}
+   STATUS_UNPARSED = { code: 2, msg: 'Summoner is not parsed.'}
+   STATUS_PARSING = { code: 3, msg: 'Parsing summoner...'}
+   STATUS_CHAMPION_AVERAGES = { code: 4, msg: 'Computing champion averages...'}
+   STATUS_DELETED = { code: 5, msg: 'Summoner deleted.'}
+   STATUS_IN_QUEUE = { code: 6, msg: 'In queue...'}
+   STATUS_DNE = { code: 7, msg: 'Summoner does not exist.'}
 
-   SUMMONER_DNE = 'Summoner does not exist.'
-   SUMMONER_UNPARSED = 'Summoner is not parsed.'
-   SUMMONER_DELETED = 'Summoner deleted.'
    API_KEY = 'Api key expired.'
+
 }
 
 export default new Config()

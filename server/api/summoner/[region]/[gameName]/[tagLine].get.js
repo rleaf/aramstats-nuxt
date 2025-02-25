@@ -10,38 +10,37 @@ export default defineEventHandler(async (e) => {
       summoner = await getSummonerStatus(routerParams.gameName, routerParams.tagLine, routerParams.region)
    } catch (e) {
       return createError({
-         status: e.status,
-         statusMessage: config.SUMMONER_DNE,
-         message: e.body.status.message
+         status: config.STATUS_DNE.code,
+         statusMessage: config.STATUS_DNE.msg,
       })
    }
 
    switch (summoner.parse.status) {
-      case config.STATUS_COMPLETE:
+      case config.STATUS_COMPLETE.code:
          console.log('SUMMONER FOUND')
-         return (await aggregateSummoner(summoner._id))[0]
+         return { status: config.STATUS_COMPLETE, body: (await aggregateSummoner(summoner._id))[0]}
+         // return (await aggregateSummoner(summoner._id))[0]
 
-      case config.STATUS_PARSING:
+      case config.STATUS_PARSING.code:
          if (queue.inactiveRegions.has(summoner.region)) {
             console.log('SUMMONER DELETED')
             // deleteSummoner(summoner)
             throw createError({
-               status: 404,
-               statusMessage: config.SUMMONER_DELETED
+               status: config.STATUS_DELETED.code,
+               statusMessage: config.STATUS_DELETED.msg
             })
          } else {
             console.log('SUMMONER PARSING')
             const queuePosition = await queue.check(summoner.puuid, summoner.region)
-            return { status: 200, body: {...summoner.parse, queuePosition} }
+            return { status: config.STATUS_PARSING, body: {...summoner.parse, queuePosition} }
             // return (queuePosition) ? { status: config.STATUS_IN_QUEUE, body: queuePosition } : { parse: summoner.parse }
          }
 
-      case config.SUMMONER_UNPARSED:
-         return { status: 200, body: config.SUMMONER_UNPARSED }
+      case config.STATUS_UNPARSED.code:
+         return config.STATUS_UNPARSED
 
       default:
          throw createError({
-            status: 404,
             statusMessage: summoner.parse.status,
             message: 'Unknown status'
          })

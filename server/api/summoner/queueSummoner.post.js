@@ -1,4 +1,4 @@
-import { SummonerModel } from "~/server/models/summoner_model"
+import { SummonerModel } from "~/server/models/summonerModel"
 
 export default defineEventHandler(async (e) => {
    /* 
@@ -9,7 +9,7 @@ export default defineEventHandler(async (e) => {
    let summoner
 
    try {
-      await findSummoner(body.gameName, body.tagLine, body.region)
+      summoner = await findSummoner(body.gameName, body.tagLine, body.region)
    } catch(e) {
       if (e instanceof Error) {
          throw createError({
@@ -19,7 +19,7 @@ export default defineEventHandler(async (e) => {
       }
    }
 
-   return summoner
+   await workQueue(summoner)
    return 'toads'
 
 
