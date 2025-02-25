@@ -4,39 +4,40 @@ export default defineEventHandler(async (e) => {
    let summoner
    
    const routerParams = getRouterParams(e)
-   console.log(`[Searching] ${routerParams.gameName}#${routerParams.tagLine} (${routerParams.region})`)
+   console.log(`[Searching]: ${routerParams.gameName}#${routerParams.tagLine} (${routerParams.region})`)
 
    try {
       summoner = await getSummonerStatus(routerParams.gameName, routerParams.tagLine, routerParams.region)
    } catch (e) {
       return createError({
-         status: config.STATUS_DNE.code,
-         statusMessage: config.STATUS_DNE.msg,
+         status: e.status_code,
+         statusMessage: (e.status_code === 404) ? config.STATUS_DNE : e.message
       })
    }
 
    switch (summoner.parse.status) {
-      case config.STATUS_COMPLETE.code:
+      case config.STATUS_COMPLETE:
          console.log('SUMMONER FOUND')
-         return { status: config.STATUS_COMPLETE, body: (await aggregateSummoner(summoner._id))[0]}
+         return { status: config.STATUS_COMPLETE, data: (await aggregateSummoner(summoner._id))[0] }
          // return (await aggregateSummoner(summoner._id))[0]
 
-      case config.STATUS_PARSING.code:
+      case config.STATUS_PARSING:
          if (queue.inactiveRegions.has(summoner.region)) {
             console.log('SUMMONER DELETED')
             // deleteSummoner(summoner)
             throw createError({
-               status: config.STATUS_DELETED.code,
-               statusMessage: config.STATUS_DELETED.msg
+               status: 404,
+               statusMessage: config.STATUS_DELETED
             })
          } else {
-            console.log('SUMMONER PARSING')
+            console.log(`[In Queue]: ${summoner.gameName}#${summoner.tagLine} (${req.params.region})`)
             const queuePosition = await queue.check(summoner.puuid, summoner.region)
-            return { status: config.STATUS_PARSING, body: {...summoner.parse, queuePosition} }
+            workQueue(summoner)
+            return { status: config.STATUS_PARSING, data: {...summoner.parse, queuePosition} }
             // return (queuePosition) ? { status: config.STATUS_IN_QUEUE, body: queuePosition } : { parse: summoner.parse }
          }
 
-      case config.STATUS_UNPARSED.code:
+      case config.STATUS_UNPARSED:
          return config.STATUS_UNPARSED
 
       default:

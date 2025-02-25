@@ -1,5 +1,7 @@
 import { SummonerModel } from "~/server/models/summonerModel"
 
+const queue = new Queue()
+
 export default defineEventHandler(async (e) => {
    /* 
       User has requested a parse.
@@ -19,41 +21,28 @@ export default defineEventHandler(async (e) => {
       }
    }
 
+   try {
+      await queue.add(summoner.puuid, summoner.region)
+      await SummonerModel.create({
+         _id: summoner.puuid,
+         gameName: summoner.gameName,
+         tagLine: summoner.tagLine,
+         region: summoner.region,
+         level: summoner.summonerLevel,
+         profileIcon: summoner.profileIconId,
+         parse: { status: config.STATUS_IN_QUEUE },
+      })
+
+      console.log(`[+ Queue]: ${summoner.gameName}#${summoner.tagLine} (${summoner.region})`)
+   } catch (e) {
+      if (e.code === 11000 && e instanceof Error) { // dup key
+         throw createError({
+            status: e.code,
+            statusMessage: e.message
+         })
+      }
+   }
+
    await workQueue(summoner)
    return 'toads'
-
-
 })
-
-async function workQueue(summoner) {
-   /**
-    * Queue management that works via baton passing.
-    * Longterm, maybe more reliable to create a separate script that runs via cronjobs to ping the queue for a given region every ~minute. Can build this in python too.
-   */
-
-   const queue = new Queue()
-   if (queue.inactiveRegions.has(summoner.region)) {
-      let qSummoner = await queue.get(summoner.region)
-      let document
-
-      while (qSummoner) {
-         queue.inactiveRegions.delete(summoner.region)
-
-         try {
-            document = await SummonerModel.findOne({ '_id': qSummoner.qPuuid })
-            await queue.update(summoner.region)
-            await initialParse(document)
-            qSummoner = await queue.get(summoner.region)
-            if (qSummoner) document = await SummonerModel.findOne({ '_id': qSummoner.qPuuid })
-         } catch (e) {
-            qSummoner = await queue.get(summoner.region)
-            queue.inactiveRegions.add(summoner.region)
-            throw e
-            // console.log(e, 'rip bozo') // So I'm not scrolling for hours in prod
-         }
-      }
-
-      console.log(`(${summoner.region}) Queue complete.`)
-      queue.inactiveRegions.add(summoner.region)
-   }
-}

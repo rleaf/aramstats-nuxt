@@ -1,16 +1,17 @@
 import { SummonerModel } from "../models/summonerModel"
 import { SummonerMatchesModel } from "../models/summonerMatchesModel"
+import { PuuidModel } from "../models/puuidModel"
 
 export async function getSummonerStatus(gameName, tagLine, region) {
    let summoner
    try {
       summoner = await findSummoner(gameName, tagLine, region)
    } catch (e) {
-      throw e
-      throw (e.status === 404) ? config.SUMMONER_DNE.code : e.body.status.message
+      throw e.body.status
+      throw (e.status === 404) ? config.SUMMONER_DNE : e.body.status.message
    }
    summoner = await SummonerModel.findById(summoner.puuid, { _id: 1, parse: 1 })
-   return summoner || { parse: { status: config.STATUS_UNPARSED.code}}
+   return summoner || { parse: { status: config.STATUS_UNPARSED}}
 }
 
 export async function findSummoner(gameName, tagLine, region) {
@@ -39,7 +40,7 @@ export async function findSummoner(gameName, tagLine, region) {
 //    summoner = await summonerModel.findById(summoner.puuid)
 
 //    util.deleteSummoner(summoner)
-//    res.status(200).send(config.SUMMONER_DELETED.code)
+//    res.status(200).send(config.SUMMONER_DELETED)
 // }
 
 export async function initialParse(summonerDoc, updateMatchlist) {
@@ -53,7 +54,7 @@ export async function initialParse(summonerDoc, updateMatchlist) {
    ])
    summonerDoc.challenges = challenges
    summonerDoc.parse.total = matchlist.length
-   summonerDoc.parse.status = config.STATUS_PARSING.code
+   summonerDoc.parse.status = config.STATUS_PARSING
    await summonerDoc.save()
 
    for (let i = 0; i < matchlist.length; i += 50) {
@@ -272,7 +273,7 @@ async function parseMatchlist(summonerDocument, match, timeline, items) {
       }
    }
 
-   await puuidModel.bulkWrite(participantPuuids)
+   await PuuidModel.bulkWrite(participantPuuids)
       .catch(e => {
          throw e
       })
@@ -314,7 +315,7 @@ function parseTimeline(timeline, playerIndex, playerTeam, items) {
                timelineData.fs = 0
             }
 
-            if (items && this.isLegendary(e[j].itemId, items)) {
+            if (items && isLegendary(e[j].itemId, items)) {
                for (let i = 0; i < 6; i++) {
                   if (timelineData.ic[i] > 0) continue
                   timelineData.ic[i] = Math.round(e[j].timestamp / 600) / 100
@@ -332,7 +333,7 @@ function parseTimeline(timeline, playerIndex, playerTeam, items) {
          }
 
          if (e[j].timestamp - initTimestamp > CONTIGUITY) {
-            if (tfPrerequisite > 1 && bin.length > 3 && this.averageDistance(bin) < AVG_TEAMFIGHT_DISTANCE) {
+            if (tfPrerequisite > 1 && bin.length > 3 && averageDistance(bin) < AVG_TEAMFIGHT_DISTANCE) {
                teamfights.push(bin)
                capFlag = e[j].timestamp
             }
@@ -459,6 +460,38 @@ function getMatchItems(player) {
    return items
 }
 
+function isLegendary(id, items) {
+   /*
+      Legendary classification
+         - Item can't build into anything except an Ornn item (items >= 7000 or has requiredAlly: "ornn" in it) 
+         - Item cost >= 2000
+   */
+   // if (items[id].into.length !== 0 || items[id].into.length !== 1) return false
+
+   // if (items[id].gold.total >= 2000 && (!items[id].into || (items[id].into && items[items[id].into]) )) {
+   // console.log(items[3031])
+
+   if (items[id].gold.total >= 2000 && (!items[id].into || (items[id].into && items[id].into >= 7000))) {
+      return true
+   }
+
+   return false
+}
+
+function averageDistance(bin) {
+   bin = bin.map(x => ({ x: x.position.x, y: x.position.y }))
+
+   let arr = []
+   let avg
+   for (let i = 0; i < bin.length; i++) {
+      for (let j = i + 1; j < bin.length; j++) {
+         arr.push(Math.sqrt(Math.pow(bin[i].x - bin[j].x, 2) + Math.pow(bin[i].y - bin[j].y, 2)))
+      }
+   }
+   avg = arr.reduce((a, b) => a + b, 0) / arr.length
+   return avg
+}
+
 async function computeChampionAverages(summonerDocument, championIds) {
    for (const champion of summonerDocument.championData) {
       let proxy
@@ -489,7 +522,7 @@ async function computeChampionAverages(summonerDocument, championIds) {
          proxy = champion.avg
       }
 
-      const matches = await summonerMatchesModel.find({ '_id': { $in: champion.matches } })
+      const matches = await SummonerMatchesModel.find({ '_id': { $in: champion.matches } })
 
       for (const match of matches) {
          proxy.ahpm += Math.round(match.t.ah / match.gd)
@@ -520,7 +553,7 @@ async function computeChampionAverages(summonerDocument, championIds) {
       if (championIds) champion.avg = proxy
    }
 
-   summonerDocument.parse.status = config.STATUS_COMPLETE.code
+   summonerDocument.parse.status = config.STATUS_COMPLETE
    summonerDocument.updated = Date.now()
    await summonerDocument.save()
 }

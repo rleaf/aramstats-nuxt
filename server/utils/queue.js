@@ -1,4 +1,5 @@
 import mongodb from 'mongodb'
+import { SummonerModel } from '../models/summonerModel'
 
 let instance = null
 
@@ -29,6 +30,7 @@ export class Queue {
          'th',
          'sg',
          'ph',
+         'me'
       ])
       this.db = generateConnections()
       this.initCollection()
@@ -76,7 +78,8 @@ export class Queue {
             'tw': 0,
             'th': 0,
             'sg': 0,
-            'ph': 0
+            'ph': 0,
+            'me': 0,
          }
 
          this.metaCollection.insertOne(schema)
@@ -89,7 +92,8 @@ export class Queue {
    */
    async get(region) {
       try {
-         return (await this.collection.findOneAndDelete({ region: region }, { sort: { _id: 1 }, projection: { _id: 0, qPuuid: 1 } })).value
+         // return (await this.collection.findOneAndDelete({ region: region }, { sort: { _id: 1 }, projection: { _id: 0, qPuuid: 1 } })).value
+         return await this.collection.findOneAndDelete({ region: region }, { sort: { _id: 1 }, projection: { _id: 0, qPuuid: 1 } })
       } catch (e) {
          if (e instanceof mongodb.MongoServerError) throw e
       }
@@ -175,5 +179,38 @@ export class Queue {
       } catch (e) {
          if (e instanceof mongodb.MongoServerError) throw e
       }
+   }
+}
+
+export async function workQueue(summoner) {
+   /**
+    * Queue management that works via baton passing.
+    * Longterm, maybe more reliable to create a separate script that runs via cronjobs to ping the queue for a given region every ~minute. Can build this in python too.
+   */
+   const queue = new Queue()
+
+   if (queue.inactiveRegions.has(summoner.region)) {
+      let qSummoner = await queue.get(summoner.region)
+      let document
+      console.log(qSummoner, 'qSummoner')
+      while (qSummoner) {
+         queue.inactiveRegions.delete(summoner.region)
+
+         try {
+            document = await SummonerModel.findOne({ '_id': qSummoner.qPuuid })
+            await queue.update(summoner.region)
+            await initialParse(document)
+            qSummoner = await queue.get(summoner.region)
+            if (qSummoner) document = await SummonerModel.findOne({ '_id': qSummoner.qPuuid })
+         } catch (e) {
+            qSummoner = await queue.get(summoner.region)
+            queue.inactiveRegions.add(summoner.region)
+            throw e
+            // console.log(e, 'rip bozo') // So I'm not scrolling for hours in prod
+         }
+      }
+
+      console.log(`(${summoner.region}) Queue complete.`)
+      queue.inactiveRegions.add(summoner.region)
    }
 }
