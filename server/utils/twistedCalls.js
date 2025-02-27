@@ -1,6 +1,6 @@
 import { RegionGroups, Regions } from 'twisted/dist/constants'
 import twisted from 'twisted'
-import promiseRetry from 'promise-retry'
+// import promiseRetry from 'promise-retry'
 
 const lolApi = new twisted.LolApi()
 const riotApi = new twisted.RiotApi()
@@ -80,30 +80,30 @@ const REGION_GROUPS = {
 //    })
 // }
 
-/*
+/** 
 * Summoner info w/ account-v1
 * Tethered to AMERICAS region rn because closest to backend server. Can move if need to balance rate limits
+* @param gameName summoner name
+* @param tagLine summoner tagline
 */
 export const getAccount = async (gameName, tagLine) => {
-   return (await riotApi.Account.getByRiotId(gameName, tagLine, RegionGroups.AMERICAS).catch(e => { })).response
-   // return await retryWrapper(riotApi.Account.getByRiotId.bind(riotApi.Account), [gameName, tagLine, RegionGroups.AMERICAS])
-   //    .catch(e => { })
+   return (await riotApi.Account.getByRiotId(gameName, tagLine, RegionGroups.AMERICAS).catch(e => { throw e })).response
 }
 
-/* 
+/** 
 * Summoner info.
+* @param puuid summoner puuid
+* @param region summoner region
 */
 export const getSummoner = async (puuid, region) => {
-   return (await lolApi.Summoner.getByPUUID(puuid, REGION_CONSTANTS[region]).catch(e => { })).response
-   // return await retryWrapper(lolApi.Summoner.getByPUUID.bind(lolApi.Summoner), [puuid, REGION_CONSTANTS[region]])
-   //    .catch(e => { })
+   return (await lolApi.Summoner.getByPUUID(puuid, REGION_CONSTANTS[region]).catch(e => { throw e })).response
 }
 
 /* 
 * Variable match history for ARAM (450). Used for utility.
 */
 export const getSummonerMatches = async (puuid, region, start, count) => {
-   return await lolApi.MatchV5.list(puuid, REGION_GROUPS[region], { queue: 450, start: start, count: count })
+   return await lolApi.MatchV5.list('adskdf', REGION_GROUPS[region], { queue: 450, start: start, count: count })
       .catch(e => { })
    // return await retryWrapper(lolApi.MatchV5.list.bind(lolApi.MatchV5), [puuid, REGION_GROUPS[region], { queue: 450, start: start, count: count }])
    //    .catch(e => { })
@@ -117,7 +117,11 @@ export const getAllSummonerMatches = async (puuid, region, lastMatchId) => {
    let stop = true
 
    for (let i = 0; stop; i+=100) {
-      let pull = await retryWrapper(lolApi.MatchV5.list.bind(lolApi.MatchV5), [puuid, REGION_GROUPS[region], { queue: 450, start: i, count: 100 }])
+      let pull = (await lolApi.MatchV5.list(puuid, REGION_GROUPS[region], { queue: 450, start: i, count: 100 })
+         .catch(e => { 
+            // maybe do something here?
+          })).response
+      // let pull = await retryWrapper(lolApi.MatchV5.list.bind(lolApi.MatchV5), [puuid, REGION_GROUPS[region], { queue: 450, start: i, count: 100 }])
       if (lastMatchId && pull.includes(lastMatchId)) {
          pull = pull.slice(0, pull.indexOf(lastMatchId))
          stop = false
@@ -166,8 +170,8 @@ export const getAllSummonerMatches = async (puuid, region, lastMatchId) => {
 * Match info.
 */
 export const getMatchInfo = async (matchId, region) => {
-   return await lolApi.MatchV5.get(matchId, REGION_GROUPS[region])
-      .catch(e => { })
+   return (await lolApi.MatchV5.get(matchId, REGION_GROUPS[region])
+      .catch(e => { })).response
    // return await retryWrapper(lolApi.MatchV5.get.bind(lolApi.MatchV5), [matchId, REGION_GROUPS[region]])
    //    .catch(e => { })
 }
@@ -177,10 +181,8 @@ export const getMatchInfo = async (matchId, region) => {
 */
 export const getBatchedMatchInfo = async (matchlist, region) => {
    return await Promise.all(matchlist.map(async matchId => {
-      return await lolApi.MatchV5.get(matchId, REGION_GROUPS[region])
-         .catch(e => {})
-      // return await axiosRetryWrapper(lolApi.MatchV5.get.bind(lolApi.MatchV5), [matchId, REGION_GROUPS[region]])
-      //    .catch(e => {})
+      return (await lolApi.MatchV5.get(matchId, REGION_GROUPS[region])
+         .catch(e => { console.log(e.status, e.message, e.body, 'getBatchedMatchInfo @@') })).response
    }))
 }
 
@@ -189,10 +191,8 @@ export const getBatchedMatchInfo = async (matchlist, region) => {
 */
 export const getBatchedTimelineInfo = async (matchlist, region) => {
    return await Promise.all(matchlist.map(async matchId => {
-      return await lolApi.MatchV5.timeline(matchId, REGION_GROUPS[region])
-         .catch(e => {})
-      // return await axiosRetryWrapper(lolApi.MatchV5.timeline.bind(lolApi.MatchV5), [matchId, REGION_GROUPS[region]])
-      //    .catch(e => {})
+      return (await lolApi.MatchV5.timeline(matchId, REGION_GROUPS[region])
+         .catch(e => { console.log(e.status, e.message, e.body, 'getBatchedTimelineInfo @@') })).response
    }))
 }
 
@@ -200,14 +200,14 @@ export const getBatchedTimelineInfo = async (matchlist, region) => {
 * Match timeline info.
 */
 export const getMatchTimeline = async (matchId, region) => {
-   return await lolApi.MatchV5.timeline(matchId, REGION_GROUPS[region])
-      .catch(e => { })
+   return (await lolApi.MatchV5.timeline(matchId, REGION_GROUPS[region])
+      .catch(e => { })).response
 }
 
 /* 
 * Player Challenges.
 */
 export const getPlayerChallenges = async (puuid, region) => {
-   return await lolApi.Challenges.PlayerChallenges(puuid, REGION_CONSTANTS[region])
-      .catch(e => { })
+   return (await lolApi.Challenges.PlayerChallenges(puuid, REGION_CONSTANTS[region])
+      .catch(e => { })).response
 }

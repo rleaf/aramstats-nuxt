@@ -1,3 +1,4 @@
+import { deleteSummoner } from "~/server/utils/ratsNest"
 
 export default defineEventHandler(async (e) => {
    const queue = new Queue()
@@ -10,12 +11,10 @@ export default defineEventHandler(async (e) => {
       summoner = await getSummonerStatus(routerParams.gameName, routerParams.tagLine, routerParams.region)
    } catch (e) {
       return createError({
-         status: e.status_code,
-         statusMessage: (e.status_code === 404) ? config.STATUS_DNE : e.message
+         status: e.status,
+         statusMessage: (e.status === 404) ? config.STATUS_DNE : e.message
       })
    }
-
-   console.log(turkey, 'turkeys')
 
    switch (summoner.parse.status) {
       case config.STATUS_COMPLETE:
@@ -26,7 +25,7 @@ export default defineEventHandler(async (e) => {
       case config.STATUS_PARSING:
          if (queue.inactiveRegions.has(routerParams.region)) {
             console.log('SUMMONER DELETED')
-            // deleteSummoner(summoner)
+            await deleteSummoner(summoner._id)
             throw createError({
                status: 404,
                statusMessage: config.STATUS_DELETED

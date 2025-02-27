@@ -12,36 +12,34 @@ export async function getSummonerStatus(gameName, tagLine, region) {
          parse: 1
       })
       
-   } catch (e) {
-      console.log(e, 'Error @ getSummonerStatus')
-   }
+   } catch (e) { }
    return summoner || { parse: { status: config.STATUS_UNPARSED}}
 }
 
 export async function findSummoner(gameName, tagLine, region) {
    const riotId = await getAccount(gameName, tagLine)
    const summoner = await getSummoner(riotId.puuid, region)
-
+   
    return { ...riotId, ...summoner, region: region }
 }
 
-// export async function deleteSummoner(req, res) {
-//    console.log(`Deleting: ${req.params.gameName}#${req.params.tagLine} (${req.params.region})`)
-//    let summoner
+export async function deleteSummoner(puuid) {
+   const summoner = await SummonerModel.findById(puuid)
+   let bin = []
 
-//    try {
-//       summoner = await util.findSummoner(req.params.gameName, req.params.tagLine, req.params.region)
-//    } catch (e) {
-//       if (e.status_code < 500) {
-//          throw e
-//       }
-//    }
+   for (const data of summoner.championData) {
+      for (const match of data.matches) {
+         bin.push({
+            deleteOne: { filter: { _id: match } }
+         })
+      }
+   }
 
-//    summoner = await summonerModel.findById(summoner.puuid)
 
-//    util.deleteSummoner(summoner)
-//    res.status(200).send(config.SUMMONER_DELETED)
-// }
+   await SummonerMatchesModel.bulkWrite(bin)
+   await SummonerModel.deleteOne({ _id: summoner._id })
+   console.log('delete successful')
+}
 
 export async function initialParse(summonerDoc, updateMatchlist) {
    let updatedChampions
@@ -59,6 +57,8 @@ export async function initialParse(summonerDoc, updateMatchlist) {
    for (let i = 0; i < matchlist.length; i += 50) {
       console.log(`${summonerDoc.gameName} i: ${i}`)
       const matches = await getBatchedMatchInfo(matchlist.slice(i, i + 50), summonerDoc.region)
+      console.log(matches, 'matches @ initialParse')
+      console.log(turkey)
       const timelines = await getBatchedTimelineInfo(matchlist.slice(i, i + 50), summonerDoc.region)
       const zip = matches.map((x, i) => [(x) ? x : undefined, (timelines[i]) ? timelines[i] : undefined])
       
