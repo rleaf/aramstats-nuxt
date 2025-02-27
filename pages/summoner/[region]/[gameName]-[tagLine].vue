@@ -1,7 +1,7 @@
 <script setup>
 const route = useRoute()
 
-const { data: summonerData, status, error } = await useFetch(`/api/summoner/${route.params.region}/${route.params.gameName}/${route.params.tagLine}`)
+const { data: res, error} = await useFetch(`/api/summoner/${route.params.region}/${route.params.gameName}/${route.params.tagLine}`)
 
 async function queueSummoner() {
    await $fetch(`/api/summoner/queueSummoner`, {
@@ -14,6 +14,7 @@ async function queueSummoner() {
       
    })
 }
+
 </script>
 
 <template>
@@ -21,23 +22,22 @@ async function queueSummoner() {
       <button @click="queueSummoner()">
          Queue Test
       </button>
-      {{ summonerData, 'yerr' }}
-      <div v-if="status === 'success'">
-         <!-- Summoner SUCCESS -->
-         {{ summonerData.gameName }}
-         {{ summonerData.tagLine }}
-         {{ summonerData.region }}
-      </div>
-      <!-- <div v-else-if="">
-         {{ summonerData, 'toads' }}
+      <br>
+      <div v-if="res">
          
-      </div> -->
-      <div v-if="status === 'error'">
-         <!-- Summoner DNE -->
-         <h1>Summoner</h1>
-         {{ status, 'status' }}
-         {{ error, 'error' }}
+         {{ res.data.gameName }}
+         {{ res.data.tagLine }}
+         {{ res.data.region }}
+      </div>
 
+      <div v-if="error">
+         <!-- Summoner DNE -->
+         {{ error }}
+         <br>
+         {{ error.statusCode }} code
+         <br>
+         {{ error.statusMessage }} statusMessage
+         <br>
       </div>
    </div>
 </template>

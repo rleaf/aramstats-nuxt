@@ -15,13 +15,15 @@ class Config {
    CHAMPION_PREFIX = `${this.prefix}/champion/:champion`
    CHAMPIONS_LIST_PREFIX = `${this.prefix}/championsList` // change to 'tier'? more catchy?
    
-   STATUS_COMPLETE = 'Complete'
-   STATUS_UNPARSED = 'Unparsed'
-   STATUS_PARSING = 'Parsing'
-   STATUS_CHAMPION_AVERAGES = 'Averages'
-   STATUS_DELETED = 'Deleted.'
-   STATUS_IN_QUEUE = 'Queue'
-   STATUS_DNE = 'DNE'
+   status = {
+      COMPLETE: 'Complete',
+      UNPARSED: 'Unparsed',
+      PARSING: 'Parsing',
+      AVERAGES: 'Averages',
+      DELETED: 'Deleted',
+      IN_QUEUE: 'Queue',
+      DNE: 'DNE'
+   }
    
    API_KEY = 'Api key expired.'
 }
