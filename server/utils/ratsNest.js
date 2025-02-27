@@ -1,28 +1,28 @@
 import { SummonerModel } from "../models/summonerModel"
 import { SummonerMatchesModel } from "../models/summonerMatchesModel"
 import { PuuidModel } from "../models/puuidModel"
+import { getPlayerChallenges } from "./twistedCalls"
 
 export async function getSummonerStatus(gameName, tagLine, region) {
-   let summoner
+   let summoner = await findSummoner(gameName, tagLine, region)
+   if (!summoner.puuid) throw { status_code: 404 }
    try {
-      summoner = await findSummoner(gameName, tagLine, region)
+      summoner = await SummonerModel.findById(summoner.puuid, {
+         _id: 1, 
+         parse: 1
+      })
+      
    } catch (e) {
-      throw e.body.status
-      throw (e.status === 404) ? config.SUMMONER_DNE : e.body.status.message
+      console.log(e, 'Error @ getSummonerStatus')
    }
-   summoner = await SummonerModel.findById(summoner.puuid, { _id: 1, parse: 1 })
    return summoner || { parse: { status: config.STATUS_UNPARSED}}
 }
 
 export async function findSummoner(gameName, tagLine, region) {
-   try {
-      const riotId = await getAccount(gameName, tagLine)
-      const summoner = await getSummoner(riotId.puuid, region)
+   const riotId = await getAccount(gameName, tagLine)
+   const summoner = await getSummoner(riotId.puuid, region)
 
-      return { ...riotId, ...summoner, region: region }
-   } catch (e) {
-      if (e instanceof Error) throw e
-   }
+   return { ...riotId, ...summoner, region: region }
 }
 
 // export async function deleteSummoner(req, res) {
@@ -56,12 +56,12 @@ export async function initialParse(summonerDoc, updateMatchlist) {
    summonerDoc.parse.total = matchlist.length
    summonerDoc.parse.status = config.STATUS_PARSING
    await summonerDoc.save()
-
    for (let i = 0; i < matchlist.length; i += 50) {
+      console.log(`${summonerDoc.gameName} i: ${i}`)
       const matches = await getBatchedMatchInfo(matchlist.slice(i, i + 50), summonerDoc.region)
       const timelines = await getBatchedTimelineInfo(matchlist.slice(i, i + 50), summonerDoc.region)
       const zip = matches.map((x, i) => [(x) ? x : undefined, (timelines[i]) ? timelines[i] : undefined])
-
+      
       for (let j = 0; j < zip.length; j++) {
          // ARAM Remake window is 3 min. Make it +30s in case someone someone takes a long time to vote.
          if (!zip[j][0] || zip[j][0].info.gameDuration < 210) continue
@@ -129,7 +129,7 @@ const challengeIds = [
 ]
 
 async function challengeScribe(puuid, region) {
-   const challengesDto = await playerChallenges(puuid, region)
+   const challengesDto = await getPlayerChallenges(puuid, region)
    const challenges = challengesDto.challenges.filter(el => challengeIds.includes(el.challengeId))
 
    return challenges

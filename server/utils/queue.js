@@ -190,11 +190,11 @@ export async function workQueue(summoner) {
    const queue = new Queue()
 
    if (queue.inactiveRegions.has(summoner.region)) {
+      queue.inactiveRegions.delete(summoner.region)
       let qSummoner = await queue.get(summoner.region)
       let document
-      console.log(qSummoner, 'qSummoner')
+      
       while (qSummoner) {
-         queue.inactiveRegions.delete(summoner.region)
 
          try {
             document = await SummonerModel.findOne({ '_id': qSummoner.qPuuid })

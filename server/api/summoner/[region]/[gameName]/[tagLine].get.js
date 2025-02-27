@@ -15,6 +15,8 @@ export default defineEventHandler(async (e) => {
       })
    }
 
+   console.log(turkey, 'turkeys')
+
    switch (summoner.parse.status) {
       case config.STATUS_COMPLETE:
          console.log('SUMMONER FOUND')
@@ -22,7 +24,7 @@ export default defineEventHandler(async (e) => {
          // return (await aggregateSummoner(summoner._id))[0]
 
       case config.STATUS_PARSING:
-         if (queue.inactiveRegions.has(summoner.region)) {
+         if (queue.inactiveRegions.has(routerParams.region)) {
             console.log('SUMMONER DELETED')
             // deleteSummoner(summoner)
             throw createError({
@@ -30,8 +32,9 @@ export default defineEventHandler(async (e) => {
                statusMessage: config.STATUS_DELETED
             })
          } else {
-            console.log(`[In Queue]: ${summoner.gameName}#${summoner.tagLine} (${req.params.region})`)
-            const queuePosition = await queue.check(summoner.puuid, summoner.region)
+            console.log(summoner, 'yer')
+            console.log(`[In Queue]: ${routerParams.gameName}#${routerParams.tagLine} (${routerParams.region})`)
+            const queuePosition = await queue.check(summoner.puuid, routerParams.region)
             workQueue(summoner)
             return { status: config.STATUS_PARSING, data: {...summoner.parse, queuePosition} }
             // return (queuePosition) ? { status: config.STATUS_IN_QUEUE, body: queuePosition } : { parse: summoner.parse }

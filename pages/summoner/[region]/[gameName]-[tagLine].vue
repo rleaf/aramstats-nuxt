@@ -2,13 +2,7 @@
 const route = useRoute()
 
 const { data: summonerData, status, error } = await useFetch(`/api/summoner/${route.params.region}/${route.params.gameName}/${route.params.tagLine}`)
-// const { data: checkSummoner, status, error } = await useFetch(`/api/summoner/check`, {
-//    params: {
-//       region: route.params.region,
-//       gameName: route.params.gameName,
-//       tagLine: route.params.tagLine
-//    }
-// })
+
 async function queueSummoner() {
    await $fetch(`/api/summoner/queueSummoner`, {
       method: 'POST',
