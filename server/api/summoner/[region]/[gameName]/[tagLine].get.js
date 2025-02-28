@@ -6,7 +6,6 @@ export default defineEventHandler(async (e) => {
    
    const routerParams = getRouterParams(e)
    console.log(`[Searching]: ${routerParams.gameName}#${routerParams.tagLine} (${routerParams.region})`)
-
    try {
       summoner = await getSummonerStatus(routerParams.gameName, routerParams.tagLine, routerParams.region)
    } catch (e) {

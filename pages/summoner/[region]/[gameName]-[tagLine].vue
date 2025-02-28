@@ -1,7 +1,7 @@
 <script setup>
 const route = useRoute()
 
-const { data: res, error} = await useFetch(`/api/summoner/${route.params.region}/${route.params.gameName}/${route.params.tagLine}`)
+const { data: res, error } = await useFetch(`/api/summoner/${route.params.region}/${route.params.gameName}/${route.params.tagLine}`)
 
 async function queueSummoner() {
    await $fetch(`/api/summoner/queueSummoner`, {
@@ -22,12 +22,12 @@ async function queueSummoner() {
       <button @click="queueSummoner()">
          Queue Test
       </button>
-      <br>
-      <div v-if="res">
-         
-         {{ res.data.gameName }}
-         {{ res.data.tagLine }}
-         {{ res.data.region }}
+   <br>
+   <div v-if="res">
+      <!-- {{ res.data.gameName }}
+      {{ res.data.tagLine }}
+         {{ res.data.region }} -->
+         <UserReady :data="res.data" />
       </div>
 
       <div v-if="error">
