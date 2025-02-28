@@ -32,14 +32,14 @@ export async function aggregateSummoner(puuid) {
             { $unwind: "$championData" },
             {
                   $lookup: {
-                        from: "test_summoner_matches",
+                        from: "nuxt_summoner_matches",
                         localField: "championData.matches",
                         foreignField: "_id",
                         as: "championData.matches",
                         pipeline: [ // For Encounters.vue
                               {
                                     $lookup: {
-                                          from: "test_summoner_puuids",
+                                          from: "nuxt_summoner_puuids",
                                           localField: "te",
                                           foreignField: "_id",
                                           as: "te",
@@ -54,7 +54,7 @@ export async function aggregateSummoner(puuid) {
                               },
                               {
                                     $lookup: {
-                                          from: "test_summoner_puuids",
+                                          from: "nuxt_summoner_puuids",
                                           localField: "ee",
                                           foreignField: "_id",
                                           as: "ee",

@@ -128,7 +128,7 @@ const challengeIds = [
    101202, // It was a... Near-Hit
 ]
 
-async function challengeScribe(puuid, region) {
+export async function challengeScribe(puuid, region) {
    const challengesDto = await getPlayerChallenges(puuid, region)
    const challenges = challengesDto.challenges.filter(el => challengeIds.includes(el.challengeId))
 

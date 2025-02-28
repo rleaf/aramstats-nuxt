@@ -61,11 +61,11 @@ function winrate(total, win) {
    return (win / total * 100)
 }
    
-const getItemName = computed(() => {
-   if (itemData.value && item.value) {
-      return itemData.value[item.value].name
-   }
-})
+// const getItemName = computed(() => {
+//    if (itemData.value && item.value) {
+//       return itemData.value[item.value].name
+//    }
+// })
 </script>
 
 <template>

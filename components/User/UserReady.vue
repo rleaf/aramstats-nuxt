@@ -1,21 +1,12 @@
 <script setup>
-// import axios from 'axios'
-// import RadarChart from '../RadarChart.vue'
-// import UXTooltip from '@/components/UXTooltip.vue'
 // import Champion from '../Champion.vue'
-// import Heatmap from '../Heatmap.vue'
-// import StatDropdown from '../StatDropdown.vue'
-// import ImageStatDropdown from '../ImageStatDropdown.vue'
-// import Challenges from '../Challenges.vue'
-// import Encounters from '../Encounters.vue'
-// import champions from '@/constants/champions.js'
-// import { summonerStore } from '@/stores/summonerStore'
-// import { superStore } from '../../stores/superStore'
+import { championNames } from '~/constants/championNames'
 import { superStore } from '@/stores/superStore'
 import { summonerStore } from '@/stores/summonerStore'
 
 const store = superStore()                   // Store for global settings
 const summStore = summonerStore()            // Store for summoner settings
+const route = useRoute()
 const props = defineProps(['data']) 
 const { data } = toRefs(props)               // Proxy data so it can mutate on Update click
 const championFilter = ref('')               // Filter for table champion search
@@ -28,14 +19,12 @@ const statsSelection = ref('Champion Stats') // Stats window to be rendered on l
 const update = ref(false)                    // Bool to help UX for update button
 const updateKey = ref(0)                     // For re-rendering post summoner update                       
 
-const header = useTemplateRef('header')
 const updateButton = useTemplateRef('updateButton')
 const championSearch = useTemplateRef('championSearch')
 
 await store.initPatches()
 
 onMounted(() => {
-   console.log(data.value, 'potatos')
    document.title = `${data.gameName} | ARAM Stats`
    window.addEventListener('keypress', championSearchFocus)
 })
@@ -45,137 +34,139 @@ onBeforeUnmount(() => {
 })
 
 function headerSort(i) {
-   (sortFilter === i) ? descending = !descending : sortFilter = i
-   sortMod = false
+   (sortFilter.value === i) ? descending.value = !descending.value : sortFilter.value = i
+   sortMod.value = false
 }
 
 function championSearchFocus(e) {
-   if (e.key !== 's' || document.activeElement === $refs.championSearch || superStore.focus || superStore.navContainerFocus) return
+   if (e.key !== 's' || document.activeElement === championSearch.value || superStore.focus || superStore.navContainerFocus) return
 
    e.preventDefault()
-   $refs.championSearch.focus()
+   championSearch.value.focus()
 }
 
 function toggleAll() {
-   toggleState = !toggleState
+   toggleState.value = !toggleState.value
 
-   if (toggleState) {
+   if (toggleState.value) {
       for (const c of data.value.championData) {
-         summonerStore.championPool.add(c.championId)
+         summStore.championPool.add(c.championId)
       }
    } else {
-      summonerStore.championPool.clear()
+      summStore.championPool.clear()
    }
 
 }
 
 function sort(idx) {
-   if (idx === sortFilter) {
-      (descending) ? sortFilter = null : descending = true
+   if (idx === sortFilter.value) {
+      (descending.value) ? sortFilter.value = null : descending.value = true
 
    } else {
-      sortFilter = idx
-      descending = false
+      sortFilter.value = idx
+      descending.value = false
    }
 }
 
 async function updateProfile() {
-   const url = `/api/update/${$route.params.region}/${$route.params.gameName}/${$route.params.tagLine}`
-   let res
+   // update.value = true
+   updateButton.value.innerHTML = 'Updating...'
 
-   update = true
-   $refs.updateButton.innerHTML = 'Updating...'
-
-   try {
-      res = await axios.get(url)
-   } catch (e) {
-      console.log(e, 'updateProfile error')
-   }
-
-   update = false
-   $refs.updateButton.innerHTML = 'Update'
+   const { data, status } = await $fetch('/api/summoner/update', {
+      method: 'PUT',
+      params: {
+         region: route.params.region,
+         gameName: route.params.gameName,
+         tagLine: route.params.tagLine
+      }
+   })
 
 
-   if (res.status === 200) {
-      data = res.data
+   update.value = false
+   updateButton.value.innerHTML = 'Update'
+
+
+   if (status === 200) {
+      data.value = data
       superStore.setNotification('Summoner updated')
       updateKey++
    }
 
-   if (res.status === 204) {
+   if (status === 204) {
+      // hmm
       superStore.setNotification('Summoner already up to date')
    }
 }
 
 const sortTable = computed(() => {
-   return ['Games', ...lhsHeaders, ...rhsHeaders]
+   return ['Games', ...lhsHeaders.value, ...rhsHeaders.value]
 })
 
 const filteredChampions = computed(() => {
-   return data.value.championData.filter(c => champions[c.championId][1].toLowerCase().includes(championFilter.toLowerCase()))
+   return data.value.championData.filter(c => championNames[c.championId][1].toLowerCase().includes(championFilter.value.toLowerCase()))
 })
 
 const sortedChampions = computed(() => {
-   if (sortMod) {
-      switch (sortFilter) {
+   if (sortMod.value) {
+      switch (sortFilter.value) {
          case 5:
-            return (descending) ? filteredChampions.sort((a, b) => (a.avg.dpm) - (b.avg.dpm)) :
-               filteredChampions.sort((a, b) => (b.avg.dpm) - (a.avg.dpm))
+            return (descending.value) ? filteredChampions.value.sort((a, b) => (a.avg.dpm) - (b.avg.dpm)) :
+               filteredChampions.value.sort((a, b) => (b.avg.dpm) - (a.avg.dpm))
          case 6:
-            return (descending) ? filteredChampions.sort((a, b) => (a.avg.dtpm) - (b.avg.dtpm)) :
-               filteredChampions.sort((a, b) => (b.avg.dtpm) - (a.avg.dtpm))
+            return (descending.value) ? filteredChampions.value.sort((a, b) => (a.avg.dtpm) - (b.avg.dtpm)) :
+               filteredChampions.value.sort((a, b) => (b.avg.dtpm) - (a.avg.dtpm))
          case 7:
-            return (descending) ? filteredChampions.sort((a, b) => (a.avg.smpm) - (b.avg.smpm)) :
-               filteredChampions.sort((a, b) => (b.avg.smpm) - (a.avg.smpm))
+            return (descending.value) ? filteredChampions.value.sort((a, b) => (a.avg.smpm) - (b.avg.smpm)) :
+               filteredChampions.value.sort((a, b) => (b.avg.smpm) - (a.avg.smpm))
          case 8:
-            return (descending) ? filteredChampions.sort((a, b) => (a.avg.hpm) - (b.avg.hpm)) :
-               filteredChampions.sort((a, b) => (b.avg.hpm) - (a.avg.hpm))
+            return (descending.value) ? filteredChampions.value.sort((a, b) => (a.avg.hpm) - (b.avg.hpm)) :
+               filteredChampions.value.sort((a, b) => (b.avg.hpm) - (a.avg.hpm))
          case 9:
-            return (descending) ? filteredChampions.sort((a, b) => (a.avg.ahpm) - (b.avg.ahpm)) :
-               filteredChampions.sort((a, b) => (b.avg.ahpm) - (a.avg.ahpm))
+            return (descending.value) ? filteredChampions.value.sort((a, b) => (a.avg.ahpm) - (b.avg.ahpm)) :
+               filteredChampions.value.sort((a, b) => (b.avg.ahpm) - (a.avg.ahpm))
          case 10:
-            return (descending) ? filteredChampions.sort((a, b) => (a.avg.gpm) - (b.avg.gpm)) :
-               filteredChampions.sort((a, b) => (b.avg.gpm) - (a.avg.gpm))
+            return (descending.value) ? filteredChampions.value.sort((a, b) => (a.avg.gpm) - (b.avg.gpm)) :
+               filteredChampions.value.sort((a, b) => (b.avg.gpm) - (a.avg.gpm))
          default:
-            return filteredChampions.sort((a, b) => (b.games) - (a.games))
+            return filteredChampions.value.sort((a, b) => (b.games) - (a.games))
       }
    } else {
-      switch (sortFilter) {
+      switch (sortFilter.value) {
          case 0:
-            return (descending) ? filteredChampions.sort((a, b) => (a.games) - (b.games)) :
-               filteredChampions.sort((a, b) => (b.games) - (a.games))
+            return (descending.value) ? filteredChampions.value.sort((a, b) => (a.games) - (b.games)) :
+               filteredChampions.value.sort((a, b) => (b.games) - (a.games))
          case 1:
-            return (descending) ? filteredChampions.sort((a, b) => champions[b.championId][1].localeCompare(champions[a.championId][1])) :
-               filteredChampions.sort((a, b) => champions[a.championId][1].localeCompare(champions[b.championId][1]))
+            return (descending.value) ? filteredChampions.value.sort((a, b) => championNames[b.championId][1].localeCompare(championNames[a.championId][1])) :
+               filteredChampions.value.sort((a, b) => championNames[a.championId][1].localeCompare(championNames[b.championId][1]))
          case 2:
-            return (descending) ? filteredChampions.sort((a, b) => (a.wins / a.games) - (b.wins / b.games)) :
-               filteredChampions.sort((a, b) => (b.wins / b.games) - (a.wins / a.games))
+            return (descending.value) ? filteredChampions.value.sort((a, b) => (a.wins / a.games) - (b.wins / b.games)) :
+               filteredChampions.value.sort((a, b) => (b.wins / b.games) - (a.wins / a.games))
          case 3:
-            return (descending) ? filteredChampions.sort((a, b) => ((a.avg.k + a.avg.a) / a.avg.d) - ((b.avg.k + b.avg.a) / b.avg.d)) :
-               filteredChampions.sort((a, b) => ((b.avg.k + b.avg.a) / b.avg.d) - ((a.avg.k + a.avg.a) / a.avg.d))
+            return (descending.value) ? filteredChampions.value.sort((a, b) => ((a.avg.k + a.avg.a) / a.avg.d) - ((b.avg.k + b.avg.a) / b.avg.d)) :
+               filteredChampions.value.sort((a, b) => ((b.avg.k + b.avg.a) / b.avg.d) - ((a.avg.k + a.avg.a) / a.avg.d))
          case 4:
-            return (descending) ? filteredChampions.sort((a, b) => (a.avg.kp) - (b.avg.kp)) :
-               filteredChampions.sort((a, b) => (b.avg.kp) - (a.avg.kp))
+            return (descending.value) ? filteredChampions.value.sort((a, b) => (a.avg.kp) - (b.avg.kp)) :
+               filteredChampions.value.sort((a, b) => (b.avg.kp) - (a.avg.kp))
          case 5:
-            return (descending) ? filteredChampions.sort((a, b) => (a.avg.tdd) - (b.avg.tdd)) :
-               filteredChampions.sort((a, b) => (b.avg.tdd) - (a.avg.tdd))
+            return (descending.value) ? filteredChampions.value.sort((a, b) => (a.avg.tdd) - (b.avg.tdd)) :
+               filteredChampions.value.sort((a, b) => (b.avg.tdd) - (a.avg.tdd))
          case 6:
-            return (descending) ? filteredChampions.sort((a, b) => (a.avg.tdt) - (b.avg.tdt)) :
-               filteredChampions.sort((a, b) => (b.avg.tdt) - (a.avg.tdt))
+            return (descending.value) ? filteredChampions.value.sort((a, b) => (a.avg.tdt) - (b.avg.tdt)) :
+               filteredChampions.value.sort((a, b) => (b.avg.tdt) - (a.avg.tdt))
          case 7:
-            return (descending) ? filteredChampions.sort((a, b) => (a.avg.tsm) - (b.avg.tsm)) :
-               filteredChampions.sort((a, b) => (b.avg.tsm) - (a.avg.tsm))
+            return (descending.value) ? filteredChampions.value.sort((a, b) => (a.avg.tsm) - (b.avg.tsm)) :
+               filteredChampions.value.sort((a, b) => (b.avg.tsm) - (a.avg.tsm))
          case 8:
-            return (descending) ? filteredChampions.sort((a, b) => (a.avg.th) - (b.avg.th)) :
-               filteredChampions.sort((a, b) => (b.avg.th) - (a.avg.th))
+            return (descending.value) ? filteredChampions.value.sort((a, b) => (a.avg.th) - (b.avg.th)) :
+               filteredChampions.value.sort((a, b) => (b.avg.th) - (a.avg.th))
          case 9:
-            return (descending) ? filteredChampions.sort((a, b) => (a.avg.ah) - (b.avg.ah)) :
-               filteredChampions.sort((a, b) => (b.avg.ah) - (a.avg.ah))
+            return (descending.value) ? filteredChampions.value.sort((a, b) => (a.avg.ah) - (b.avg.ah)) :
+               filteredChampions.value.sort((a, b) => (b.avg.ah) - (a.avg.ah))
          case 10:
-            return (descending) ? filteredChampions.sort((a, b) => (a.avg.ge) - (b.avg.ge)) :
-               filteredChampions.sort((a, b) => (b.avg.ge) - (a.avg.ge))
+            return (descending.value) ? filteredChampions.value.sort((a, b) => (a.avg.ge) - (b.avg.ge)) :
+               filteredChampions.value.sort((a, b) => (b.avg.ge) - (a.avg.ge))
          default:
-            return filteredChampions.sort((a, b) => (b.games) - (a.games))
+            return filteredChampions.value.sort((a, b) => (b.games) - (a.games))
       }
    }
 })
@@ -216,7 +207,7 @@ const computeAccountStats = computed(() => {
    }
 
    return {
-      'champs': `${data.championData.length}`,
+      'champs': `${data.value.championData.length}`,
       'winrate': `${(a_w / a_g * 100).toFixed(2)}%`,
       'time': `${Math.round(a_tp / 1440 * 100) / 100} days`,
       'games': `${a_g}`,
@@ -354,8 +345,8 @@ const aggregatedStats = computed(() => {
 
    let itemArrayHelper = [0, 0, 0, 0, 0, 0]
 
-   for (const c of summonerStore.championPool) {
-      const o = convertChampionData[c]
+   for (const c of summStore.championPool) {
+      const o = convertChampionData.value[c]
 
       c_kda[0] += o.avg.k
       c_kda[1] += o.avg.d
@@ -453,10 +444,10 @@ const aggregatedStats = computed(() => {
     * CHAMPION AVERAGE STATS
     * Stats that are already averaged for the champion on the backend and need to be divided against the amount of champions selected.
     */
-   const divByChamps = (o) => Math.round(o / summonerStore.championPool.size)
+   const divByChamps = (o) => Math.round(o / summStore.championPool.size)
    c_kda = c_kda.map(x => divByChamps(x))
 
-   championAveragedStats.forEach(o => stats[o] = Math.round(stats[o] / summonerStore.championPool.size))
+   championAveragedStats.forEach(o => stats[o] = Math.round(stats[o] / summStore.championPool.size))
    stats.kda = `${c_kda[0]}/${c_kda[1]}/${c_kda[2]}`
 
 
@@ -481,118 +472,115 @@ const aggregatedStats = computed(() => {
 
 const getAccountStats = computed(() => {
    return [
-      ['Champions Played', computeAccountStats['champs']],
-      ['Winrate', computeAccountStats['winrate']],
-      ['Time Played', computeAccountStats['time']],
-      ['Games', computeAccountStats['games']],
-      // ['Red Side Winrate', computeAccountStats['rw']],
-      // ['Blue Side Winrate', computeAccountStats['bw']],
-      // ['Fountain Sitting', computeAccountStats['fs']],
+      ['Champions Played', computeAccountStats.value['champs']],
+      ['Winrate', computeAccountStats.value['winrate']],
+      ['Time Played', computeAccountStats.value['time']],
+      ['Games', computeAccountStats.value['games']],
    ]
 })
 
 const getGeneralStats = computed(() => {
    return [
-      ['KDA', aggregatedStats['kda']],
-      ['Matches', aggregatedStats['matches']],
-      ['First Blood', aggregatedStats['fbk']],
-      ['Kill Participation', aggregatedStats['killParticipation'] + '%'],
-      ['Game Length', aggregatedStats['gameLength']],
-      ['Death Time', aggregatedStats['deathTime']],
-      ['Damage', aggregatedStats['damage']],
-      ['Damage Taken', aggregatedStats['damageTaken']],
-      ['Damage Mitigated', aggregatedStats['damageMitigated']],
-      ['Healing', aggregatedStats['healed']],
-      ['Ally Healing', aggregatedStats['allyHealed']],
-      ['Ally Shielding', aggregatedStats['allyShielded']],
-      ['Gold', aggregatedStats['gold']],
+      ['KDA', aggregatedStats.value['kda']],
+      ['Matches', aggregatedStats.value['matches']],
+      ['First Blood', aggregatedStats.value['fbk']],
+      ['Kill Participation', aggregatedStats.value['killParticipation'] + '%'],
+      ['Game Length', aggregatedStats.value['gameLength']],
+      ['Death Time', aggregatedStats.value['deathTime']],
+      ['Damage', aggregatedStats.value['damage']],
+      ['Damage Taken', aggregatedStats.value['damageTaken']],
+      ['Damage Mitigated', aggregatedStats.value['damageMitigated']],
+      ['Healing', aggregatedStats.value['healed']],
+      ['Ally Healing', aggregatedStats.value['allyHealed']],
+      ['Ally Shielding', aggregatedStats.value['allyShielded']],
+      ['Gold', aggregatedStats.value['gold']],
    ]
 })
 
 const getItemSlots = computed(() => {
    return [
-      ['Slot 1', aggregatedStats['slotUnus']],
-      ['Slot 2', aggregatedStats['slotDuo']],
-      ['Slot 3', aggregatedStats['slotTres']],
-      ['Slot 4', aggregatedStats['slotQuattuor']],
-      ['Slot 5', aggregatedStats['slotQuinque']],
-      ['Slot 6', aggregatedStats['slotSex']],
+      ['Slot 1', aggregatedStats.value['slotUnus']],
+      ['Slot 2', aggregatedStats.value['slotDuo']],
+      ['Slot 3', aggregatedStats.value['slotTres']],
+      ['Slot 4', aggregatedStats.value['slotQuattuor']],
+      ['Slot 5', aggregatedStats.value['slotQuinque']],
+      ['Slot 6', aggregatedStats.value['slotSex']],
    ]
 })
 
 const getMultiKills = computed(() => {
    return [
-      ['Triples', aggregatedStats['triples']],
-      ['Quadras', aggregatedStats['quadras']],
-      ['Pentas', aggregatedStats['pentas']],
+      ['Triples', aggregatedStats.value['triples']],
+      ['Quadras', aggregatedStats.value['quadras']],
+      ['Pentas', aggregatedStats.value['pentas']],
    ]
 })
 
 const getStructures = computed(() => {
    return [
-      ['Towers Destroyed', aggregatedStats['towersDestroyed']],
-      ['Towers Lost', aggregatedStats['towersLost']],
-      ['Tower Damage Dealt', Math.round(aggregatedStats['damageDealtToTowers'])],
+      ['Towers Destroyed', aggregatedStats.value['towersDestroyed']],
+      ['Towers Lost', aggregatedStats.value['towersLost']],
+      ['Tower Damage Dealt', Math.round(aggregatedStats.value['damageDealtToTowers'])],
    ]
 })
 
 const getTeamfights = computed(() => {
    return [
-      ['Frequency', aggregatedStats['frequency']],
-      ['Expectation', aggregatedStats['expectation'].toFixed(2)],
-      ['Longevity', aggregatedStats['usefulness'].toFixed(2)],
-      ['Participation', (aggregatedStats['participation'] / aggregatedStats['frequency'] * 100).toFixed(2) + '%'],
-      ['Death', (aggregatedStats['death'] * 100).toFixed(1) + '%'],
-      ['Capitalization', (aggregatedStats['capitalization'] * 100).toFixed(1) + '%'],
+      ['Frequency', aggregatedStats.value['frequency']],
+      ['Expectation', aggregatedStats.value['expectation'].toFixed(2)],
+      ['Longevity', aggregatedStats.value['usefulness'].toFixed(2)],
+      ['Participation', (aggregatedStats.value['participation'] / aggregatedStats.value['frequency'] * 100).toFixed(2) + '%'],
+      ['Death', (aggregatedStats.value['death'] * 100).toFixed(1) + '%'],
+      ['Capitalization', (aggregatedStats.value['capitalization'] * 100).toFixed(1) + '%'],
    ]
 })
 
 const getSummonerSpells = computed(() => {
    return [
-      ['1', aggregatedStats['1']],
-      ['3', aggregatedStats['3']],
-      ['4', aggregatedStats['4']],
-      ['6', aggregatedStats['6']],
-      ['7', aggregatedStats['7']],
-      ['13', aggregatedStats['13']],
-      ['14', aggregatedStats['14']],
-      ['21', aggregatedStats['21']],
-      ['32', aggregatedStats['32']],
+      ['1', aggregatedStats.value['1']],
+      ['3', aggregatedStats.value['3']],
+      ['4', aggregatedStats.value['4']],
+      ['6', aggregatedStats.value['6']],
+      ['7', aggregatedStats.value['7']],
+      ['13', aggregatedStats.value['13']],
+      ['14', aggregatedStats.value['14']],
+      ['21', aggregatedStats.value['21']],
+      ['32', aggregatedStats.value['32']],
    ]
 })
 
 const getSpellCasts = computed(() => {
    return [
-      ['Q', aggregatedStats['q']],
-      ['W', aggregatedStats['w']],
-      ['E', aggregatedStats['e']],
-      ['R', aggregatedStats['r']],
+      ['Q', aggregatedStats.value['q']],
+      ['W', aggregatedStats.value['w']],
+      ['E', aggregatedStats.value['e']],
+      ['R', aggregatedStats.value['r']],
    ]
 })
 
 const getKeystoneRunes = computed(() => {
-   return Object.entries(aggregatedStats.primaryRunes)
+   return Object.entries(aggregatedStats.value.primaryRunes)
 })
 
 const getSecondaryTree = computed(() => {
-   return Object.entries(aggregatedStats.secondaryRunes)
+   return Object.entries(aggregatedStats.value.secondaryRunes)
 })
 
 const getPings = computed(() => {
    return [
-      ['All In', aggregatedStats['allIn']],
-      ['Missing', aggregatedStats['missing']],
-      ['Basic', aggregatedStats['basic']],
-      ['Command', aggregatedStats['command']],
-      ['Danger', aggregatedStats['danger']],
-      ['Enemy Missing', aggregatedStats['enMiss']],
-      ['Enemy Vision', aggregatedStats['enVis']],
-      ['Back', aggregatedStats['back']],
-      ['Hold', aggregatedStats['hold']],
-      ['Need Vision', aggregatedStats['vis']],
-      ['On My Way', aggregatedStats['omw']],
-      ['Push', aggregatedStats['push']],
-      ['Vision Clear', aggregatedStats['visClear']],
+      ['All In', aggregatedStats.value['allIn']],
+      ['Missing', aggregatedStats.value['missing']],
+      ['Basic', aggregatedStats.value['basic']],
+      ['Command', aggregatedStats.value['command']],
+      ['Danger', aggregatedStats.value['danger']],
+      ['Enemy Missing', aggregatedStats.value['enMiss']],
+      ['Enemy Vision', aggregatedStats.value['enVis']],
+      ['Back', aggregatedStats.value['back']],
+      ['Hold', aggregatedStats.value['hold']],
+      ['Need Vision', aggregatedStats.value['vis']],
+      ['On My Way', aggregatedStats.value['omw']],
+      ['Push', aggregatedStats.value['push']],
+      ['Vision Clear', aggregatedStats.value['visClear']],
    ]
 })
 
@@ -632,13 +620,12 @@ const updatedDate = computed(() => {
       </div>
       <div class="body">
 
-         <!-- <div class="lhs-body">
+         <div class="lhs-body">
             <div class="section">
                <div class="section-header">
                   <h2>Account</h2>
                   <UXTooltip :align="'left'" :tip="'account'" />
                </div>
-
                <StatDropdown :stats="getAccountStats" :persist="true" :tooltip="'implement'" />
 
                <div class="side-stats" style="padding-bottom: 30px;">
@@ -745,13 +732,13 @@ const updatedDate = computed(() => {
                </div>
 
             </div>
-         </div> -->
+         </div>
 
-         <!-- <div class="rhs-body">
+         <div class="rhs-body">
             <Heatmap :data="data.championData" />
             <div class="utility">
                <div>
-                  <input ref="championSearch" @keyup.escape="$refs.championSearch.blur()"
+                  <input ref="championSearch" @keyup.escape="championSearch.blur()"
                      @click="championFilter = ''" type="text" v-model="championFilter" spellcheck="false">
                   <span v-show="!championFilter.length" class="keyboard-shortcut">
                      Press <kbd>s</kbd> to search
@@ -796,9 +783,9 @@ const updatedDate = computed(() => {
                </div>
             </div>
             <div class="champions">
-               <Champion :data="c" v-for="c in sortedChampions" :patch="patch" :key="c.championId" />
+               <Champion :data="c" v-for="c in sortedChampions" :patch="store.patches[0]" :key="c.championId" />
             </div>
-         </div> -->
+         </div>
       </div>
    </div>
 </template>

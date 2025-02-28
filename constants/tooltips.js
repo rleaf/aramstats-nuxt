@@ -109,7 +109,7 @@ export default {
       `A teamfight is any sequence of champion kills within 5 seconds of each other where at least two of the kills have 2+ assists and the average distance between all kills is less than or equal to 1300 units (about the same as Ashe Hawkshot).`,
       `<b>Frequency</b>: Total teamfights.`,
       `<b>Expectation</b>: The expected outcome of the teamfight. Domained [-5, 5]. <i>"My expectation is 0.7 which means, on average, I can expect my team to be up 0.7 kills after a teamfight."</i>`,
-      `<b>Longevity</b>: When, if you do, die. Domained [1, 6] where 1 = first to die and 6 = you don't die. <i>"My longevity is 2.97 which means, on average, I am usually the ~3rd person to die on my team."</i></span> `,
+      `<b>Longevity</b>: When, if you do, die. Domained [1, 6] where 1 = first to die and 6 = you don't die. <i>"My longevity is 2.97 which means, on average, I am usually the ~3rd person to die on my team."</i>`,
       `<b>Participation</b>: How frequently you participate in the observed teamfights.`,
       `<b>Death</b>: How often you die in a teamfight.`,
       `<b>Capitalization</b>: In the proceeding 30 seconds after a teamfight, how often does your team destroy a structure.`,
