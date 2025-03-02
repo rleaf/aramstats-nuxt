@@ -12,6 +12,9 @@ const winrates = reactive({
    delta: 0
 })
 
+// const championData = ref(null)
+// const status = ref('success')
+
 await store.initPatches()
 const { data: championData, status } = await useAsyncData(
    () => $fetch('/api/champions', {
@@ -23,11 +26,15 @@ const { data: championData, status } = await useAsyncData(
    }
 )
 
+computeWinrates()
+
+
 watch(status, n => {
-   if (n === 'success') computeWinrates()
+   if (n === 'success') {
+      computeWinrates()
+   }
 })
 
-computeWinrates()
 
 function computeWinrates() {
    for (const i in championData.value) {
@@ -173,7 +180,7 @@ const getChampionsList = computed(() => {
 </script>
 
 <template>
-
+   <!-- <Loading v-if="status === 'pending'" /> -->
    <div class="champ-list-main">
       <div class="utilities">
 
@@ -181,7 +188,8 @@ const getChampionsList = computed(() => {
             <span class="superscript">Patch:</span>
             <button class="patch-button">{{ useRoute().query.patch || store.recentCleanPatch }}</button>
             <div class="patch-options">
-               <button @click="patchChange(patch)" v-for="patch in store.patches" :key="patch">{{ cleanPatch(patch) }}</button>
+               <button @click="patchChange(patch)" v-for="patch in store.patches" :key="patch">{{ cleanPatch(patch)
+                  }}</button>
             </div>
          </div>
 
@@ -210,70 +218,75 @@ const getChampionsList = computed(() => {
          </button>
          <!-- <UXTooltip class='toads' :align="'left'" :tip="'tierlist'" /> -->
       </div>
-      <div class="champ-table">
-         <div class="header">
-            <div v-for="(h, i) in headers" :key="i">
-               <div v-if="i < 4">
-                  <h2 :class="{ 'highlight': sort === i }" @click="headerSort(i)">{{ h[0] }}</h2>
+      <Suspense>
+
+         <div v-if="status === 'success'" class="champ-table">
+            <div class="header">
+               <div v-for="(h, i) in headers" :key="i">
+                  <div v-if="i < 4">
+                     <h2 :class="{ 'highlight': sort === i }" @click="headerSort(i)">{{ h[0] }}</h2>
+                  </div>
+                  <div v-else class="metrics">
+                     <div>
+                        <h3 @click="headerSort(i)">{{ h[0] }}</h3>
+                        <hr>
+                     </div>
+                     <div>
+                        <h2 :class="{ 'highlight': sort === (Math.floor(i / 4) - 1) * 4 + i + (i % 4) }"
+                           @click="headerSort((Math.floor(i / 4) - 1) * 4 + i + (i % 4))">µ</h2>
+                        <h2 :class="{ 'highlight': sort === (Math.floor(i / 4) - 1) * 4 + i + (i % 4) + 1 }"
+                           @click="headerSort((Math.floor(i / 4) - 1) * 4 + i + (i % 4) + 1)">σ</h2>
+                     </div>
+                  </div>
                </div>
-               <div v-else class="metrics">
-                  <div>
-                     <h3 @click="headerSort(i)">{{ h[0] }}</h3>
-                     <hr>
-                  </div>
-                  <div>
-                     <h2 :class="{ 'highlight': sort === (Math.floor(i / 4) - 1) * 4 + i + (i % 4) }"
-                        @click="headerSort((Math.floor(i / 4) - 1) * 4 + i + (i % 4))">µ</h2>
-                     <h2 :class="{ 'highlight': sort === (Math.floor(i / 4) - 1) * 4 + i + (i % 4) + 1 }"
-                        @click="headerSort((Math.floor(i / 4) - 1) * 4 + i + (i % 4) + 1)">σ</h2>
-                  </div>
+            </div>
+            <div v-if="status === 'success'" :class="{ 'o': i % 2 === 0 }" class="champion"
+               v-for="(champ, i) in getChampionsList" :key="i">
+               <div class="index">
+                  {{ i + 1 }}
+               </div>
+               <div>
+                  <NuxtLink :to="{ name: 'champions-champion', params: { champion: championRoute(champ._id) } }">
+                     <div class="image-wrapper">
+                        <img rel="preload" :src="champIcon(champ._id)" alt="">
+                     </div>
+                     <div>
+                        <span class="name">{{ championNames[champ._id][1] }}</span>
+                     </div>
+                  </NuxtLink>
+               </div>
+               <div :style="{ color: computeColor(champ.winrate) }" class="winrate">
+                  {{ champ.winrate }}%
+               </div>
+               <div>
+                  {{ champ.games }}
+               </div>
+               <div>
+                  {{ champ.pickRate }}%
+               </div>
+               <div class="metric-value">
+                  <span>{{ (champ.dpm) ? champ.dpm.m : '-' }}</span>
+                  <span>{{ (champ.dpm) ? champ.dpm.v : '-' }}</span>
+               </div>
+               <div class="metric-value">
+                  <span>{{ (champ.dtpm) ? champ.dtpm.m : '-' }}</span>
+                  <span>{{ (champ.dtpm) ? champ.dtpm.v : '-' }}</span>
+               </div>
+               <div class="metric-value">
+                  <span>{{ (champ.dmpm) ? champ.dmpm.m : '-' }}</span>
+                  <span>{{ (champ.dmpm) ? champ.dmpm.v : '-' }}</span>
+               </div>
+               <div class="metric-value">
+                  <span>{{ (champ.gpm) ? champ.gpm.m : '-' }}</span>
+                  <span>{{ (champ.gpm) ? champ.gpm.v : '-' }}</span>
                </div>
             </div>
-         </div>
-         <div v-if="status === 'success'" :class="{ 'o': i % 2 === 0 }" class="champion" v-for="(champ, i) in getChampionsList" :key="i">
-            <div class="index">
-               {{ i + 1 }}
-            </div>
-            <div>
-               <NuxtLink :to="{ name: 'champions-champion', params: { champion: championRoute(champ._id) } }">
-                  <div class="image-wrapper">
-                     <img rel="preload" :src="champIcon(champ._id)" alt="">
-                  </div>
-                  <div>
-                     <span class="name">{{ championNames[champ._id][1] }}</span>
-                  </div>
-               </NuxtLink>
-            </div>
-            <div :style="{ color: computeColor(champ.winrate) }" class="winrate">
-               {{ champ.winrate }}%
-            </div>
-            <div>
-               {{ champ.games }}
-            </div>
-            <div>
-               {{ champ.pickRate }}%
-            </div>
-            <div class="metric-value">
-               <span>{{ (champ.dpm) ? champ.dpm.m : '-' }}</span>
-               <span>{{ (champ.dpm) ? champ.dpm.v : '-' }}</span>
-            </div>
-            <div class="metric-value">
-               <span>{{ (champ.dtpm) ? champ.dtpm.m : '-' }}</span>
-               <span>{{ (champ.dtpm) ? champ.dtpm.v : '-' }}</span>
-            </div>
-            <div class="metric-value">
-               <span>{{ (champ.dmpm) ? champ.dmpm.m : '-' }}</span>
-               <span>{{ (champ.dmpm) ? champ.dmpm.v : '-' }}</span>
-            </div>
-            <div class="metric-value">
-               <span>{{ (champ.gpm) ? champ.gpm.m : '-' }}</span>
-               <span>{{ (champ.gpm) ? champ.gpm.v : '-' }}</span>
+            <div v-else class="loading-champ-list">
+               <Loading />
             </div>
          </div>
-         <div v-else class="loading-champ-list">
-            <Loading />
-         </div>
-      </div>
+         <Loading v-else />
+      </Suspense>
    </div>
 
 </template>

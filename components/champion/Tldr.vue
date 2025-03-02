@@ -13,6 +13,14 @@ const store = superStore()
 const props = defineProps(['championData'])
 const { championData } = toRefs(props)
 
+watch(championData, () => {
+   organizedCore.value = []
+   maxWinrate.value = 0
+   minWinrate.value = 2
+   coreFocus.value = 0
+   sortCore()
+})
+
 sortCore()
 function sortCore() {
    for (const c in championData.value.core) {

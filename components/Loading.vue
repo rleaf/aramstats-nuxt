@@ -1,6 +1,5 @@
 <script setup>
 // import { superStore } from '@/stores/superStore'
-
 </script>
 
 <template>

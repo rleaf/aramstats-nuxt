@@ -30,7 +30,7 @@ export default defineEventHandler(async (e) => {
          region: summoner.region,
          level: summoner.summonerLevel,
          profileIcon: summoner.profileIconId,
-         parse: { status: config.STATUS_IN_QUEUE },
+         parse: { status: config.status.IN_QUEUE },
       })
 
       console.log(`[+ Queue]: ${summoner.gameName}#${summoner.tagLine} (${summoner.region})`)

@@ -1,7 +1,6 @@
 <script setup>
 const route = useRoute()
 const poll = ref(null)
-const key = ref(0)
 const res = reactive({
    stage: null,
    data: null
@@ -12,7 +11,8 @@ res.stage = data.value.stage
 res.data = data.value.data
 
 async function queueSummoner() {
-   await $fetch(`/api/summoner/queueSummoner`, {
+   res.stage = null
+   $fetch(`/api/summoner/queueSummoner`, {
       method: 'POST',
       body: {
          region: route.params.region,
@@ -21,8 +21,8 @@ async function queueSummoner() {
       },
    })
 
-   poll.value = setInterval(ping, 10000);
-   ping()
+   poll.value = setInterval(ping, 15000);
+   setTimeout(ping, 3000);
 }
 
 async function ping() {
@@ -32,7 +32,6 @@ async function ping() {
 
    res.stage = stage
    res.data = data
-   key.value++
 
    if (stage === 'Complete') {
       console.log('clearing')
@@ -42,12 +41,12 @@ async function ping() {
 
 </script>
 
-<template :key="key">
+<template>
    <div>
-   <div v-if="res">
-      <UserReady v-if="res.stage === 'Complete'" :data="res.data" />
-      <UserLoading @parse-summoner="queueSummoner" v-else :response="res" />
-   </div>
+      <div v-if="res">
+         <UserReady v-if="res.stage === 'Complete'" :data="res.data" />
+         <UserLoading v-else @parse-summoner="queueSummoner" :response="res" />
+      </div>
 
       <div v-if="error">
          <!-- Summoner DNE -->
@@ -63,7 +62,7 @@ async function ping() {
 
 <style scoped>
 
-*:not(button) {
+/* *:not(button) {
    color: var(--color-font);
-}
+} */
 </style>

@@ -14,6 +14,17 @@ const slotWinrate = ref([0, 0, 0, 0, 0, 0])
 const props = defineProps(['championData'])
 const { championData } = toRefs(props)
 
+watch(championData, () => {
+   item.value = null
+   total.value = 0
+   wins.value = 0
+   mean.value = 0
+   popularity.value = 0
+   slotPopularity.value = [0, 0, 0, 0, 0, 0]
+   slotWinrate.value = [0, 0, 0, 0, 0, 0]
+   popularityFocus.value = null
+})
+
 function setItem(id) {
    setLabels(id)
 

@@ -54,10 +54,10 @@ export async function initialParse(summonerDoc, updateMatchlist) {
    summonerDoc.parse.total = matchlist.length
    summonerDoc.parse.status = config.status.PARSING
    await summonerDoc.save()
-   for (let i = 0; i < matchlist.length; i += 50) {
-      console.log(`${summonerDoc.gameName} i: ${i}`)
-      const matches = await getBatchedMatchInfo(matchlist.slice(i, i + 50), summonerDoc.region)
-      const timelines = await getBatchedTimelineInfo(matchlist.slice(i, i + 50), summonerDoc.region)
+   const VAL = 4
+   for (let i = 0; i < matchlist.length; i += VAL) {
+      const matches = await getBatchedMatchInfo(matchlist.slice(i, i + VAL), summonerDoc.region)
+      const timelines = await getBatchedTimelineInfo(matchlist.slice(i, i + VAL), summonerDoc.region)
       const zip = matches.map((x, i) => [(x) ? x : undefined, (timelines[i]) ? timelines[i] : undefined])
       
       for (let j = 0; j < zip.length; j++) {

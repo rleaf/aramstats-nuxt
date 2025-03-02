@@ -1,56 +1,56 @@
 <script setup>
 const { response } = defineProps(['response'])
-const { stage, data } = response
+const { stage, data } = toRefs(response)
 
 useHead({
    title: 'ARAM Stats'
 })
 
-const queueInfo = computed(() => {
-   // document.title = `(${data.parse.current} / ${data.parse.total}) | ARAM Stats`
-   return `${data.parse.current} / ${data.parse.total} matches completed`
+const parseStatus = computed(() => {
+   if (document) document.title = `${data.value.current} / ${data.value.total} | ARAM Stats`
+   return `${data.value.current} / ${data.value.total} matches completed`
 })
 
+const msg = `I update every 30 seconds. A summoner generally takes a couple minutes to parse. Feel free to close this window & check back later.`
 </script>
 
 <template>
    <div class="loading-main">
       <div v-if="stage === 'Queue'">
          <h2>Summoner is in queue.</h2>
-         <p class="sub">
+         <p class="queue">
             <span v-if="data === 1">You are next.</span>
             <span v-else-if="data - 1 === 1">There is 1 summoner ahead of you.</span>
             <span v-else>There are {{ data - 1 }} summoners ahead of you.</span>
-            <br>
-            <NuxtLink
-               :to="{ name: 'summoner-region-gameName-tagLine', params: { region: 'na', gameName: 'ryi', tagLine: 'na1' } }"
+         </p>
+         <p class="sub">
+            {{ msg }}
+            <NuxtLink :to="{ name: 'summoner-region-gameName-tagLine', params: { region: 'na', gameName: 'ryi', tagLine: 'na1' } }"
                target="_blank">Here</NuxtLink> is what you can expect to see.
          </p>
-         <!-- <p v-if="data === 1">You are next.</p>
-         <p v-else-if="data - 1 === 1">There is 1 summoner ahead of you.</p>
-         <p v-else>There are {{ data - 1 }} summoners ahead of you.</p> -->
 
       </div>
 
       <div v-else-if="stage === 'Parsing'">
          <h2>Currently parsing summoner.</h2>
-         <p class="queue">{{ queueInfo }}</p>
-         <p class="sub">
-            I update every 30 seconds. A single summoner can take, ballpark, upwards of 20 min to complete. Feel free to
-            close this window & check back later.
-         </p>
+         <p class="queue">{{ parseStatus }}</p>
+         <p class="sub"> {{ msg }} </p>
       </div>
 
       <div v-else-if="stage === 'Unparsed'">
          <h2>Hello, it seems this summoner has never been parsed.</h2>
          <p class="sub">
-            This process can take some time, upwards of 20 minutes if there is no queue. You'll be able to refresh the page to see your accounts progress.
+            This process can take some time depending on the queue. You'll be able to refresh the page to see your progress.
             <NuxtLink
                :to="{ name: 'summoner-region-gameName-tagLine', params: { region: 'na', gameName: 'ryi', tagLine: 'na1' } }"
                target="_blank">Here</NuxtLink>
             is what you can expect to see when the account finishes.
          </p>
          <button @click="$emit('parseSummoner')">Parse summoner</button>
+      </div>
+
+      <div v-else>
+         <h2>Loading...</h2>
       </div>
    </div>
 </template>
@@ -94,10 +94,6 @@ button {
 
 button:hover {
    border-color: var(--outline);
-}
-
-p.queue {
-   font-weight: 500;
 }
 
 p.sub {

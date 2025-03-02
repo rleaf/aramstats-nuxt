@@ -121,10 +121,13 @@ export const getAllSummonerMatches = async (puuid, region, lastMatchId) => {
          .catch(e => { 
             // maybe do something here?
           })).response
-      // let pull = await retryWrapper(lolApi.MatchV5.list.bind(lolApi.MatchV5), [puuid, REGION_GROUPS[region], { queue: 450, start: i, count: 100 }])
       if (lastMatchId && pull.includes(lastMatchId)) {
          pull = pull.slice(0, pull.indexOf(lastMatchId))
          stop = false
+
+         if (pull.length === 0) {
+            return 0 // summoner already UTD
+         }
       }
 
       matchList.push(pull)
@@ -132,7 +135,10 @@ export const getAllSummonerMatches = async (puuid, region, lastMatchId) => {
       try {
          await getMatchInfo(pull[pull.length - 1], region)
       } catch (e) {
-         if (e.status === 404) return matchList.flat()
+         if (e.status === 404) {
+            console.log(matchList.flat().length, 'initial match length')
+            return matchList.flat()
+         }
       }
       
       if (pull.length === 0) stop = false

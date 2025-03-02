@@ -1,10 +1,8 @@
-import { deleteSummoner } from "~/server/utils/ratsNest"
-
 export default defineEventHandler(async (e) => {
    const queue = new Queue()
    let summoner
    
-   const routerParams = getRouterParams(e)
+   const routerParams = getRouterParams(e, { decode: true})
    console.log(`[Searching]: ${routerParams.gameName}#${routerParams.tagLine} (${routerParams.region})`)
    try {
       summoner = await getSummonerStatus(routerParams.gameName, routerParams.tagLine, routerParams.region)
@@ -14,7 +12,7 @@ export default defineEventHandler(async (e) => {
          statusMessage: e.body.status.message || e.status.message || e.message
       })
    }
-   
+
    switch (summoner.parse.status) {
       case config.status.COMPLETE:
          console.log('SUMMONER FOUND')
@@ -38,7 +36,7 @@ export default defineEventHandler(async (e) => {
          console.log(`[In Queue]: ${routerParams.gameName}#${routerParams.tagLine} (${routerParams.region})`)
          return {
             stage: config.status.IN_QUEUE,
-            data: await queue.check(summoner.puuid)
+            data: await queue.check(summoner._id)
          }
 
       case config.status.UNPARSED:

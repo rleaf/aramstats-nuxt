@@ -30,9 +30,16 @@ function scrollTo(el) {
    return
 }
 
-function patchChange(patch) {
+async function patchChange(patch) {
    queryPatch.value = cleanPatch(patch)
-   navigateTo({ name: 'champions-champion', query: { patch: queryPatch.value } })
+   const data = await $fetch(`/api/champion/${route.params.champion}`, {
+      params: {
+            patch: queryPatch.value,
+            champId: championId.value,
+         }
+   }) 
+   championData.value = data
+   // navigateTo({ name: 'champions-champion', query: { patch: queryPatch.value } })
 }
 
 function cleanPatch(patch) {

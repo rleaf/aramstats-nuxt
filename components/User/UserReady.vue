@@ -24,8 +24,11 @@ const championSearch = useTemplateRef('championSearch')
 
 await store.initPatches()
 
+useHead({
+   title: `${data.value.gameName}#${data.value.tagLine} | ARAM Stats`
+})
+
 onMounted(() => {
-   document.title = `${data.gameName} | ARAM Stats`
    window.addEventListener('keypress', championSearchFocus)
 })
 
@@ -56,6 +59,17 @@ function toggleAll() {
       summStore.championPool.clear()
    }
 
+}
+
+function del() {
+   $fetch(`/api/summoner/delete`,{
+      method: 'DELETE',
+      params: {
+         region: route.params.region,
+         gameName: route.params.gameName,
+         tagLine: route.params.tagLine,
+      }
+   })
 }
 
 async function updateProfile() {
@@ -586,6 +600,8 @@ const updatedDate = computed(() => {
                <div class="buttons">
                   <button :class="{ 'active-update': update }" ref="updateButton" :disabled="update"
                      @click="updateProfile()">Update</button>
+                  <button :class="{ 'active-update': update }" ref="updateButton" :disabled="update"
+                     @click="del()">Delete</button>
                </div>
                <div class="last-updated">
                   Last updated: {{ updatedDate }}

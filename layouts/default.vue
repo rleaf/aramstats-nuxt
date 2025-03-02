@@ -3,8 +3,7 @@
 </script>
 
 <template>
-   <div>
-      <Nav />
-      <slot />
-   </div>
+   <NuxtLoadingIndicator :height="2" :color="'var(--primary)'" />
+   <Nav />
+   <slot />
 </template>
