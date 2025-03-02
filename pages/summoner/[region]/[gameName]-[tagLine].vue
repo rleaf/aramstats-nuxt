@@ -1,7 +1,15 @@
 <script setup>
 const route = useRoute()
+const poll = ref(null)
+const key = ref(0)
+const res = reactive({
+   stage: null,
+   data: null
+})
 
-const { data: res, error } = await useFetch(`/api/summoner/${route.params.region}/${route.params.gameName}/${route.params.tagLine}`)
+const { data, error } = await useFetch(`/api/summoner/${route.params.region}/${route.params.gameName}/${route.params.tagLine}`)
+res.stage = data.value.stage
+res.data = data.value.data
 
 async function queueSummoner() {
    await $fetch(`/api/summoner/queueSummoner`, {
@@ -11,24 +19,35 @@ async function queueSummoner() {
          gameName: route.params.gameName,
          tagLine: route.params.tagLine
       },
-      
    })
+
+   poll.value = setInterval(ping, 10000);
+   ping()
+}
+
+async function ping() {
+   console.log('ping')
+   const { stage, data } = await $fetch(`/api/summoner/${route.params.region}/${route.params.gameName}/${route.params.tagLine}`)
+      .catch((e) => { console.log(e, 'error') })
+
+   res.stage = stage
+   res.data = data
+   key.value++
+
+   if (stage === 'Complete') {
+      console.log('clearing')
+      clearInterval(poll.value)
+   }
 }
 
 </script>
 
-<template>
+<template :key="key">
    <div>
-      <button @click="queueSummoner()">
-         Queue Test
-      </button>
-   <br>
    <div v-if="res">
-      <!-- {{ res.data.gameName }}
-      {{ res.data.tagLine }}
-         {{ res.data.region }} -->
-         <UserReady :data="res.data" />
-      </div>
+      <UserReady v-if="res.stage === 'Complete'" :data="res.data" />
+      <UserLoading @parse-summoner="queueSummoner" v-else :response="res" />
+   </div>
 
       <div v-if="error">
          <!-- Summoner DNE -->

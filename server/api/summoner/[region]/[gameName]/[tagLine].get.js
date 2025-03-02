@@ -14,7 +14,7 @@ export default defineEventHandler(async (e) => {
          statusMessage: e.body.status.message || e.status.message || e.message
       })
    }
-
+   
    switch (summoner.parse.status) {
       case config.status.COMPLETE:
          console.log('SUMMONER FOUND')

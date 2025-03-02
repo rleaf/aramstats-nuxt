@@ -20,7 +20,7 @@
       remove: [],
       fix: [],
       adjust: [
-         `Redeveloped site on the Nuxt stack.`
+         `Rebuilt site on Nuxt stack.`,
       ],
       known: [],
    },

@@ -78,7 +78,7 @@ function winrate(total, win) {
          <div class="synopsis">
             <div class="synopsis-header">
                <div class="image-wrapper">
-                  <img v-if="item" :src="itemImage(item)" @click="this.setLabels()" alt="">
+                  <img v-if="item" :src="itemImage(item)" @click="setLabels()" alt="">
                </div>
                <div v-if="item">{{ store.items[item].name }}</div>
                <div class="placeholder" v-else>Click an item</div>

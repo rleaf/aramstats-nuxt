@@ -25,9 +25,9 @@ export default defineEventHandler(async (e) => {
 
    if (!matchlist.length) {
       console.log(`[Already UTD]: ${query.gameName}#${query.tagLine} (${query.region})`)
-      return { 
-         status: 204 // do something better here
-      }
+      summonerDocument.updated = new Date()
+      await summonerDocument.save()
+      return { status: 204 }
    }
    
    console.log('updating summoner')

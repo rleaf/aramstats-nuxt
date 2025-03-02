@@ -13,7 +13,7 @@ export async function getSummonerStatus(gameName, tagLine, region) {
       })
       
    } catch (e) { }
-   return summoner || { parse: { status: config.STATUS_UNPARSED}}
+   return summoner || { parse: { status: config.status.UNPARSED}}
 }
 
 export async function findSummoner(gameName, tagLine, region) {
@@ -52,13 +52,11 @@ export async function initialParse(summonerDoc, updateMatchlist) {
    ])
    summonerDoc.challenges = challenges
    summonerDoc.parse.total = matchlist.length
-   summonerDoc.parse.status = config.STATUS_PARSING
+   summonerDoc.parse.status = config.status.PARSING
    await summonerDoc.save()
    for (let i = 0; i < matchlist.length; i += 50) {
       console.log(`${summonerDoc.gameName} i: ${i}`)
       const matches = await getBatchedMatchInfo(matchlist.slice(i, i + 50), summonerDoc.region)
-      console.log(matches, 'matches @ initialParse')
-      console.log(turkey)
       const timelines = await getBatchedTimelineInfo(matchlist.slice(i, i + 50), summonerDoc.region)
       const zip = matches.map((x, i) => [(x) ? x : undefined, (timelines[i]) ? timelines[i] : undefined])
       
@@ -553,7 +551,7 @@ async function computeChampionAverages(summonerDocument, championIds) {
       if (championIds) champion.avg = proxy
    }
 
-   summonerDocument.parse.status = config.STATUS_COMPLETE
+   summonerDocument.parse.status = config.status.COMPLETE
    summonerDocument.updated = Date.now()
    await summonerDocument.save()
 }

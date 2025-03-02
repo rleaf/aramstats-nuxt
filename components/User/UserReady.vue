@@ -39,7 +39,7 @@ function headerSort(i) {
 }
 
 function championSearchFocus(e) {
-   if (e.key !== 's' || document.activeElement === championSearch.value || superStore.focus || superStore.navContainerFocus) return
+   if (e.key !== 's' || document.activeElement === championSearch.value || store.focus || store.navContainerFocus) return
 
    e.preventDefault()
    championSearch.value.focus()
@@ -58,18 +58,8 @@ function toggleAll() {
 
 }
 
-function sort(idx) {
-   if (idx === sortFilter.value) {
-      (descending.value) ? sortFilter.value = null : descending.value = true
-
-   } else {
-      sortFilter.value = idx
-      descending.value = false
-   }
-}
-
 async function updateProfile() {
-   // update.value = true
+   update.value = true
    updateButton.value.innerHTML = 'Updating...'
 
    const { data, status } = await $fetch('/api/summoner/update', {
@@ -81,20 +71,19 @@ async function updateProfile() {
       }
    })
 
-
    update.value = false
    updateButton.value.innerHTML = 'Update'
 
-
+   console.log(status, 'status')
    if (status === 200) {
       data.value = data
-      superStore.setNotification('Summoner updated')
+      store.setNotification('Summoner updated')
       updateKey++
    }
 
    if (status === 204) {
       // hmm
-      superStore.setNotification('Summoner already up to date')
+      store.setNotification('Summoner already up to date')
    }
 }
 
@@ -417,16 +406,6 @@ const aggregatedStats = computed(() => {
             stats.secondaryRunes[m.sr] = [1, (m.w) ? 1 : 0]
          }
 
-         // if (stats.secondaryRunes[m.sr]) {
-         //    stats.secondaryRunes[m.sr].games++
-         //    stats.secondaryRunes[m.sr].wins += (m.w) ? 1 : 0
-         // } else {
-         //    stats.secondaryRunes[m.sr] = {
-         //       games: 1,
-         //       wins: (m.w) ? 1 : 0 
-         //    }
-         // }
-
          for (let i = 0; i < 6; i++) {
             if (m.ic[i] > 0) itemArrayHelper[i]++
          }
@@ -738,8 +717,8 @@ const updatedDate = computed(() => {
             <Heatmap :data="data.championData" />
             <div class="utility">
                <div>
-                  <input ref="championSearch" @keyup.escape="championSearch.blur()"
-                     @click="championFilter = ''" type="text" v-model="championFilter" spellcheck="false">
+                  <input ref="championSearch" @keyup.escape="championSearch.blur()" @click="championFilter = ''"
+                     type="text" v-model="championFilter" spellcheck="false">
                   <span v-show="!championFilter.length" class="keyboard-shortcut">
                      Press <kbd>s</kbd> to search
                   </span>

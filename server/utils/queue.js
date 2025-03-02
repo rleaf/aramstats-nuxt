@@ -135,7 +135,7 @@ export class Queue {
       await this.collection.findOne({ qPuuid: puuid })
          .then(res => position = (res) ? res.position : null)
 
-      return position
+      return position || 1
    }
 
    /**
