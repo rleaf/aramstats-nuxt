@@ -3,6 +3,7 @@ import { superStore } from '@/stores/superStore'
 import { championNames } from '~/constants/championNames'
 
 const store = superStore()
+const { start, finish } = useLoadingIndicator()
 const queryPatch = ref(useRoute().query.patch || store.recentCleanPatch)
 const sort = ref(1)
 const descending = ref(false)
@@ -12,29 +13,15 @@ const winrates = reactive({
    delta: 0
 })
 
-// const championData = ref(null)
-// const status = ref('success')
-
 await store.initPatches()
-const { data: championData, status } = await useAsyncData(
+const { data: championData } = await useAsyncData(
    () => $fetch('/api/champions', {
       query: {
          patch: queryPatch.value
       }
-   }), {
-      watch: [queryPatch]
-   }
-)
+   }))
 
 computeWinrates()
-
-
-watch(status, n => {
-   if (n === 'success') {
-      computeWinrates()
-   }
-})
-
 
 function computeWinrates() {
    for (const i in championData.value) {
@@ -71,8 +58,16 @@ function cleanPatch(patch) {
 }
 
 async function patchChange(patch) {
+   start()
    queryPatch.value = cleanPatch(patch)
-   navigateTo({ name: 'champions', query: { patch: queryPatch.value } })
+   championData.value = await $fetch('/api/champions', {
+      query: {
+         patch: queryPatch.value
+      }
+   })
+   computeWinrates()
+   useRouter().push({ query: { patch: queryPatch.value } })
+   finish()
 }
 
 function headerSort(o) {
@@ -180,7 +175,6 @@ const getChampionsList = computed(() => {
 </script>
 
 <template>
-   <!-- <Loading v-if="status === 'pending'" /> -->
    <div class="champ-list-main">
       <div class="utilities">
 
@@ -188,8 +182,7 @@ const getChampionsList = computed(() => {
             <span class="superscript">Patch:</span>
             <button class="patch-button">{{ useRoute().query.patch || store.recentCleanPatch }}</button>
             <div class="patch-options">
-               <button @click="patchChange(patch)" v-for="patch in store.patches" :key="patch">{{ cleanPatch(patch)
-                  }}</button>
+               <button @click="patchChange(patch)" v-for="patch in store.patches" :key="patch">{{ cleanPatch(patch) }}</button>
             </div>
          </div>
 
@@ -216,11 +209,10 @@ const getChampionsList = computed(() => {
                <rect class="asc-des" x="2" y="18" :width="descending ? '18' : '6'" height="2" />
             </svg>
          </button>
-         <!-- <UXTooltip class='toads' :align="'left'" :tip="'tierlist'" /> -->
+         <UXTooltip class='toads' :align="'left'" :tip="'tierlist'" />
       </div>
-      <Suspense>
 
-         <div v-if="status === 'success'" class="champ-table">
+         <div class="champ-table">
             <div class="header">
                <div v-for="(h, i) in headers" :key="i">
                   <div v-if="i < 4">
@@ -240,7 +232,7 @@ const getChampionsList = computed(() => {
                   </div>
                </div>
             </div>
-            <div v-if="status === 'success'" :class="{ 'o': i % 2 === 0 }" class="champion"
+            <div :class="{ 'o': i % 2 === 0 }" class="champion"
                v-for="(champ, i) in getChampionsList" :key="i">
                <div class="index">
                   {{ i + 1 }}
@@ -281,12 +273,7 @@ const getChampionsList = computed(() => {
                   <span>{{ (champ.gpm) ? champ.gpm.v : '-' }}</span>
                </div>
             </div>
-            <div v-else class="loading-champ-list">
-               <Loading />
-            </div>
          </div>
-         <Loading v-else />
-      </Suspense>
    </div>
 
 </template>

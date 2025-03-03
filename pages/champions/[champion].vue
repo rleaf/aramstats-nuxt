@@ -3,7 +3,7 @@ import { championNames, nameToId } from '~/constants/championNames';
 
 const route = useRoute()
 const store = superStore()
-
+const { start, finish } = useLoadingIndicator()
 await store.initPatches() // Prereq for the other store inits
 await Promise.all([
    store.initRunes(),
@@ -30,16 +30,18 @@ function scrollTo(el) {
    return
 }
 
+
 async function patchChange(patch) {
+   start()
    queryPatch.value = cleanPatch(patch)
    const data = await $fetch(`/api/champion/${route.params.champion}`, {
       params: {
-            patch: queryPatch.value,
-            champId: championId.value,
-         }
-   }) 
+         patch: queryPatch.value,
+         champId: championId.value,
+      }
+   })
    championData.value = data
-   // navigateTo({ name: 'champions-champion', query: { patch: queryPatch.value } })
+   finish()
 }
 
 function cleanPatch(patch) {
