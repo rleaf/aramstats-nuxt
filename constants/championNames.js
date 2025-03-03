@@ -239,7 +239,9 @@ let _names
 export const nameToId = (() => {
    if (!_names) {
       _names = {}
-      Object.keys(championNames).forEach(k => _names[championNames[k][0].toLowerCase()] = k)
+      Object.keys(championNames).forEach(k => {
+         (championNames[k][0] === 'MonkeyKing') ? _names['wukong'] = k : _names[championNames[k][0].toLowerCase()] = k
+      })
    }
    return _names
 })()

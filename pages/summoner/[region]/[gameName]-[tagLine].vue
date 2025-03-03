@@ -7,9 +7,15 @@ const res = reactive({
 })
 
 const { data, error } = await useFetch(`/api/summoner/${route.params.region}/${route.params.gameName}/${route.params.tagLine}`)
-res.stage = data.value.stage
-res.data = data.value.data
 
+console.log(data.value, 'data')
+console.log(error.value, 'error')
+
+if (data.value) {
+   res.stage = data.value.stage
+   res.data = data.value.data
+}
+console.log(res, 'res')
 async function queueSummoner() {
    res.stage = null
    $fetch(`/api/summoner/queueSummoner`, {
@@ -43,7 +49,7 @@ async function ping() {
 
 <template>
    <div>
-      <div v-if="res">
+      <div v-if="res.data">
          <UserReady v-if="res.stage === 'Complete'" :data="res.data" />
          <UserLoading v-else @parse-summoner="queueSummoner" :response="res" />
       </div>

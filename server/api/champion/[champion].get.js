@@ -1,6 +1,9 @@
 export default defineEventHandler(async e => {
    const query = getQuery(e)
    const coll = await utilLoadChampionCollection(query.patch)
+   if (!coll) {
+      return
+   }
    const pancakes = (await aggregateChampion(coll, Number(query.champId)))[0]
 
    if (!pancakes) {

@@ -8,7 +8,7 @@ export const superStore = defineStore('super', {
          loading: false,         // Boolean to determine if loading component is active
          champions: [],          // Array of champions for search bars. Initialized in App.vue
          focus: false,           // Boolean to determine if nav search bar is focused.
-         notification: '',       // Notifacation message
+         notification: null,       // Notifacation message
          patches: null,          // Array of 5 most recent patches
          championCDN: null,      // (CDN) Champion on most recent patch
          items: null,            // (CDN) Items on most recent patch
@@ -73,8 +73,9 @@ export const superStore = defineStore('super', {
          Fired after initPatches is called. Dont need conditional check because needs to be refreshed when clicking between champs.
       */
       async getChampionDragon(champ) {
+         const o = (champ === 'wukong') ? 'monkeyking' : champ 
          try {
-            const url = `https://cdn.communitydragon.org/${this.patches[0]}/champion/${champ}/data.json`;
+            const url = `https://cdn.communitydragon.org/${this.patches[0]}/champion/${o}/data.json`;
             ({ data: this.championCDN } = await useFetch(url))
          } catch (e) {
             if (e instanceof Error) console.log(e)

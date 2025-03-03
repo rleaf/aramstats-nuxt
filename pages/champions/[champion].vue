@@ -14,33 +14,34 @@ await Promise.all([
 
 const queryPatch = ref(route.query.patch || store.recentCleanPatch)
 const championId = ref(nameToId[route.params.champion.toLowerCase()])
-
-const { data: championData, status, error } = await useAsyncData(
+const { data: championData, error } = await useAsyncData(
    () => $fetch(`/api/champion/${route.params.champion}`, {
       params: {
          patch: queryPatch.value,
          champId: championId.value
       }
-   }), {
-      watch: [queryPatch]
-   }
-)
+   }))
 
 function scrollTo(el) {
    return
 }
 
-
 async function patchChange(patch) {
    start()
    queryPatch.value = cleanPatch(patch)
-   const data = await $fetch(`/api/champion/${route.params.champion}`, {
+   const res = await $fetch(`/api/champion/${route.params.champion}`, {
       params: {
          patch: queryPatch.value,
          champId: championId.value,
       }
    })
-   championData.value = data
+
+   if (res) {
+      championData.value = res
+      useRouter().push({ query: { patch: queryPatch.value } })
+   } else {
+         store.setNotification('Patch data unavailable.')      
+   }
    finish()
 }
 
@@ -49,7 +50,9 @@ function cleanPatch(patch) {
 }
 
 const background = computed(() => {
-   return `radial-gradient(ellipse at top, rgba(var(--surface-rgb), 0.8), rgba(var(--surface-rgb), 1) 73%), no-repeat -10% 25%/100% url('/champion_splash/${route.params.champion.toLowerCase()}.webp')` 
+   // return `radial-gradient(ellipse at top, rgba(var(--surface-rgb), 0.8), rgba(var(--surface-rgb), 1) 73%), no-repeat -10% 25%/100% url('/champion_splash/${route.params.champion.toLowerCase()}.webp')` 
+   return `radial-gradient(ellipse at top, rgba(var(--surface-rgb), 0.8), rgba(var(--surface-rgb), 1) 73%), no-repeat -10% 25%/100% url('/champion_splash/${championNames[championId.value][0]}.webp')` 
+   
 })
 
 const champIcon = computed(() => {

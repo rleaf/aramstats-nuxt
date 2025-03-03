@@ -3,6 +3,7 @@ import { superStore } from '@/stores/superStore'
 import { championNames } from '~/constants/championNames'
 
 const store = superStore()
+await store.initPatches()
 const { start, finish } = useLoadingIndicator()
 const queryPatch = ref(useRoute().query.patch || store.recentCleanPatch)
 const sort = ref(1)
@@ -60,13 +61,19 @@ function cleanPatch(patch) {
 async function patchChange(patch) {
    start()
    queryPatch.value = cleanPatch(patch)
-   championData.value = await $fetch('/api/champions', {
+   const res = await $fetch('/api/champions', {
       query: {
          patch: queryPatch.value
       }
    })
-   computeWinrates()
-   useRouter().push({ query: { patch: queryPatch.value } })
+
+   if (res) {
+      championData.value = res
+      useRouter().push({ query: { patch: queryPatch.value } })
+      computeWinrates()
+   } else {
+      store.setNotification('Patch data unavailable.')
+   }
    finish()
 }
 
