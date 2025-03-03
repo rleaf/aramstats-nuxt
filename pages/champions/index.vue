@@ -15,12 +15,16 @@ const winrates = reactive({
 })
 
 await store.initPatches()
-const { data: championData } = await useAsyncData(
+const { data: championData, error } = await useAsyncData(
    () => $fetch('/api/champions', {
       query: {
          patch: queryPatch.value
       }
    }))
+
+if (error.value) {
+   throw createError({ statusCode: error.value.statusCode, fatal: true })
+}
 
 computeWinrates()
 
@@ -219,68 +223,68 @@ const getChampionsList = computed(() => {
          <UXTooltip class='toads' :align="'left'" :tip="'tierlist'" />
       </div>
 
-         <div class="champ-table">
-            <div class="header">
-               <div v-for="(h, i) in headers" :key="i">
-                  <div v-if="i < 4">
-                     <h2 :class="{ 'highlight': sort === i }" @click="headerSort(i)">{{ h[0] }}</h2>
+      <div class="champ-table">
+         <div class="header">
+            <div v-for="(h, i) in headers" :key="i">
+               <div v-if="i < 4">
+                  <h2 :class="{ 'highlight': sort === i }" @click="headerSort(i)">{{ h[0] }}</h2>
+               </div>
+               <div v-else class="metrics">
+                  <div>
+                     <h3 @click="headerSort(i)">{{ h[0] }}</h3>
+                     <hr>
                   </div>
-                  <div v-else class="metrics">
-                     <div>
-                        <h3 @click="headerSort(i)">{{ h[0] }}</h3>
-                        <hr>
-                     </div>
-                     <div>
-                        <h2 :class="{ 'highlight': sort === (Math.floor(i / 4) - 1) * 4 + i + (i % 4) }"
-                           @click="headerSort((Math.floor(i / 4) - 1) * 4 + i + (i % 4))">µ</h2>
-                        <h2 :class="{ 'highlight': sort === (Math.floor(i / 4) - 1) * 4 + i + (i % 4) + 1 }"
-                           @click="headerSort((Math.floor(i / 4) - 1) * 4 + i + (i % 4) + 1)">σ</h2>
-                     </div>
+                  <div>
+                     <h2 :class="{ 'highlight': sort === (Math.floor(i / 4) - 1) * 4 + i + (i % 4) }"
+                        @click="headerSort((Math.floor(i / 4) - 1) * 4 + i + (i % 4))">µ</h2>
+                     <h2 :class="{ 'highlight': sort === (Math.floor(i / 4) - 1) * 4 + i + (i % 4) + 1 }"
+                        @click="headerSort((Math.floor(i / 4) - 1) * 4 + i + (i % 4) + 1)">σ</h2>
                   </div>
-               </div>
-            </div>
-            <div :class="{ 'o': i % 2 === 0 }" class="champion"
-               v-for="(champ, i) in getChampionsList" :key="i">
-               <div class="index">
-                  {{ i + 1 }}
-               </div>
-               <div>
-                  <NuxtLink :to="{ name: 'champions-champion', params: { champion: championRoute(champ._id) } }">
-                     <div class="image-wrapper">
-                        <img rel="preload" :src="champIcon(champ._id)" alt="">
-                     </div>
-                     <div>
-                        <span class="name">{{ championNames[champ._id][1] }}</span>
-                     </div>
-                  </NuxtLink>
-               </div>
-               <div :style="{ color: computeColor(champ.winrate) }" class="winrate">
-                  {{ champ.winrate }}%
-               </div>
-               <div>
-                  {{ champ.games }}
-               </div>
-               <div>
-                  {{ champ.pickRate }}%
-               </div>
-               <div class="metric-value">
-                  <span>{{ (champ.dpm) ? champ.dpm.m : '-' }}</span>
-                  <span>{{ (champ.dpm) ? champ.dpm.v : '-' }}</span>
-               </div>
-               <div class="metric-value">
-                  <span>{{ (champ.dtpm) ? champ.dtpm.m : '-' }}</span>
-                  <span>{{ (champ.dtpm) ? champ.dtpm.v : '-' }}</span>
-               </div>
-               <div class="metric-value">
-                  <span>{{ (champ.dmpm) ? champ.dmpm.m : '-' }}</span>
-                  <span>{{ (champ.dmpm) ? champ.dmpm.v : '-' }}</span>
-               </div>
-               <div class="metric-value">
-                  <span>{{ (champ.gpm) ? champ.gpm.m : '-' }}</span>
-                  <span>{{ (champ.gpm) ? champ.gpm.v : '-' }}</span>
                </div>
             </div>
          </div>
+         <div :class="{ 'o': i % 2 === 0 }" class="champion"
+            v-for="(champ, i) in getChampionsList" :key="i">
+            <div class="index">
+               {{ i + 1 }}
+            </div>
+            <div>
+               <NuxtLink :to="{ name: 'champions-champion', params: { champion: championRoute(champ._id) } }">
+                  <div class="image-wrapper">
+                     <img rel="preload" :src="champIcon(champ._id)" alt="">
+                  </div>
+                  <div>
+                     <span class="name">{{ championNames[champ._id][1] }}</span>
+                  </div>
+               </NuxtLink>
+            </div>
+            <div :style="{ color: computeColor(champ.winrate) }" class="winrate">
+               {{ champ.winrate }}%
+            </div>
+            <div>
+               {{ champ.games }}
+            </div>
+            <div>
+               {{ champ.pickRate }}%
+            </div>
+            <div class="metric-value">
+               <span>{{ (champ.dpm) ? champ.dpm.m : '-' }}</span>
+               <span>{{ (champ.dpm) ? champ.dpm.v : '-' }}</span>
+            </div>
+            <div class="metric-value">
+               <span>{{ (champ.dtpm) ? champ.dtpm.m : '-' }}</span>
+               <span>{{ (champ.dtpm) ? champ.dtpm.v : '-' }}</span>
+            </div>
+            <div class="metric-value">
+               <span>{{ (champ.dmpm) ? champ.dmpm.m : '-' }}</span>
+               <span>{{ (champ.dmpm) ? champ.dmpm.v : '-' }}</span>
+            </div>
+            <div class="metric-value">
+               <span>{{ (champ.gpm) ? champ.gpm.m : '-' }}</span>
+               <span>{{ (champ.gpm) ? champ.gpm.v : '-' }}</span>
+            </div>
+         </div>
+      </div>
    </div>
 
 </template>

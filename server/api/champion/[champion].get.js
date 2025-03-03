@@ -1,18 +1,25 @@
 export default defineEventHandler(async e => {
+   // if (e.context.dbReadyState === 0) {
+   //    throw createError({
+   //       statusCode: config.db.FAIL_STATUS,
+   //       body: config.db.FAIL_MESSAGE
+   //    })
+   // }
    const query = getQuery(e)
    const coll = await utilLoadChampionCollection(query.patch)
    if (!coll) {
       return
    }
-   const pancakes = (await aggregateChampion(coll, Number(query.champId)))[0]
 
-   if (!pancakes) {
+   const pancakes = (await aggregateChampion(coll, Number(query.champId)))
+   
+   if (!pancakes.length) {
       throw createError({
          statusCode: 404,
       })
    }
 
-   return pancakes
+   return pancakes[0]
 })
 
 async function aggregateChampion(coll, champion) {

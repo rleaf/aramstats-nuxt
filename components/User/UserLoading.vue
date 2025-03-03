@@ -6,6 +6,7 @@ useHead({
    title: 'ARAM Stats'
 })
 
+const roulette = computed(() => useRoulette())
 const parseStatus = computed(() => {
    if (document) document.title = `${data.value.current} / ${data.value.total} | ARAM Stats`
    return `${data.value.current} / ${data.value.total} matches completed`
@@ -25,7 +26,8 @@ const msg = `I update every 30 seconds. A summoner generally takes a couple minu
          </p>
          <p class="sub">
             {{ msg }}
-            <NuxtLink :to="{ name: 'summoner-region-gameName-tagLine', params: { region: 'na', gameName: 'ryi', tagLine: 'na1' } }"
+            <NuxtLink
+               :to="{ name: 'summoner-region-gameName-tagLine', params: { region: 'na', gameName: 'ryi', tagLine: 'na1' } }"
                target="_blank">Here</NuxtLink> is what you can expect to see.
          </p>
 
@@ -40,13 +42,20 @@ const msg = `I update every 30 seconds. A summoner generally takes a couple minu
       <div v-else-if="stage === 'Unparsed'">
          <h2>Hello, it seems this summoner has never been parsed.</h2>
          <p class="sub">
-            This process can take some time depending on the queue. You'll be able to refresh the page to see your progress.
+            This process can take some time depending on the queue. You'll be able to refresh the page to see your
+            progress.
             <NuxtLink
                :to="{ name: 'summoner-region-gameName-tagLine', params: { region: 'na', gameName: 'ryi', tagLine: 'na1' } }"
                target="_blank">Here</NuxtLink>
             is what you can expect to see when the account finishes.
          </p>
          <button @click="$emit('parseSummoner')">Parse summoner</button>
+      </div>
+
+      <div v-else-if="stage === 'DNE'">
+         <h2>Summoner does not exist.</h2>
+         <p class="sub">{{ data }}</p>
+         <img :src="`${roulette}`" alt="">
       </div>
 
       <div v-else>
@@ -56,6 +65,13 @@ const msg = `I update every 30 seconds. A summoner generally takes a couple minu
 </template>
 
 <style scoped>
+
+img {
+   padding-top: 50px;
+   max-height: 55vh;
+   display: block;
+   margin: auto;
+}
 
 h2 {
    font-size: 0.9rem;

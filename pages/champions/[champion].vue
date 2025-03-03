@@ -22,6 +22,10 @@ const { data: championData, error } = await useAsyncData(
       }
    }))
 
+if (error.value) {
+   throw createError({ statusCode: error.value.statusCode, fatal: true })
+}
+
 function scrollTo(el) {
    return
 }

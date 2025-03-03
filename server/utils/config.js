@@ -14,6 +14,11 @@ class Config {
 
    CHAMPION_PREFIX = `${this.prefix}/champion/:champion`
    CHAMPIONS_LIST_PREFIX = `${this.prefix}/championsList` // change to 'tier'? more catchy?
+
+   db = {
+      FAIL_STATUS: 500,
+      FAIL_MESSAGE: 'Database connection failed.'
+   }
    
    status = {
       COMPLETE: 'Complete',

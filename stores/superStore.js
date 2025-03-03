@@ -8,7 +8,7 @@ export const superStore = defineStore('super', {
          loading: false,         // Boolean to determine if loading component is active
          champions: [],          // Array of champions for search bars. Initialized in App.vue
          focus: false,           // Boolean to determine if nav search bar is focused.
-         notification: null,       // Notifacation message
+         notification: null,     // Notifacation message
          patches: null,          // Array of 5 most recent patches
          championCDN: null,      // (CDN) Champion on most recent patch
          items: null,            // (CDN) Items on most recent patch
@@ -108,7 +108,7 @@ export const superStore = defineStore('super', {
 
       setNotification(notification, duration) {
          this.notification = notification
-         setTimeout(() => this.notification = '', duration || 2000)
+         setTimeout(() => this.notification = null, duration || 3000)
       },
       
       setTooltipData(params) {

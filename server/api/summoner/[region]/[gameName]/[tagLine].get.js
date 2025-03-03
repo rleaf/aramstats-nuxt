@@ -1,16 +1,21 @@
 export default defineEventHandler(async (e) => {
+   // if (e.context.dbReadyState === 0) {
+   //    throw createError({
+   //       statusCode: config.db.FAIL_STATUS,
+   //       body: config.db.FAIL_MESSAGE
+   //    })
+   // }
    const queue = new Queue()
    let summoner
-   
    const routerParams = getRouterParams(e, { decode: true})
    console.log(`[Searching]: ${routerParams.gameName}#${routerParams.tagLine} (${routerParams.region})`)
    try {
       summoner = await getSummonerStatus(routerParams.gameName, routerParams.tagLine, routerParams.region)
    } catch (e) {
-      throw createError({
-         status: e.status,
-         statusMessage: e.body.status.message || e.status.message || e.message
-      })
+      return {
+         stage: config.status.DNE,
+         data: e.body.status.message || e.status.message || e.message
+      }
    }
 
    switch (summoner.parse.status) {
