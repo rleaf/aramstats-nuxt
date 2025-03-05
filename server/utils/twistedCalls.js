@@ -1,4 +1,4 @@
-import { RegionGroups, Regions } from 'twisted/dist/constants'
+import { RegionGroups, Regions } from 'twisted/dist/constants/index.js'
 import twisted from 'twisted'
 // import promiseRetry from 'promise-retry'
 

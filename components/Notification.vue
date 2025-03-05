@@ -5,7 +5,7 @@ const store = superStore()
 
 function onBeforeEnter(el) {
    el.style.opacity = `0`
-   el.style.transform = `translate(-50%,-200%)`
+   el.style.transform = `translate(-50%,-100%)`
 }
 
 function onAfterEnter(el) {
@@ -14,7 +14,7 @@ function onAfterEnter(el) {
 }
 
 function onBeforeLeave(el) {
-   el.style.transform = `translate(-50%,-200%)`
+   el.style.transform = `translate(-50%,-100%)`
    el.style.opacity = `0`
 }
 </script>
@@ -48,10 +48,10 @@ h2 {
 
 span {
    position: absolute;
-   height: 3px;
+   height: 5px;
    bottom: 0;
-   border-radius: 3px;
-   background-color: var(--error-container);
+   border-radius: 0 3px 3px 3px;
+   background-color: var(--tertiary-container);
    left: 0;
    animation: animate 2500ms linear;
    animation-delay: 500ms;  /* notification duration - transition = animation delay */
@@ -63,10 +63,12 @@ span {
 }
 
 svg {
-   fill: var(--error-container);
+   fill: var(--tertiary-container);
 }
 .notification-main {
    cursor: pointer;
+   font-family: var(--font-main);
+   font-weight: 600;
    display: flex;
    justify-content: center;
    align-items: center;
@@ -77,9 +79,9 @@ svg {
    left: 50%;
    transform: translateX(-50%);
    z-index: 10;
-   color: var(--error-container);
+   color: var(--on-tertiary);
    font-size: 0.85rem;
-   background: var(--error);
+   background: var(--tertiary);
    border-radius: 3px;
    padding: 0.75rem 1.5rem;
    transition: all 500ms ease-in-out;

@@ -3,6 +3,10 @@ import updates from '@/constants/updates'
 import version from '@/constants/version'
 const tab = ref(0)
 
+useSeoMeta({
+   title: 'Updates | ARAM Stats',
+})
+
 function getImage(fileName) {
    return fileName.includes('imgur.com') ? fileName :
    `/images/${fileName}.webp`

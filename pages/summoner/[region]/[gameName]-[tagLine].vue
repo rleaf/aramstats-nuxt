@@ -25,12 +25,11 @@ async function queueSummoner() {
       },
    })
 
-   poll.value = setInterval(ping, 15000);
+   poll.value = setInterval(ping, 30000);
    setTimeout(ping, 3000);
 }
 
 async function ping() {
-   console.log('ping')
    const { stage, data } = await $fetch(`/api/summoner/${route.params.region}/${route.params.gameName}/${route.params.tagLine}`)
       .catch((e) => { console.log(e, 'error') })
 
@@ -38,7 +37,6 @@ async function ping() {
    res.data = data
 
    if (stage === 'Complete') {
-      console.log('clearing')
       clearInterval(poll.value)
    }
 }

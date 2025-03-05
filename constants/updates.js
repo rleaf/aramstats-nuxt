@@ -11,6 +11,31 @@
 */
 
 const updates = [
+   
+   {
+      title: `"New" Site`,
+      version: "4.0.0",
+      date: "3/5/25",
+      body: [
+         `Aramstats has been redeveloped on Nuxt. Functionality is generally the same, however there are a few new UX things which are listed off in the versioning tab.`,
+         `There's a non zero chance of bugs due to the significance of this update. I'll be monitoring for any issues.`,
+      ],
+      links: [],
+      img: [], // Expected webp format
+      imgCaption: ""
+   },
+   {
+      title: "Site Will be Down ~3/4 - 3/5",
+      version: "",
+      date: "3/4/25",
+      body: [
+         `Aramstats will be down, March 3 - March 4, to accomodate transitioning to the new build. Transition should take less than a day, but is variable.`,
+         `If you're seeing this update accompanied with the corresponding red header at the top of the site, I would hold off on parsing/updating any accounts until the site is back up.`
+      ],
+      links: [],
+      img: [], // Expected webp format
+      imgCaption: ""
+   },
    {
       title: "Riot API Issues",
       version: "3.14.3",

@@ -2,10 +2,6 @@
 const { response } = defineProps(['response'])
 const { stage, data } = toRefs(response)
 
-useHead({
-   title: 'ARAM Stats'
-})
-
 const roulette = computed(() => useRoulette())
 const parseStatus = computed(() => {
    if (document) document.title = `${data.value.current} / ${data.value.total} | ARAM Stats`
@@ -27,7 +23,7 @@ const msg = `I update every 30 seconds. A summoner generally takes a couple minu
          <p class="sub">
             {{ msg }}
             <NuxtLink
-               :to="{ name: 'summoner-region-gameName-tagLine', params: { region: 'na', gameName: 'ryi', tagLine: 'na1' } }"
+               :to="{ name: 'summoner-region-gameName-tagLine', params: { region: 'na', gameName: 'Night Owl', tagLine: 'ryi' } }"
                target="_blank">Here</NuxtLink> is what you can expect to see.
          </p>
 
@@ -45,7 +41,7 @@ const msg = `I update every 30 seconds. A summoner generally takes a couple minu
             This process can take some time depending on the queue. You'll be able to refresh the page to see your
             progress.
             <NuxtLink
-               :to="{ name: 'summoner-region-gameName-tagLine', params: { region: 'na', gameName: 'ryi', tagLine: 'na1' } }"
+               :to="{ name: 'summoner-region-gameName-tagLine', params: { region: 'na', gameName: 'Night Owl', tagLine: 'ryi' } }"
                target="_blank">Here</NuxtLink>
             is what you can expect to see when the account finishes.
          </p>

@@ -74,6 +74,11 @@ export const superStore = defineStore('super', {
       */
       async getChampionDragon(champ) {
          const o = (champ === 'wukong') ? 'monkeyking' : champ 
+
+         /*
+            Work on issue where when new patch rolls around, cdragon doesn't update immediately, so roll back to prior cdragon patch. Use while loop with a roller or something
+         */
+
          try {
             const url = `https://cdn.communitydragon.org/${this.patches[0]}/champion/${o}/data.json`;
             ({ data: this.championCDN } = await useFetch(url))

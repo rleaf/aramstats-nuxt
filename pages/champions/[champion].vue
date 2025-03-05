@@ -26,6 +26,14 @@ if (error.value) {
    throw createError({ statusCode: error.value.statusCode, fatal: true })
 }
 
+useSeoMeta({
+   title: `${championNames[championId.value][1]} | ARAM Stats`,
+   ogTitle: `${championNames[championId.value][1]} | ARAM Stats`,
+   description: `${championNames[championId.value][1]} builds and stats for ARAM on patch ${store.recentCleanPatch}. View data tailored to the most popular core builds.`,
+   ogDescription: `${championNames[championId.value][1]} builds and stats for ARAM on patch ${store.recentCleanPatch}. View data tailored to the most popular core builds.`,
+   ogImage: `https://ddragon.leagueoflegends.com/cdn/${store.patches[0]}/img/champion/${championNames[championId.value][0]}.png`
+})
+
 function scrollTo(el) {
    return
 }
@@ -54,8 +62,7 @@ function cleanPatch(patch) {
 }
 
 const background = computed(() => {
-   // return `radial-gradient(ellipse at top, rgba(var(--surface-rgb), 0.8), rgba(var(--surface-rgb), 1) 73%), no-repeat -10% 25%/100% url('/champion_splash/${route.params.champion.toLowerCase()}.webp')` 
-   return `radial-gradient(ellipse at top, rgba(var(--surface-rgb), 0.8), rgba(var(--surface-rgb), 1) 73%), no-repeat -10% 25%/100% url('/champion_splash/${championNames[championId.value][0]}.webp')` 
+   return `radial-gradient(ellipse at top, rgba(var(--surface-rgb), 0.8), rgba(var(--surface-rgb), 1) 73%), no-repeat -10% 25%/100% url('/champion_splash/${championNames[championId.value][0].toLowerCase()}.webp')` 
    
 })
 

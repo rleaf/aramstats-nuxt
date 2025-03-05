@@ -20,7 +20,7 @@ export default defineEventHandler(async (e) => {
 
    switch (summoner.parse.status) {
       case config.status.COMPLETE:
-         console.log('SUMMONER FOUND')
+         console.log(`[Found]: ${routerParams.gameName}#${routerParams.tagLine} (${routerParams.region})`)
          return {
             stage: config.status.COMPLETE,
             data: (await aggregateSummoner(summoner._id))[0]
@@ -28,7 +28,7 @@ export default defineEventHandler(async (e) => {
 
       case config.status.PARSING:
          if (queue.inactiveRegions.has(routerParams.region)) { // Limbo accounts
-            console.log('SUMMONER DELETED')
+            console.log(`[Deleted]: ${routerParams.gameName}#${routerParams.tagLine} (${routerParams.region})`)
             await deleteSummoner(summoner._id)
             return { stage: config.status.DELETED }
          } else {
@@ -45,6 +45,7 @@ export default defineEventHandler(async (e) => {
          }
 
       case config.status.UNPARSED:
+         console.log(`[Unparsed]: ${routerParams.gameName}#${routerParams.tagLine} (${routerParams.region})`)
          return {
             stage: config.status.UNPARSED,
             data: 'Summoner is not parsed.'

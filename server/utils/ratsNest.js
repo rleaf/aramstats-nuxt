@@ -38,7 +38,6 @@ export async function deleteSummoner(puuid) {
 
    await SummonerMatchesModel.bulkWrite(bin)
    await SummonerModel.deleteOne({ _id: summoner._id })
-   console.log('delete successful')
 }
 
 export async function initialParse(summonerDoc, updateMatchlist) {

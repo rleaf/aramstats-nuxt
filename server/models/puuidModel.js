@@ -10,4 +10,4 @@ const puuidSchema = new mongoose.Schema({
    name: String,
 }, { versionKey: false })
 
-export const PuuidModel = mongoose.model('nuxt_summoner_puuid', puuidSchema)
+export const PuuidModel = mongoose.model('test_summoner_puuid', puuidSchema)

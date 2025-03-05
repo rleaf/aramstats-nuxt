@@ -39,4 +39,4 @@ const summonerMatchesSchema = new mongoose.Schema({
    tId: Number,         // teamId
 })
 
-export const SummonerMatchesModel = mongoose.model('nuxt_summoner_matches', summonerMatchesSchema)
+export const SummonerMatchesModel = mongoose.model('test_summoner_matches', summonerMatchesSchema)

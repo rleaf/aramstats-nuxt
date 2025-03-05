@@ -24,7 +24,7 @@ const championSearch = useTemplateRef('championSearch')
 
 await store.initPatches()
 
-useHead({
+useSeoMeta({
    title: `${data.value.gameName}#${data.value.tagLine} | ARAM Stats`
 })
 
@@ -61,16 +61,16 @@ function toggleAll() {
 
 }
 
-function del() {
-   $fetch(`/api/summoner/delete`,{
-      method: 'DELETE',
-      params: {
-         region: route.params.region,
-         gameName: route.params.gameName,
-         tagLine: route.params.tagLine,
-      }
-   })
-}
+// function del() {
+//    $fetch(`/api/summoner/delete`,{
+//       method: 'DELETE',
+//       params: {
+//          region: route.params.region,
+//          gameName: route.params.gameName,
+//          tagLine: route.params.tagLine,
+//       }
+//    })
+// }
 
 async function updateProfile() {
    update.value = true
@@ -88,7 +88,6 @@ async function updateProfile() {
    update.value = false
    updateButton.value.innerHTML = 'Update'
 
-   console.log(status, 'status')
    if (status === 200) {
       data.value = data
       store.setNotification('Summoner updated')
@@ -600,8 +599,6 @@ const updatedDate = computed(() => {
                <div class="buttons">
                   <button :class="{ 'active-update': update }" ref="updateButton" :disabled="update"
                      @click="updateProfile()">Update</button>
-                  <button :class="{ 'active-update': update }" ref="updateButton" :disabled="update"
-                     @click="del()">Delete</button>
                </div>
                <div class="last-updated">
                   Last updated: {{ updatedDate }}

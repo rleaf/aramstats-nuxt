@@ -26,6 +26,13 @@ if (error.value) {
    throw createError({ statusCode: error.value.statusCode, fatal: true })
 }
 
+useSeoMeta({
+   title: `Champions | ARAM Stats`,
+   ogTitle: `Champions | ARAM Stats`,
+   description: `ARAM tier list on patch ${store.recentCleanPatch}.`,
+   ogDescription: `ARAM tier list on patch ${store.recentCleanPatch}.`,
+})
+
 computeWinrates()
 
 function computeWinrates() {

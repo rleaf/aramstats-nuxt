@@ -1,5 +1,9 @@
 <script setup>
 import about from '@/constants/about'
+
+useSeoMeta({
+   title: 'About | ARAM Stats',
+})
 </script>
 
 <template>

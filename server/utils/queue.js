@@ -120,7 +120,6 @@ export class Queue {
       try {
          const idx = (await this.count(region))
          await this.collection.insertOne({ qPuuid: puuid, region: region, position: idx + 1 })
-         console.log(idx, 'idx add queue')
       } catch (e) {
          if (e instanceof mongodb.MongoServerError) throw e
       }

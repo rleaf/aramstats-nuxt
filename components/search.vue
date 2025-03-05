@@ -33,7 +33,11 @@ function blurInput() {
 async function summonerSearch() {
    if (!input.value) return
    if (filteredChamps.value[step.value]) {
-      await navigateTo({ name: 'champions-champion', params: { champion: filteredChamps.value[step.value].back } })
+      if (filteredChamps.value[step.value].back === 'monkeyking') {
+         await navigateTo({ name: 'champions-champion', params: { champion: 'wukong' } })
+      } else {
+         await navigateTo({ name: 'champions-champion', params: { champion: filteredChamps.value[step.value].back } })
+      }
       store.navContainerFocus = false
       return
    }

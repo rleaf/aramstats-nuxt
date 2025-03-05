@@ -14,15 +14,26 @@
   const version = [
    {
       version: "4.0.0",
-      date: "2/22/25",
+      date: "3/5/25",
       notes: `Vue/Express -> Nuxt/Nitro.`,
-      add: [],
-      remove: [],
-      fix: [],
-      adjust: [
-         `Rebuilt site on Nuxt stack.`,
+      add: [
+         `Loading indicator for fetches`,
+         `A little better 500 error handling.`,
+         `SWR rendering on champion affiliated pages.`,
+         `Made animal pics roulette larger.`,
       ],
-      known: [],
+      remove: [],
+      fix: [
+         `Routing to 404 monkeyking page when searching for wukong.`
+      ],
+      adjust: [
+         `Rebuilt Aramstats on Nuxt stack.`,
+         `Improved notifications UX for data fetching. Instead of defaulting to latest patch on an invalid patch query, it'll let you know that the patch data DNE. (This is just one example).`,
+         `Improved UX of going through the stages of parsing a summoner.`,
+      ],
+      known: [
+         `cdragon/ddragon versioning mismatches causing 404 during new patch releases.`
+      ],
    },
    {
       version: "3.15.1",

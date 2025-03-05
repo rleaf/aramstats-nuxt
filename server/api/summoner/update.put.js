@@ -30,7 +30,6 @@ export default defineEventHandler(async (e) => {
       return { status: 204 }
    }
    
-   console.log('updating summoner')
    summonerDocument.challenges = challenges
    summonerDocument.gameName = summoner.gameName
    summonerDocument.tagLine = summoner.tagLine
