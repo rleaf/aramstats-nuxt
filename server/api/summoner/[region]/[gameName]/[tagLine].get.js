@@ -14,10 +14,11 @@ export default defineEventHandler(async (e) => {
    } catch (e) {
       return {
          stage: config.status.DNE,
-         data: e.body.status.message || e.status.message || e.message
+         data: e.body.message || e.message
       }
    }
-
+   
+   console.log('turkey')
    switch (summoner.parse.status) {
       case config.status.COMPLETE:
          console.log(`[Found]: ${routerParams.gameName}#${routerParams.tagLine} (${routerParams.region})`)

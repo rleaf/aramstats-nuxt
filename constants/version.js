@@ -20,10 +20,11 @@
       ],
       remove: [],
       fix: [
-         `Landing title`,
-         `+Legal footer`,
-         `+Google tag`,
-         `+Small screen notification`,
+         `Landing title.`,
+         `Summoner DNE response (404).`
+         `+Legal footer.`,
+         `+Google tag.`,
+         `+Small screen notification.`,
       ],
       adjust: [],
       known: [],
@@ -33,7 +34,7 @@
       date: "3/5/25",
       notes: `Vue/Express -> Nuxt/Nitro.`,
       add: [
-         `Loading indicator for fetches`,
+         `Loading indicator for fetches.`,
          `A little better 500 error handling.`,
          `SWR rendering on champion affiliated pages.`,
          `Made animal pics roulette larger.`,
