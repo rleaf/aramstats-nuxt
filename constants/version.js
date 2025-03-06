@@ -14,14 +14,16 @@
   const version = [
    {
       version: "4.0.1",
-      date: "3/5/25",
+      date: "3/6/25",
       notes: "",
       add: [
       ],
       remove: [],
       fix: [
          `Landing title`,
-         `Readded Legal footer`
+         `+Legal footer`,
+         `+Google tag`,
+         `+Small screen notification`,
       ],
       adjust: [],
       known: [],

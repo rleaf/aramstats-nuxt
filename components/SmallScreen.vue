@@ -7,7 +7,6 @@ onMounted(() => {
 })
 
 onBeforeUnmount(() => {
-
    window.removeEventListener('resize', fire)
 })
 
