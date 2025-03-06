@@ -1,20 +1,13 @@
 <script setup>
-import updates from '../constants/updates'
-// const msg = ref(updates[0].title)
-// const data = ref(null)
-onMounted(async () => {
-})
-const url = 'https://raw.githubusercontent.com/rleaf/aramstats-nuxt/refs/heads/main/package.json'
-const url3 = 'https://cdn.jsdelivr.net/gh/rleaf/aramstats-nuxt@latest/constants/updates.js'
-const url2 = 'https://gist.github.com/rleaf/5cbd81793fa359837e9b41f89d4394be.js'
-const { data } = await useFetch(url3)
+const url = 'https://cdn.jsdelivr.net/gh/rleaf/aramstats-nuxt@latest/constants/header.json'
+const { data } = await useFetch(url)
 console.log(data.value, 'header data')
 
 </script>
 
 <template>
    <div class="header-main red">
-      {{ data.name }}
+      <!-- {{ data['4.1.0'] }} -->
       <!-- <RouterLink to="/updates">{{ data.name }}</RouterLink> -->
    </div>
 </template>
