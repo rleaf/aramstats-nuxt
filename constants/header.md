@@ -1,1 +1,1 @@
-amazingly few discotheques provide jukeboxes
+pack my box with five dozen liquor jugs
