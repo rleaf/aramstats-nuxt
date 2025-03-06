@@ -20,7 +20,6 @@ export default defineNuxtConfig({
   ],
   modules: [
     '@pinia/nuxt',
-    'nuxt-gtag',
   ],
   vite: {
     assetsInclude: ['**/*.glb'],
@@ -28,8 +27,5 @@ export default defineNuxtConfig({
   css: [
     '~/assets/css/main.css'
   ],
-  gtag: {
-    id: 'G-PD6QYJ923C',
-  },
   compatibilityDate: '2025-03-05',
 })
