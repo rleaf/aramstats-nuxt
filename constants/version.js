@@ -13,6 +13,20 @@
   
   const version = [
    {
+      version: "4.0.1",
+      date: "3/5/25",
+      notes: "",
+      add: [
+      ],
+      remove: [],
+      fix: [
+         `Landing title`,
+         `Readded Legal footer`
+      ],
+      adjust: [],
+      known: [],
+   }, 
+   {
       version: "4.0.0",
       date: "3/5/25",
       notes: `Vue/Express -> Nuxt/Nitro.`,

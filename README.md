@@ -1,2 +1,2 @@
 # aramstats-nuxt
-aramstats built using nuxt
+[aramstats](https://github.com/rleaf/aramstats) built using nuxt
