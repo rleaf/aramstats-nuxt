@@ -21,7 +21,7 @@
       remove: [],
       fix: [
          `Landing title.`,
-         `Summoner DNE response (404).`
+         `Summoner DNE response (404).`,
          `+Legal footer.`,
          `+Google tag.`,
          `+Small screen notification.`,
