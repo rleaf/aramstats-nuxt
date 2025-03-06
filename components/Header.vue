@@ -1,14 +1,11 @@
 <script setup>
-const url = 'https://cdn.jsdelivr.net/gh/rleaf/aramstats-nuxt@latest/constants/header.json'
-const { data } = await useFetch(url)
-console.log(data.value, 'header data')
-
+const { data } = await useFetch('https://cdn.jsdelivr.net/gh/rleaf/aramstats-nuxt@latest/constants/header.json')
 </script>
 
 <template>
-   <div class="header-main red">
-      <!-- {{ data['4.1.0'] }} -->
-      <!-- <RouterLink to="/updates">{{ data.name }}</RouterLink> -->
+   <div v-if="data.msg" class="header-main">
+      <!-- <RouterLink to="/updates">{{ data.msg }}</RouterLink> -->
+      <p>{{ data.msg }}</p>
    </div>
 </template>
 
@@ -18,10 +15,7 @@ console.log(data.value, 'header data')
       justify-content: center;
       align-items: center;
       height: 30px;
-      background: linear-gradient(90deg, rgba(94, 150, 167, 0.5), rgba(32, 107, 129, 0.5));
-      background-size: 400% 400%;
-      animation: gradient 5s ease infinite;
-      color: var(--color-font);
+      background: rgba(var(--tertiary-container-rgb), 0.5);
       font-size: 0.85rem;
    }
 
@@ -30,7 +24,7 @@ console.log(data.value, 'header data')
    }
    
    a, p {
-      color: var(--color-font);
+      color: var(--tertiary);
    }
 
    @keyframes gradient {

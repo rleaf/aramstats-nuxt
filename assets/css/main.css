@@ -46,8 +46,10 @@
    --on-secondary-fixed-variant: rgb(63 71 89);
 
    --tertiary: rgb(222 188 223);
+   --tertiary-rgb: 222, 188, 223;
    --on-tertiary: rgb(64 40 67);
    --tertiary-container: rgb(88 62 91);
+   --tertiary-container-rgb: 88, 62, 91;
    --tertiary-container-hover: rgb(106, 74, 109);
    --on-tertiary-container: rgb(251 215 252);
    --tertiary-fixed: rgb(251 215 252);
@@ -124,6 +126,7 @@
    --tertiary: rgb(113 85 115);
    --on-tertiary: rgb(255 255 255);
    --tertiary-container: rgb(251 215 252);
+   --tertiary-container-rgb: 251, 215, 252;
    --on-tertiary-container: rgb(41 19 45);
    --tertiary-fixed: rgb(251 215 252);
    --on-tertiary-fixed: rgb(41 19 45);
