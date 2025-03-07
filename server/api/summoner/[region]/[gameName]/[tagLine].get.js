@@ -18,7 +18,6 @@ export default defineEventHandler(async (e) => {
       }
    }
    
-   console.log('turkey')
    switch (summoner.parse.status) {
       case config.status.COMPLETE:
          console.log(`[Found]: ${routerParams.gameName}#${routerParams.tagLine} (${routerParams.region})`)
