@@ -1,5 +1,5 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
-import { championNames } from "./constants/championNames"
+import { championNames, nameToId } from "./constants/championNames"
 export default defineNuxtConfig({
   app: {
     head: {
@@ -16,8 +16,8 @@ export default defineNuxtConfig({
   sitemap: {
     urls: () => {
       let arr = []
-      for (const c of Object.values(championNames)) {
-        arr.push(`/champions/${c[0].toLowerCase()}`)
+      for (const c of Object.keys(nameToId)) {
+        arr.push(`/champions/${c.toLowerCase()}`)
       }
       return arr
     }
