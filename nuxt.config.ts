@@ -1,4 +1,5 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
+import { championNames } from "./constants/championNames"
 export default defineNuxtConfig({
   app: {
     head: {
@@ -6,6 +7,19 @@ export default defineNuxtConfig({
       htmlAttrs: {
         lang: 'en'
       }
+    }
+  },
+  site: {
+    url: 'https://aramstats.lol',
+    name: 'ARAM Stats',
+  },
+  sitemap: {
+    urls: () => {
+      let arr = []
+      for (const c of Object.values(championNames)) {
+        arr.push(`/champions/${c[0].toLowerCase()}`)
+      }
+      return arr
     }
   },
   devtools: {
@@ -20,7 +34,8 @@ export default defineNuxtConfig({
   ],
   modules: [
     '@pinia/nuxt',
-    'nuxt-gtag'
+    '@nuxtjs/sitemap',
+    'nuxt-gtag',
   ],
   gtag: {
     id: 'G-PD6QYJ923C'

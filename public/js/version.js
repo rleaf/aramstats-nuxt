@@ -19,7 +19,8 @@
       add: [],
       remove: [],
       fix: [
-         `Delegate small screen to client side.`
+         `Delegate small screen to client side.`,
+         `Sitemap`
       ],
       adjust: [
          `Edit v4.0.0 update for more clarity.`,
