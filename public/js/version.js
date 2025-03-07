@@ -13,11 +13,26 @@
   
   const version = [
    {
+      version: "4.1.0",
+      date: "3/7/25",
+      notes: "",
+      add: [],
+      remove: [],
+      fix: [
+         `Delegate small screen to client side.`
+      ],
+      adjust: [
+         `Edit v4.0.0 update for more clarity.`,
+         `Dramatically simplify communicating updates/version so I'm not rebuilding this behemoth every time.`,
+         `Increased landing description clarity.`,
+      ],
+      known: [],
+   }, 
+   {
       version: "4.0.1",
       date: "3/6/25",
       notes: "",
-      add: [
-      ],
+      add: [],
       remove: [],
       fix: [
          `Landing title.`,

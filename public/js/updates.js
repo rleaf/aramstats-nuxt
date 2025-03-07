@@ -11,14 +11,14 @@
 */
 
 const updates = [
-   
    {
-      title: `"New" Site`,
+      title: `"New" Site. Expect Unexpected Downtime.`,
       version: "4.0.0",
+      header: true,
       date: "3/5/25",
       body: [
          `Aramstats has been redeveloped on Nuxt. Functionality is generally the same, however there are a few new UX things which are listed off in the versioning tab.`,
-         `There's a non zero chance of bugs due to the significance of this update. I'll be monitoring for any issues.`,
+         `There's a non zero chance of bugs due to the significance of this update. I'll be monitoring for any issues and taking the site offline to patch them if needed.`,
       ],
       links: [],
       img: [], // Expected webp format

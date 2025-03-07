@@ -20,7 +20,11 @@ export default defineNuxtConfig({
   ],
   modules: [
     '@pinia/nuxt',
+    'nuxt-gtag'
   ],
+  gtag: {
+    id: 'G-PD6QYJ923C'
+  },
   vite: {
     assetsInclude: ['**/*.glb'],
   },

@@ -4,7 +4,9 @@
 <template>
    <NuxtLoadingIndicator :height="2" :color="'var(--primary)'" />
    <Header />
-   <SmallScreen />
+   <ClientOnly>
+      <SmallScreen />
+   </ClientOnly>
    <Notification />
    <Nav />
    <slot />

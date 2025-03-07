@@ -1,15 +1,14 @@
 <script setup>
+const store = superStore()
+store.initPatches()
+const patch = computed(() => (store.recentCleanPatch) ? `Patch ${store.recentCleanPatch} data available. ☃️` : '☃️')
 
 useSeoMeta({
    title: 'ARAM Stats',
    ogTitle: 'ARAM Stats',
-   description: 'Aramstats provides insightful Howling Abyss summoner and champion statistics. ☃️',
-   ogDescription: 'Aramstats provides insightful Howling Abyss summoner and champion statistics. ☃️',
+   description: `Aramstats provides insightful Howling Abyss summoner and champion statistics. ${patch.value}`,
+   ogDescription: `Aramstats provides insightful Howling Abyss summoner and champion statistics. ${patch.value}`,
 })
-
-const legal = computed(() => 
-{
-   return `Aramstats.lol isn't endorsed by Riot Games and doesn't reflect the views or opinions of Riot Games or anyone officially involved in producing or managing Riot Games properties. Riot Games, and all associated properties are trademarks or registered trademarks of Riot Games, Inc.` })
 
 </script>
 
@@ -17,7 +16,9 @@ const legal = computed(() =>
    <div>
       <Search />
       <Experience />
-      <span>{{ legal }}</span>
+      <span>
+         Aramstats.lol isn't endorsed by Riot Games and doesn't reflect the views or opinions of Riot Games or anyone associated properties are trademarks or registered trademarks of Riot Games, Inc.
+      </span>
    </div>
 </template>
 

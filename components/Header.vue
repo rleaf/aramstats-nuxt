@@ -1,11 +1,10 @@
 <script setup>
-const { data } = await useFetch('https://raw.githubusercontent.com/rleaf/aramstats-nuxt/refs/heads/main/constants/header.md')
+import updates from '~/public/js/updates'
 </script>
 
 <template>
-   <div v-if="data" class="header-main">
-      <!-- <RouterLink to="/updates">{{ data.msg }}</RouterLink> -->
-      <p>{{ data }}</p>
+   <div v-if="updates[0].header" class="header-main">
+      <NuxtLink to="/updates">{{ updates[0].title }}</NuxtLink>
    </div>
 </template>
 

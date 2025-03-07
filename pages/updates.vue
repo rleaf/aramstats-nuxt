@@ -1,6 +1,6 @@
 <script setup>
-import updates from '@/constants/updates'
-import version from '@/constants/version'
+import updates from '~/public/js/updates'
+import version from '~/public/js/version'
 const tab = ref(0)
 
 useSeoMeta({
