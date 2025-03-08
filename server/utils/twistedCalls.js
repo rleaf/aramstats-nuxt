@@ -44,42 +44,6 @@ const REGION_GROUPS = {
    ph: RegionGroups.SEA,
 }
 
-// export const retryWrapper = async (fn, args) => {
-//    return await promiseRetry(async retry => {
-//       try {
-//          return (await fn(...args)).response
-//       } catch (e) {
-//          if (e instanceof Error && (e.status !== 404) && e.status !== 429) { // Do not retry on 404
-//             console.log(e.status, e.message, e.body, 'retryWrapper ')
-//             if (e.status === 403 || e.status === 400) throw e
-//             retry()
-//          } else {
-//             throw e
-//          }
-//       }
-//    }, { retries: 2, factor: 2, minTimeout: 2000 })
-//    .catch(e => {
-//       if (e instanceof Error) throw e
-//    })
-// }
-
-// export const axiosRetryWrapper = async (fn, args) => {
-//    return await promiseRetry(async retry => {
-//       try {
-//          return (await fn(...args)).response
-//       } catch (e) {
-//          if (e instanceof Error && (e.name === 'GenericError') && e.status !== 429) { // Do not retry on 404
-//             retry()
-//          } else {
-//             throw e
-//          }
-//       }
-//    }, { retries: 1, factor: 2, minTimeout: 2000 })
-//    .catch(e => {
-//       if (e instanceof Error) throw e
-//    })
-// }
-
 /** 
 * Summoner info w/ account-v1
 * Tethered to AMERICAS region rn because closest to backend server. Can move if need to balance rate limits
@@ -105,8 +69,6 @@ export const getSummoner = async (puuid, region) => {
 export const getSummonerMatches = async (puuid, region, start, count) => {
    return await lolApi.MatchV5.list('adskdf', REGION_GROUPS[region], { queue: 450, start: start, count: count })
       .catch(e => { })
-   // return await retryWrapper(lolApi.MatchV5.list.bind(lolApi.MatchV5), [puuid, REGION_GROUPS[region], { queue: 450, start: start, count: count }])
-   //    .catch(e => { })
 }
 
 /* 
@@ -149,37 +111,11 @@ export const getAllSummonerMatches = async (puuid, region, lastMatchId) => {
 }
 
 /* 
-* Get ARAM matches on the most recent patch by the hundreds. Used for crawl init atm.
-* Summoner `iLoveUrMomXD` (na) has a contiguous sequence of dead matches that return 404. Starting @ NA1_3961520099.
-* 
-* Break loop if matchlist[-1] 404s  
-*/
-// export const getSummonerMatchesOnPatch = async (puuid, region, patch) => {
-//    let matchlist = []
-//    let stop = true
-
-//    for (let i = 0; stop; i+=100) {
-//       const pull = await retryWrapper(lolApi.MatchV5.list.bind(lolApi.MatchV5), [puuid, REGION_GROUPS[region], { queue: 450, start: i, count: 100 }])
-//       matchlist.push(pull)
-
-//       const lastMatch = await getMatchInfo(pull[pull.length - 1], region)
-//       if (lastMatch.status_code && lastMatch.status_code === 404) break
-
-//       const matchPatch = lastMatch.info.gameVersion.split('.').slice(0, 2).join('.')
-//       if (patch != matchPatch) stop = false
-//    }
-
-//    return matchlist.flat()
-// }
-
-/* 
 * Match info.
 */
 export const getMatchInfo = async (matchId, region) => {
    return (await lolApi.MatchV5.get(matchId, REGION_GROUPS[region])
       .catch(e => { })).response
-   // return await retryWrapper(lolApi.MatchV5.get.bind(lolApi.MatchV5), [matchId, REGION_GROUPS[region]])
-   //    .catch(e => { })
 }
 
 /* 
