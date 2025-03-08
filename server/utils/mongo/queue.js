@@ -1,5 +1,6 @@
 import mongodb from 'mongodb'
 import { SummonerModel } from '../models/summonerModel'
+// import { initSummonerParse } from './parse'
 
 let instance = null
 
@@ -32,8 +33,8 @@ export class Queue {
          'ph',
          'me'
       ])
-      this.db = generateConnections()
-      this.initCollection()
+      // this.db = generateConnections()
+      // this.initCollection()
    }
 
    async initCollection() {

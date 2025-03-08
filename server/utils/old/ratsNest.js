@@ -1,6 +1,6 @@
-import { SummonerModel } from "../../models/summonerModel"
-import { SummonerMatchesModel } from "../../models/summonerMatchesModel"
-import { PuuidModel } from "../../models/puuidModel"
+import { SummonerModel } from "../models/summonerModel"
+import { SummonerMatchesModel } from "../models/summonerMatchesModel"
+import { PuuidModel } from "../models/puuidModel"
 import { getPlayerChallenges } from "../twistedCalls"
 
 export async function getSummonerStatus(gameName, tagLine, region) {

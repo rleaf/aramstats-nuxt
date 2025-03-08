@@ -44,6 +44,22 @@ const REGION_GROUPS = {
    ph: RegionGroups.SEA,
 }
 
+/**
+* Utility wrapper to auto retry on 500 requests. Dunno if I want to use.
+*/
+// async function retryWrapper(fn, args) {
+//    return await promiseRetry(async retry => {
+//       return (await fn(...args)).response
+//          .catch(e => {
+//             if (e instanceof Error && e.status >= 500) {
+//                retry()
+//             } else {
+//                throw e
+//             }
+//          })
+//    },{ retries: 2, factor: 2, minTimeout: 2000 })
+// }
+
 /** 
 * Summoner info w/ account-v1
 * Tethered to AMERICAS region rn because closest to backend server. Can move if need to balance rate limits
@@ -63,36 +79,30 @@ export const getSummoner = async (puuid, region) => {
    return (await lolApi.Summoner.getByPUUID(puuid, REGION_CONSTANTS[region]).catch(e => { throw e })).response
 }
 
-/* 
-* Variable match history for ARAM (450). Used for utility.
+/** 
+* Total match history for ARAM (450). matchList[0] is most recent match.
+* @param puuid summoner puuid
+* @param region summoner region
+* @param lastMatchId the last match played to start from. Used for updating a summoner.
 */
-export const getSummonerMatches = async (puuid, region, start, count) => {
-   return await lolApi.MatchV5.list('adskdf', REGION_GROUPS[region], { queue: 450, start: start, count: count })
-      .catch(e => { })
-}
-
-/* 
-* Total match history for ARAM (450). matchList[0] is most recent match. 
-*/
-export const getAllSummonerMatches = async (puuid, region, lastMatchId) => {
+export const getSummonerMatches = async (puuid, region, lastMatchId) => {
    let matchList = []
    let stop = true
 
    for (let i = 0; stop; i+=100) {
-      let pull = (await lolApi.MatchV5.list(puuid, REGION_GROUPS[region], { queue: 450, start: i, count: 100 })
-         .catch(e => { 
-            // maybe do something here?
-          })).response
-      if (lastMatchId && pull.includes(lastMatchId)) {
-         pull = pull.slice(0, pull.indexOf(lastMatchId))
+      let cookie = (await lolApi.MatchV5.list(puuid, REGION_GROUPS[region], { queue: 450, start: i, count: 100 })
+         .catch(e => { throw e })).response
+
+      if (lastMatchId && cookie.includes(lastMatchId)) {
+         cookie = cookie.slice(0, cookie.indexOf(lastMatchId))
          stop = false
 
-         if (pull.length === 0) {
+         if (cookie.length === 0) {
             return 0 // summoner already UTD
          }
       }
 
-      matchList.push(pull)
+      matchList.push(cookie)
       
       try {
          await getMatchInfo(pull[pull.length - 1], region)
@@ -113,9 +123,9 @@ export const getAllSummonerMatches = async (puuid, region, lastMatchId) => {
 /* 
 * Match info.
 */
-export const getMatchInfo = async (matchId, region) => {
+const getMatchInfo = async (matchId, region) => {
    return (await lolApi.MatchV5.get(matchId, REGION_GROUPS[region])
-      .catch(e => { })).response
+      .catch(e => { throw e })).response
 }
 
 /* 
@@ -124,7 +134,7 @@ export const getMatchInfo = async (matchId, region) => {
 export const getBatchedMatchInfo = async (matchlist, region) => {
    return await Promise.all(matchlist.map(async matchId => {
       return (await lolApi.MatchV5.get(matchId, REGION_GROUPS[region])
-         .catch(e => { console.log(e.status, e.message, e.body, 'getBatchedMatchInfo @@') })).response
+         .catch(e => { throw e })).response
    }))
 }
 
@@ -134,22 +144,44 @@ export const getBatchedMatchInfo = async (matchlist, region) => {
 export const getBatchedTimelineInfo = async (matchlist, region) => {
    return await Promise.all(matchlist.map(async matchId => {
       return (await lolApi.MatchV5.timeline(matchId, REGION_GROUPS[region])
-         .catch(e => { console.log(e.status, e.message, e.body, 'getBatchedTimelineInfo @@') })).response
+         .catch(e => { throw e })).response
    }))
 }
 
-/* 
-* Match timeline info.
-*/
-export const getMatchTimeline = async (matchId, region) => {
-   return (await lolApi.MatchV5.timeline(matchId, REGION_GROUPS[region])
-      .catch(e => { })).response
-}
+const challengeIds = [
+   101105, // No hiding
+   101204, // Free Money
+   101205, // Free Ticket to Base
+   101206, // Pop Goes the Poro
+   101306, // Can't Touch This
+   101201, // Another Day, Another Bullseye
+   101203, // Snow Day
+   101000, // Aram Authority
+   101100, // Aram Warrior
+   101200, // Aram Finesse
+   101300, // Aram Champion
+   101103, // Aram Legend
+   101106, // ARAM Eradication
+   101301, // All Random All Champions
+   101305, // Active Participant
+   101302, // All Random All Flawless
+   101104, // Bad Medicine
+   101107, // Farm Champs Not Minions
+   101303, // Rapid Demolition
+   101101, // DPS Threat
+   101102, // Double Decimation
+   101304, // Lightning Round
+   101108, // Solo Carry
+   101307, // NA-RAM
+   101202, // It was a... Near-Hit
+]
 
 /* 
 * Player Challenges.
 */
 export const getPlayerChallenges = async (puuid, region) => {
-   return (await lolApi.Challenges.PlayerChallenges(puuid, REGION_CONSTANTS[region])
-      .catch(e => { })).response
+   const donut = (await lolApi.Challenges.PlayerChallenges(puuid, REGION_CONSTANTS[region])
+      .catch(e => { throw e })).response
+
+   return donut.challenges.filter(el => challengeIds.includes(el.challengeId))
 }
