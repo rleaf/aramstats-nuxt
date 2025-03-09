@@ -25,7 +25,7 @@ export default defineEventHandler(async (e) => {
             stage: config.status.COMPLETE,
             data: (await aggregateSummoner(summoner._id))[0]
          }
-
+         
       case config.status.PARSING:
          if (queue.inactiveRegions.has(routerParams.region)) { // Limbo accounts
             console.log(`[Deleted]: ${routerParams.gameName}#${routerParams.tagLine} (${routerParams.region})`)
