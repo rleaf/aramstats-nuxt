@@ -46,7 +46,7 @@ export async function initialParse(summonerDoc, updateMatchlist) {
       updatedChampions = new Set()
    }
    const [matchlist, challenges] = await Promise.all([
-      updateMatchlist || getAllSummonerMatches(summonerDoc._id, summonerDoc.region),
+      updateMatchlist || getSummonerMatches(summonerDoc._id, summonerDoc.region),
       challengeScribe(summonerDoc._id, summonerDoc.region)
    ])
    summonerDoc.challenges = challenges

@@ -1,0 +1,54 @@
+check ENDPOINT
+   o = getSummonerStatus
+   switch(o)
+      FOUND
+         aggregateSummoner
+      PARSING
+         if queue region
+            deleteSummoner
+         else
+            workQueue
+      IN QUEUE
+         checkQueueForSummoner
+      UNPARSED
+         return summ is not parsed
+
+update ENDPOINT
+   o = getPUUID
+   dbFind(o)
+   m = getMatchlist(o.lastMatchId)
+   if m.length = 0
+      return summoner already UTD
+   else:
+      parseSummoner(m)
+   
+   return aggregateSummoner
+
+queue ENDPOINT
+   o = getSummonerData
+   addToQueue(o)
+   skeletonizeSummonerDocument(o)
+   workQueue
+
+
+
+workQueue()
+   baton pass between summoners in queue
+      m = getMatchlist(batonHolder)
+      parseSummoner(m)
+
+parseSummoner(m, updateFlag)
+   setChallenges
+   setParseMetrics
+   doc.save()
+   for matches in m:
+      getBatchMatchInfo
+      getBatchMatchTimeline
+      z = zip(getBatchMatchInfo, getBatchMatchTimeline)
+      for match in z:
+         updateParseStatusEvery25Matches
+         parseMatch
+         parseTimeline
+
+centralize the summonerDoc so only i'm not passing it to all functions
+only one function should call doc.save()

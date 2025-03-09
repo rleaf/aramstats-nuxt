@@ -6,7 +6,7 @@ export async function getParseStatus(gameName, tagLine) {
          parse: 1
       })
    } catch (e) { 
-      // throw e ???
+      throw e
    }
    
    return summoner || { parse: { status: config.status.UNPARSED}}

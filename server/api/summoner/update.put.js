@@ -24,7 +24,7 @@ export default defineEventHandler(async (e) => {
    //    getPlayerChallenges(summoner.puuid, summoner.region)
    // ])
 
-   const updateFlag = checkForUpdate(summonerDocument, summoner)
+   // const updateFlag = checkForUpdate(summonerDocument, summoner)
 
    if (!matchlist.length) {
       console.log(`[Already UTD]: ${query.gameName}#${query.tagLine} (${query.region})`)
