@@ -41,13 +41,14 @@ parseSummoner(m, updateFlag)
    setChallenges
    setParseMetrics
    doc.save()
+
    for matches in m:
       getBatchMatchInfo
       getBatchMatchTimeline
       z = zip(getBatchMatchInfo, getBatchMatchTimeline)
       for match in z:
          updateParseStatusEvery25Matches
-         parseMatch
+         mDoc = parseMatch()
          parseTimeline
 
 centralize the summonerDoc so only i'm not passing it to all functions

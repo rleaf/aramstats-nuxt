@@ -45,10 +45,10 @@ export async function initialParse(summonerDoc, updateMatchlist) {
    if (updateMatchlist) {
       updatedChampions = new Set()
    }
-   const [matchlist, challenges] = await Promise.all([
-      updateMatchlist || getSummonerMatches(summonerDoc._id, summonerDoc.region),
-      challengeScribe(summonerDoc._id, summonerDoc.region)
-   ])
+   // const [matchlist, challenges] = await Promise.all([
+   //    updateMatchlist || getSummonerMatches(summonerDoc._id, summonerDoc.region),
+   //    challengeScribe(summonerDoc._id, summonerDoc.region)
+   // ])
    summonerDoc.challenges = challenges
    summonerDoc.parse.total = matchlist.length
    summonerDoc.parse.status = config.status.PARSING
@@ -143,140 +143,140 @@ async function parseMatchlist(summonerDocument, match, timeline, items) {
    if (!match) console.log(match, 'wut in tarnation')
 
    // https://leagueoflegends.fandom.com/wiki/Surrendering (ctrl+f "early") Don't use gameEndedInEarlySurrender. It is neq to a remake.
-   player = match.info.participants.find(p => p.puuid === summonerDocument._id)
+   // player = match.info.participants.find(p => p.puuid === summonerDocument._id)
    playerIndex = player.participantId
    playerTeam = player.teamId
    if (timeline) timelineData = parseTimeline(timeline, playerIndex, playerTeam, items)
 
-   const matchDocument = new SummonerMatchesModel({
-      m: summonerDocument._id,
-      mId: match.metadata.matchId,
-      gc: match.info.gameCreation,
-      gd: (match.info.gameEndTimestamp) ? (match.info.gameDuration / 60).toFixed(1) : (match.info.gameDuration / 60000).toFixed(1),
-      gv: match.info.gameVersion,
-      w: player.win,
-      k: player.kills,
-      d: player.deaths,
-      tsd: player.totalTimeSpentDead,
-      a: player.assists,
-      kp: getKillParticipation(player, match.info.participants),
-      ds: getDamageShare(player, match.info.participants),
-      i: getMatchItems(player),
-      s1: player.summoner1Id,
-      s2: player.summoner2Id,
-      pr: player.perks.styles[0].selections[0].perk,
-      sr: player.perks.styles[1].style,
-      t: {
-         dtc: player.totalDamageDealtToChampions,
-         dt: player.totalDamageTaken,
-         sm: player.damageSelfMitigated,
-         h: player.totalHeal,
-         as: player.totalDamageShieldedOnTeammates,
-         ah: player.totalHealsOnTeammates,
-         g: player.goldEarned
-      },
-      mk: [
-         player.tripleKills,
-         player.quadraKills,
-         player.pentaKills,
-      ],
-      tId: player.teamId,
-   })
+   // const matchDocument = new SummonerMatchesModel({
+   //    m: summonerDocument._id,
+   //    mId: match.metadata.matchId,
+   //    gc: match.info.gameCreation,
+   //    gd: (match.info.gameEndTimestamp) ? (match.info.gameDuration / 60).toFixed(1) : (match.info.gameDuration / 60000).toFixed(1),
+   //    gv: match.info.gameVersion,
+   //    w: player.win,
+   //    k: player.kills,
+   //    d: player.deaths,
+   //    tsd: player.totalTimeSpentDead,
+   //    a: player.assists,
+   //    kp: getKillParticipation(player, match.info.participants),
+   //    ds: getDamageShare(player, match.info.participants),
+   //    i: getMatchItems(player),
+   //    s1: player.summoner1Id,
+   //    s2: player.summoner2Id,
+   //    pr: player.perks.styles[0].selections[0].perk,
+   //    sr: player.perks.styles[1].style,
+   //    t: {
+   //       dtc: player.totalDamageDealtToChampions,
+   //       dt: player.totalDamageTaken,
+   //       sm: player.damageSelfMitigated,
+   //       h: player.totalHeal,
+   //       as: player.totalDamageShieldedOnTeammates,
+   //       ah: player.totalHealsOnTeammates,
+   //       g: player.goldEarned
+   //    },
+   //    mk: [
+   //       player.tripleKills,
+   //       player.quadraKills,
+   //       player.pentaKills,
+   //    ],
+   //    tId: player.teamId,
+   // })
 
-   championEmbed = summonerDocument.championData.find(c => c.championId === player.championId)
-   if (!championEmbed) {
-      summonerDocument.championData.push({ championId: player.championId })
-      championEmbed = summonerDocument.championData.find(c => c.championId === player.championId)
-   }
+   // championEmbed = summonerDocument.championData.find(c => c.championId === player.championId)
+   // if (!championEmbed) {
+   //    summonerDocument.championData.push({ championId: player.championId })
+   //    championEmbed = summonerDocument.championData.find(c => c.championId === player.championId)
+   // }
 
-   championEmbed.wins += (player.win) ? 1 : 0
-   championEmbed.games += 1
-   championEmbed.tg += match.info.participants.find(p => p.teamId !== player.teamId).turretsLost
-   championEmbed.tl += player.turretsLost
-   championEmbed.ddtt += player.damageDealtToTurrets
-   championEmbed.fbk += player.firstBloodKill
-   // color-side wins
-   championEmbed.bw += (player.teamId === 100 && player.win) ? 1 : 0
-   championEmbed.rw += (player.teamId === 200 && player.win) ? 1 : 0
-   // color-side games
-   championEmbed.rsg += (player.teamId === 200) ? 1 : 0
-   // multikills
-   championEmbed.mk.t += player.tripleKills
-   championEmbed.mk.q += player.quadraKills
-   championEmbed.mk.p += player.pentaKills
-   // champion spells
-   championEmbed.sc.q += player.spell1Casts
-   championEmbed.sc.w += player.spell2Casts
-   championEmbed.sc.e += player.spell3Casts
-   championEmbed.sc.r += player.spell4Casts
-   // summoner spells
-   championEmbed.ss[player.summoner1Id].games++
-   championEmbed.ss[player.summoner1Id].casts += player.summoner1Casts
-   championEmbed.ss[player.summoner2Id].games++
-   championEmbed.ss[player.summoner2Id].casts += player.summoner2Casts
-   // pings
-   championEmbed.p.all += player.allInPings
-   championEmbed.p.assist += player.assistMePings
-   championEmbed.p.basic += player.basicPings
-   championEmbed.p.comm += player.commandPings
-   championEmbed.p.danger += player.dangerPings
-   championEmbed.p.enMiss += player.enemyMissingPings
-   championEmbed.p.enVis += player.enemyVisionPings
-   championEmbed.p.back += player.getBackPings
-   championEmbed.p.hold += player.holdPings
-   championEmbed.p.vis += player.needVisionPings
-   championEmbed.p.omw += player.onMyWayPings
-   championEmbed.p.push += player.pushPings
-   championEmbed.p.visClr += player.visionClearedPings
-   // championEmbed.matches.unshift(matchDocument._id)
-   championEmbed.matches.push(matchDocument._id)
+   // championEmbed.wins += (player.win) ? 1 : 0
+   // championEmbed.games += 1
+   // championEmbed.tg += match.info.participants.find(p => p.teamId !== player.teamId).turretsLost
+   // championEmbed.tl += player.turretsLost
+   // championEmbed.ddtt += player.damageDealtToTurrets
+   // championEmbed.fbk += player.firstBloodKill
+   // // color-side wins
+   // championEmbed.bw += (player.teamId === 100 && player.win) ? 1 : 0
+   // championEmbed.rw += (player.teamId === 200 && player.win) ? 1 : 0
+   // // color-side games
+   // championEmbed.rsg += (player.teamId === 200) ? 1 : 0
+   // // multikills
+   // championEmbed.mk.t += player.tripleKills
+   // championEmbed.mk.q += player.quadraKills
+   // championEmbed.mk.p += player.pentaKills
+   // // champion spells
+   // championEmbed.sc.q += player.spell1Casts
+   // championEmbed.sc.w += player.spell2Casts
+   // championEmbed.sc.e += player.spell3Casts
+   // championEmbed.sc.r += player.spell4Casts
+   // // summoner spells
+   // championEmbed.ss[player.summoner1Id].games++
+   // championEmbed.ss[player.summoner1Id].casts += player.summoner1Casts
+   // championEmbed.ss[player.summoner2Id].games++
+   // championEmbed.ss[player.summoner2Id].casts += player.summoner2Casts
+   // // pings
+   // championEmbed.p.all += player.allInPings
+   // championEmbed.p.assist += player.assistMePings
+   // championEmbed.p.basic += player.basicPings
+   // championEmbed.p.comm += player.commandPings
+   // championEmbed.p.danger += player.dangerPings
+   // championEmbed.p.enMiss += player.enemyMissingPings
+   // championEmbed.p.enVis += player.enemyVisionPings
+   // championEmbed.p.back += player.getBackPings
+   // championEmbed.p.hold += player.holdPings
+   // championEmbed.p.vis += player.needVisionPings
+   // championEmbed.p.omw += player.onMyWayPings
+   // championEmbed.p.push += player.pushPings
+   // championEmbed.p.visClr += player.visionClearedPings
+   // // championEmbed.matches.unshift(matchDocument._id)
+   // championEmbed.matches.push(matchDocument._id)
 
-   if (timelineData) {
-      // Average it out on the front end (datum / games)
-      for (let i = 0; i < 6; i++) {
-         matchDocument.ic[i] = Math.round((matchDocument.ic[i] + timelineData.ic[i]) * 100) / 100
-      }
-      championEmbed.tf.exp += timelineData.exp
-      championEmbed.tf.cap += timelineData.cap
-      championEmbed.tf.use += timelineData.use
-      championEmbed.tf.death += timelineData.death
-      championEmbed.tf.part += timelineData.part
-      championEmbed.tf.freq += timelineData.freq
-      summonerDocument.fs += timelineData.fs
-   }
+   // if (timelineData) {
+   //    // Average it out on the front end (datum / games)
+   //    for (let i = 0; i < 6; i++) {
+   //       matchDocument.ic[i] = Math.round((matchDocument.ic[i] + timelineData.ic[i]) * 100) / 100
+   //    }
+   //    championEmbed.tf.exp += timelineData.exp
+   //    championEmbed.tf.cap += timelineData.cap
+   //    championEmbed.tf.use += timelineData.use
+   //    championEmbed.tf.death += timelineData.death
+   //    championEmbed.tf.part += timelineData.part
+   //    championEmbed.tf.freq += timelineData.freq
+   //    summonerDocument.fs += timelineData.fs
+   // }
 
-   for (const participant of match.info.participants) {
-      if (!participant.riotIdGameName) continue
-      participantPuuids.push({
-         updateOne: {
-            filter: { _id: participant.puuid },
-            update: {
-               _id: participant.puuid,
-               gn: participant.riotIdGameName,
-               tl: participant.riotIdTagline,
-            },
-            upsert: true
-         }
-      })
+   // for (const participant of match.info.participants) {
+   //    if (!participant.riotIdGameName) continue
+   //    participantPuuids.push({
+   //       updateOne: {
+   //          filter: { _id: participant.puuid },
+   //          update: {
+   //             _id: participant.puuid,
+   //             gn: participant.riotIdGameName,
+   //             tl: participant.riotIdTagline,
+   //          },
+   //          upsert: true
+   //       }
+   //    })
 
-      if (participant.puuid != player.puuid) {
-         if (player.teamId === participant.teamId) {
-            matchDocument.te.push(participant.puuid)
-            matchDocument.tc.push(participant.championId)
-         } else {
-            matchDocument.ee.push(participant.puuid)
-            matchDocument.ec.push(participant.championId)
-         }
-      }
-   }
+   //    if (participant.puuid != player.puuid) {
+   //       if (player.teamId === participant.teamId) {
+   //          matchDocument.te.push(participant.puuid)
+   //          matchDocument.tc.push(participant.championId)
+   //       } else {
+   //          matchDocument.ee.push(participant.puuid)
+   //          matchDocument.ec.push(participant.championId)
+   //       }
+   //    }
+   // }
 
-   await PuuidModel.bulkWrite(participantPuuids)
-      .catch(e => {
-         throw e
-      })
+   // await PuuidModel.bulkWrite(participantPuuids)
+   //    .catch(e => {
+   //       throw e
+   //    })
 
-   await matchDocument.save()
-   return player.championId
+   // await matchDocument.save()
+   // return player.championId
 }
 
 function parseTimeline(timeline, playerIndex, playerTeam, items) {

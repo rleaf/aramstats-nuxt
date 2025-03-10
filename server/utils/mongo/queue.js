@@ -200,7 +200,14 @@ export async function workQueue(summoner) {
          try {
             document = await SummonerModel.findOne({ '_id': qSummoner.qPuuid })
             await queue.update(summoner.region)
-            await initialParse(document)
+
+            const [matchlist, challenges] = await Promise.all([
+               getSummonerMatches(document._id, document.region),
+               challengeScribe(document._id, document.region)
+            ])
+
+            await parseSummoner(matchlist)
+            // await initialParse(document)
             qSummoner = await queue.get(summoner.region)
             if (qSummoner) document = await SummonerModel.findOne({ '_id': qSummoner.qPuuid })
          } catch (e) {
