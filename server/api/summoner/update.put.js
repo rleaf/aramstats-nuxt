@@ -1,4 +1,4 @@
-import { SummonerModel } from "~/server/models/summonerModel"
+import { SummonerModel } from "~/server/utils/models/summonerModel"
 
 export default defineEventHandler(async (e) => {
    /* 
@@ -18,10 +18,13 @@ export default defineEventHandler(async (e) => {
 
    const summonerDocument = await SummonerModel.findById(summoner.puuid)
 
-   const [matchlist, challenges] = await Promise.all([
-      getAllSummonerMatches(summoner.puuid, summoner.region, summonerDocument.lastMatchId),
-      challengeScribe(summoner.puuid, summoner.region)
-   ])
+   // shouldn't have to do this?
+   // const [matchlist, challenges] = await Promise.all([
+   //    getAllSummonerMatches(summoner.puuid, summoner.region, summonerDocument.lastMatchId),
+   //    getPlayerChallenges(summoner.puuid, summoner.region)
+   // ])
+
+   // const updateFlag = checkForUpdate(summonerDocument, summoner)
 
    if (!matchlist.length) {
       console.log(`[Already UTD]: ${query.gameName}#${query.tagLine} (${query.region})`)

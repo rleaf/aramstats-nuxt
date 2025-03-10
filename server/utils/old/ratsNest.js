@@ -1,7 +1,7 @@
 import { SummonerModel } from "../models/summonerModel"
 import { SummonerMatchesModel } from "../models/summonerMatchesModel"
 import { PuuidModel } from "../models/puuidModel"
-import { getPlayerChallenges } from "./twistedCalls"
+import { getPlayerChallenges } from "../twistedCalls"
 
 export async function getSummonerStatus(gameName, tagLine, region) {
    let summoner = await findSummoner(gameName, tagLine, region)
@@ -46,14 +46,14 @@ export async function initialParse(summonerDoc, updateMatchlist) {
       updatedChampions = new Set()
    }
    const [matchlist, challenges] = await Promise.all([
-      updateMatchlist || getAllSummonerMatches(summonerDoc._id, summonerDoc.region),
+      updateMatchlist || getSummonerMatches(summonerDoc._id, summonerDoc.region),
       challengeScribe(summonerDoc._id, summonerDoc.region)
    ])
    summonerDoc.challenges = challenges
    summonerDoc.parse.total = matchlist.length
    summonerDoc.parse.status = config.status.PARSING
    await summonerDoc.save()
-   const VAL = 4
+   const VAL = 50
    for (let i = 0; i < matchlist.length; i += VAL) {
       const matches = await getBatchedMatchInfo(matchlist.slice(i, i + VAL), summonerDoc.region)
       const timelines = await getBatchedTimelineInfo(matchlist.slice(i, i + VAL), summonerDoc.region)

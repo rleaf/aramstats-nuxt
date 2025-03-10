@@ -1,23 +1,24 @@
+import { MongooseError } from "mongoose"
+
 export default defineEventHandler(async (e) => {
-   // if (e.context.dbReadyState === 0) {
-   //    throw createError({
-   //       statusCode: config.db.FAIL_STATUS,
-   //       body: config.db.FAIL_MESSAGE
-   //    })
-   // }
-   const queue = new Queue()
    let summoner
    const routerParams = getRouterParams(e, { decode: true})
    console.log(`[Searching]: ${routerParams.gameName}#${routerParams.tagLine} (${routerParams.region})`)
    try {
-      summoner = await getSummonerStatus(routerParams.gameName, routerParams.tagLine, routerParams.region)
+      summoner = await getParseStatus(routerParams.gameName, routerParams.tagLine)
    } catch (e) {
-      return {
-         stage: config.status.DNE,
-         data: e.body.message || e.message
+      if (e instanceof MongooseError) {
+         // db connection broken
+      } else {
+         return {
+            stage: config.status.DNE,
+            data: e.body.message || e.message
+         }
       }
    }
    
+   const queue = new Queue()
+
    switch (summoner.parse.status) {
       case config.status.COMPLETE:
          console.log(`[Found]: ${routerParams.gameName}#${routerParams.tagLine} (${routerParams.region})`)
@@ -25,7 +26,7 @@ export default defineEventHandler(async (e) => {
             stage: config.status.COMPLETE,
             data: (await aggregateSummoner(summoner._id))[0]
          }
-         
+
       case config.status.PARSING:
          if (queue.inactiveRegions.has(routerParams.region)) { // Limbo accounts
             console.log(`[Deleted]: ${routerParams.gameName}#${routerParams.tagLine} (${routerParams.region})`)
