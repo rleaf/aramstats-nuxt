@@ -16,7 +16,9 @@
       version: "4.1.0",
       date: "3/7/25",
       notes: "",
-      add: [],
+      add: [
+         `Sentry.`,
+      ],
       remove: [],
       fix: [
          `Delegate small screen to client side.`,

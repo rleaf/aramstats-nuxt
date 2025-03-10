@@ -13,6 +13,7 @@ export default defineNuxtConfig({
     url: 'https://aramstats.lol',
     name: 'ARAM Stats',
   },
+
   sitemap: {
     urls: () => {
       let arr = []
@@ -22,29 +23,50 @@ export default defineNuxtConfig({
       return arr
     }
   },
+
   devtools: {
     enabled: true
   },
+
   routeRules: {
     '/champions': { swr: 1800 },
     '/champions/**': { swr: 1800 },
   },
+
   components: [
     { path: '~/components', pathPrefix: false },
   ],
-  modules: [
-    '@pinia/nuxt',
-    '@nuxtjs/sitemap',
-    'nuxt-gtag',
-  ],
+
+  modules: ['@pinia/nuxt', '@nuxtjs/sitemap', 'nuxt-gtag', '@sentry/nuxt/module'],
+
   gtag: {
     id: 'G-PD6QYJ923C'
   },
+
   vite: {
     assetsInclude: ['**/*.glb'],
   },
+
   css: [
     '~/assets/css/main.css'
   ],
+
   compatibilityDate: '2025-03-05',
+  sentry: {
+    sourceMapsUploadOptions: {
+      org: 'aramstats',
+      project: 'javascript-nuxt',
+      sourcemaps: {
+        filesToDeleteAfterUpload: [
+          ".output/public/**/*.map",
+          ".output/server/**/*.map",
+        ]
+      }
+      // telemetry: false
+    },
+  },
+
+  sourcemap: {
+    client: 'hidden',
+  },
 })
