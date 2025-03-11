@@ -18,7 +18,7 @@ export default defineEventHandler(async (e) => {
    }
    
    const queue = new Queue()
-
+   
    switch (summoner.parse.status) {
       case config.status.COMPLETE:
          console.log(`[Found]: ${routerParams.gameName}#${routerParams.tagLine} (${routerParams.region})`)

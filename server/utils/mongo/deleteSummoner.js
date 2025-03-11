@@ -10,7 +10,6 @@ export async function deleteSummoner(puuid) {
       }
    }
 
-
    await SummonerMatchesModel.bulkWrite(bin)
    await SummonerModel.deleteOne({ _id: summoner._id })
 }

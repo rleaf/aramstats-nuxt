@@ -37,7 +37,12 @@ export default defineNuxtConfig({
     { path: '~/components', pathPrefix: false },
   ],
 
-  modules: ['@pinia/nuxt', '@nuxtjs/sitemap', 'nuxt-gtag', '@sentry/nuxt/module'],
+  modules: [
+    '@pinia/nuxt',
+    '@nuxtjs/sitemap',
+    'nuxt-gtag',
+    '@sentry/nuxt/module'
+  ],
 
   gtag: {
     id: 'G-PD6QYJ923C'
@@ -64,6 +69,7 @@ export default defineNuxtConfig({
       }
       // telemetry: false
     },
+    enabled: process.env.NODE_ENV !== 'development',
   },
 
   sourcemap: {

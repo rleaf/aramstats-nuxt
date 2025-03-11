@@ -1,6 +1,6 @@
-import { SummonerModel } from "../models/summonerModel"
-import { SummonerMatchesModel } from "../models/summonerMatchesModel"
-import { PuuidModel } from "../models/puuidModel"
+import { SummonerModel } from "../utils/models/summonerModel"
+import { SummonerMatchesModel } from "../utils/models/summonerMatchesModel"
+import { PuuidModel } from "../utils/models/puuidModel"
 import { getPlayerChallenges } from "../twistedCalls"
 
 export async function getSummonerStatus(gameName, tagLine, region) {
@@ -301,127 +301,127 @@ function parseTimeline(timeline, playerIndex, playerTeam, items) {
    let capFlag
    let tfPrerequisite = 0
 
-   //  ITER FRAMES
-   for (let i = 0; i < timeline.info.frames.length; i++) {
-      let e = timeline.info.frames[i].events
+   // //  ITER FRAMES
+   // for (let i = 0; i < timeline.info.frames.length; i++) {
+   //    let e = timeline.info.frames[i].events
 
-      // ITER EVENTS
-      for (let j = 0; j < e.length; j++) {
-         if (e[j].type === 'ITEM_PURCHASED' && playerIndex === e[j].participantId) {
-            if (timelineData.fs && e[j].timestamp < FOUNTAIN_SITTING) {
-               timelineData.fs = 0
-            }
+   //    // ITER EVENTS
+   //    for (let j = 0; j < e.length; j++) {
+   //       if (e[j].type === 'ITEM_PURCHASED' && playerIndex === e[j].participantId) {
+   //          if (timelineData.fs && e[j].timestamp < FOUNTAIN_SITTING) {
+   //             timelineData.fs = 0
+   //          }
 
-            if (items && isLegendary(e[j].itemId, items)) {
-               for (let i = 0; i < 6; i++) {
-                  if (timelineData.ic[i] > 0) continue
-                  timelineData.ic[i] = Math.round(e[j].timestamp / 600) / 100
-                  break
-               }
-            }
-         }
-         // if (timelineData.fs && playerIndex === e[j].participantId && e[j].timestamp < FOUNTAIN_SITTING && e[j].type === 'ITEM_PURCHASED') {
-         //    timelineData.fs = 0
-         // }
+   //          if (items && isLegendary(e[j].itemId, items)) {
+   //             for (let i = 0; i < 6; i++) {
+   //                if (timelineData.ic[i] > 0) continue
+   //                timelineData.ic[i] = Math.round(e[j].timestamp / 600) / 100
+   //                break
+   //             }
+   //          }
+   //       }
+   //       // if (timelineData.fs && playerIndex === e[j].participantId && e[j].timestamp < FOUNTAIN_SITTING && e[j].type === 'ITEM_PURCHASED') {
+   //       //    timelineData.fs = 0
+   //       // }
 
-         if (e[j].timestamp - capFlag <= BUILDING_KILL_WINDOW && e[j].type === 'BUILDING_KILL' && e[j].teamId !== playerTeam) {
-            timelineData.cap++
-            capFlag = undefined
-         }
+   //       if (e[j].timestamp - capFlag <= BUILDING_KILL_WINDOW && e[j].type === 'BUILDING_KILL' && e[j].teamId !== playerTeam) {
+   //          timelineData.cap++
+   //          capFlag = undefined
+   //       }
 
-         if (e[j].timestamp - initTimestamp > CONTIGUITY) {
-            if (tfPrerequisite > 1 && bin.length > 3 && averageDistance(bin) < AVG_TEAMFIGHT_DISTANCE) {
-               teamfights.push(bin)
-               capFlag = e[j].timestamp
-            }
+   //       if (e[j].timestamp - initTimestamp > CONTIGUITY) {
+   //          if (tfPrerequisite > 1 && bin.length > 3 && averageDistance(bin) < AVG_TEAMFIGHT_DISTANCE) {
+   //             teamfights.push(bin)
+   //             capFlag = e[j].timestamp
+   //          }
 
-            tfPrerequisite = 0
-            initTimestamp = c1 = c2 = undefined
-            bin = []
-         }
+   //          tfPrerequisite = 0
+   //          initTimestamp = c1 = c2 = undefined
+   //          bin = []
+   //       }
 
-         if (e[j].type === 'CHAMPION_KILL') {
-            if (e[j].timestamp - initTimestamp <= CONTIGUITY) {
-               if ('assistingParticipantIds' in e[j] && e[j].assistingParticipantIds.length >= 2) tfPrerequisite++
-               initTimestamp = e[j].timestamp
-               bin.push(e[j])
-            } else {
-               if ('assistingParticipantIds' in e[j] && e[j].assistingParticipantIds.length >= 2) tfPrerequisite++
+   //       if (e[j].type === 'CHAMPION_KILL') {
+   //          if (e[j].timestamp - initTimestamp <= CONTIGUITY) {
+   //             if ('assistingParticipantIds' in e[j] && e[j].assistingParticipantIds.length >= 2) tfPrerequisite++
+   //             initTimestamp = e[j].timestamp
+   //             bin.push(e[j])
+   //          } else {
+   //             if ('assistingParticipantIds' in e[j] && e[j].assistingParticipantIds.length >= 2) tfPrerequisite++
 
-               if (!initTimestamp) {
-                  initTimestamp = e[j].timestamp
-                  bin.push(e[j])
-               }
-            }
-         }
-      }
-   }
-
-   // Frequency
-   timelineData.freq = teamfights.length
-
-   // ITER TEAMFIGHTS
-   for (let i = 0; i < teamfights.length; i++) {
-      let use = []
-      let death = false
-      let part = false
-
-      // exp: 0,   // expectation
-      // cap: 0,   // capitalization
-      // use: 0,   // usefullness
-      // death: 0, // death probability
-      // part: 0,  // participation
-      // freq: 0,  // frequency
-      // fs: 1,    // fountain sitting
-
-      // ITER TEAMFIGHT EVENTS
-      for (let j = 0; j < teamfights[i].length; j++) {
-         const cell = teamfights[i][j]
-
-         if (('assistingParticipantIds' in cell
-            && cell.assistingParticipantIds[playerIndex])
-            || cell.killerId === playerIndex
-            || cell.victimId === playerIndex) {
-
-            // Participation
-            part = true
-
-            // Expectation
-            if ((playerIndex <= 5 && cell.killerId <= 5) || (playerIndex > 5 && cell.killerId > 5)) {
-               timelineData.exp++
-            } else {
-               timelineData.exp--
-
-               // Usefullness/Longevity
-               use.push(cell.victimId)
-            }
-
-            // Death Probability
-            if (cell.victimId === playerIndex) death = true
-         }
-      }
-
-      if (part) {
-         // Participation
-         timelineData.part++
-
-         // Usefullness/Longevity
-         timelineData.use += (use.findIndex(o => o === playerIndex) + 1) || 6
-      }
-
-      if (death) timelineData.death++
-   }
-
-   // Average out values since they're just iterating through and summing
-   const af = (n, d) => (Math.round(n / d * 1000) / 1000)
-
-   // if (timelineData.part) {
-   //    timelineData.cap = af(timelineData.cap, timelineData.freq)      
-   //    timelineData.exp = af(timelineData.exp, timelineData.part)
-   //    timelineData.use = af(timelineData.use, timelineData.part)
-   //    timelineData.death = af(timelineData.death, timelineData.part)
+   //             if (!initTimestamp) {
+   //                initTimestamp = e[j].timestamp
+   //                bin.push(e[j])
+   //             }
+   //          }
+   //       }
+   //    }
    // }
-   return timelineData
+
+//    // Frequency
+//    timelineData.freq = teamfights.length
+
+//    // ITER TEAMFIGHTS
+//    for (let i = 0; i < teamfights.length; i++) {
+//       let use = []
+//       let death = false
+//       let part = false
+
+//       // exp: 0,   // expectation
+//       // cap: 0,   // capitalization
+//       // use: 0,   // usefullness
+//       // death: 0, // death probability
+//       // part: 0,  // participation
+//       // freq: 0,  // frequency
+//       // fs: 1,    // fountain sitting
+
+//       // ITER TEAMFIGHT EVENTS
+//       for (let j = 0; j < teamfights[i].length; j++) {
+//          const cell = teamfights[i][j]
+
+//          if (('assistingParticipantIds' in cell
+//             && cell.assistingParticipantIds[playerIndex])
+//             || cell.killerId === playerIndex
+//             || cell.victimId === playerIndex) {
+
+//             // Participation
+//             part = true
+
+//             // Expectation
+//             if ((playerIndex <= 5 && cell.killerId <= 5) || (playerIndex > 5 && cell.killerId > 5)) {
+//                timelineData.exp++
+//             } else {
+//                timelineData.exp--
+
+//                // Usefullness/Longevity
+//                use.push(cell.victimId)
+//             }
+
+//             // Death Probability
+//             if (cell.victimId === playerIndex) death = true
+//          }
+//       }
+
+//       if (part) {
+//          // Participation
+//          timelineData.part++
+
+//          // Usefullness/Longevity
+//          timelineData.use += (use.findIndex(o => o === playerIndex) + 1) || 6
+//       }
+
+//       if (death) timelineData.death++
+//    }
+
+//    // Average out values since they're just iterating through and summing
+//    const af = (n, d) => (Math.round(n / d * 1000) / 1000)
+
+//    // if (timelineData.part) {
+//    //    timelineData.cap = af(timelineData.cap, timelineData.freq)      
+//    //    timelineData.exp = af(timelineData.exp, timelineData.part)
+//    //    timelineData.use = af(timelineData.use, timelineData.part)
+//    //    timelineData.death = af(timelineData.death, timelineData.part)
+//    // }
+//    return timelineData
 }
 
 function getKillParticipation(player, participants) {

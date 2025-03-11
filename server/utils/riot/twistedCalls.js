@@ -105,7 +105,7 @@ export const getSummonerMatches = async (puuid, region, lastMatchId) => {
       matchList.push(cookie)
       
       try {
-         await getMatchInfo(pull[pull.length - 1], region)
+         await getMatchInfo(cookie[cookie.length - 1], region)
       } catch (e) {
          if (e.status === 404) {
             console.log(matchList.flat().length, 'initial match length')
@@ -113,7 +113,7 @@ export const getSummonerMatches = async (puuid, region, lastMatchId) => {
          }
       }
       
-      if (pull.length === 0) stop = false
+      if (cookie.length === 0) stop = false
    }
    
    console.log(matchList.flat().length, 'initial match length')
@@ -184,4 +184,11 @@ export const getPlayerChallenges = async (puuid, region) => {
       .catch(e => { throw e })).response
 
    return donut.challenges.filter(el => challengeIds.includes(el.challengeId))
+}
+
+export async function challengeScribe(puuid, region) {
+   const challengesDto = await getPlayerChallenges(puuid, region)
+   const challenges = challengesDto.challenges.filter(el => challengeIds.includes(el.challengeId))
+
+   return challenges
 }

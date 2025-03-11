@@ -61,16 +61,16 @@ function toggleAll() {
 
 }
 
-// function del() {
-//    $fetch(`/api/summoner/delete`,{
-//       method: 'DELETE',
-//       params: {
-//          region: route.params.region,
-//          gameName: route.params.gameName,
-//          tagLine: route.params.tagLine,
-//       }
-//    })
-// }
+function del() {
+   $fetch(`/api/summoner/delete`,{
+      method: 'DELETE',
+      params: {
+         region: route.params.region,
+         gameName: route.params.gameName,
+         tagLine: route.params.tagLine,
+      }
+   })
+}
 
 async function updateProfile() {
    update.value = true
@@ -599,6 +599,10 @@ const updatedDate = computed(() => {
                <div class="buttons">
                   <button :class="{ 'active-update': update }" ref="updateButton" :disabled="update"
                      @click="updateProfile()">Update</button>
+               </div>
+               <div class="buttons">
+                  <button :class="{ 'active-update': update }" ref="updateButton" :disabled="update"
+                     @click="del()">Del</button>
                </div>
                <div class="last-updated">
                   Last updated: {{ updatedDate }}

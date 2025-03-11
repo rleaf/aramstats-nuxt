@@ -1,11 +1,25 @@
-export async function parseSummoner(matchlist, update) {
+export async function parseSummoner(summonerDoc, update = false) {
    const val = 50
+   let updateIds
+   if (update) {
+      updateIds = new Set()
+   }
+
+   const [matchlist, challenges] = await Promise.all([
+      getSummonerMatches(summonerDoc._id, summonerDoc.region),
+      getPlayerChallenges(summonerDoc._id, summonerDoc.region)
+   ])
+
+   if (!matchlist.length) {
+      console.log('Summoner already UTD')
+      return
+   }
 
    // preliminaries
-   summoner.challenges = challenges
-   summoner.parse.total = matchlist.length
-   summoner.parse.status = config.status.PARSING
-   summoner.save()
+   summonerDoc.challenges = challenges
+   summonerDoc.parse.total = matchlist.length
+   summonerDoc.parse.status = config.status.PARSING
+   summonerDoc.save()
 
    for (let i = 0; i < matchlist.length; i += val) {
       const matches = await getBatchedMatchInfo(matchlist.slice(i, i + val), summonerDoc.region)
@@ -31,14 +45,19 @@ export async function parseSummoner(matchlist, update) {
             } catch (e) { }
          }
 
-         const champions = new Set()
          const player = zip[j][0].info.participants.find(p => p.puuid === summonerDoc._id)
+         let champContainer = summonerDoc.championData.find(c => c.championId === player.championId)
 
-         const tl = parseTimeline(player, zip[j][1], items)
-         const id = parseMatch(player, zip[j][0], tl)
+         if (!champContainer) {
+            summonerDoc.championData.push({ championId: player.championId })
+            champContainer = summonerDoc.championData.find(c => c.championId === player.championId)
+         }
+
+         const teamfightData = parseTimeline(player, zip[j][1], items)
+         const champId = await parseMatch(summonerDoc._id, player, zip[j][0], teamfightData, champContainer)
 
          if (update) {
-            champions.add(id)
+            updateIds.add(champId)
          }
 
          if ((i + j) % 25 === 0) {
@@ -48,11 +67,51 @@ export async function parseSummoner(matchlist, update) {
          }
       }
    }
+
+   await summonerDoc.save()
+
+   // champion averages
+   for (const champion of summonerDoc.championData) {
+      if (update && !updateIds.has(champion.championId)) continue
+      const matches = await SummonerMatchesModel.find({ '_id': { $in: champion.matches } })
+
+      for (const match of matches) {
+         champion.avg.ahpm += Math.round(match.t.ah / match.gd)
+         champion.avg.a += match.a
+         champion.avg.dmg += match.t.dtc
+         champion.avg.dpm += Math.round(match.t.dtc / match.gd)
+         champion.avg.ds += match.ds * 100
+         champion.avg.dtpm += Math.round(match.t.dt / match.gd)
+         champion.avg.d += match.d
+         champion.avg.ge += match.t.g
+         champion.avg.gpm += Math.round(match.t.g / match.gd)
+         champion.avg.hpm += Math.round(match.t.h / match.gd)
+         champion.avg.ah += match.t.ah
+         champion.avg.as += match.t.as
+         champion.avg.kp += match.kp * 100
+         champion.avg.k += match.k
+         champion.avg.smpm += Math.round(match.t.sm / match.gd)
+         champion.avg.tdd += match.t.dtc
+         champion.avg.tdt += match.t.dt
+         champion.avg.th += match.t.h
+         champion.avg.tsm += match.t.sm
+      }
+
+      for (const [k, v] of Object.entries(champion.avg)) {
+         champion.avg[k] = Math.round(v / matches.length)
+      }
+      // champion.avg = computeChampionAverages(champion, updateIds)
+
+   }
+
+   summonerDoc.parse.status = config.status.COMPLETE
+   summonerDoc.updated = Date.now()
+   await summonerDoc.save()
 }
 
-async function parseMatch(player, match, teamfightData) {
+async function parseMatch(id, player, match, teamfightData, champContainer) {
    const matchDocument = new SummonerMatchesModel({
-         m: summonerDocument._id,
+         m: id,
          mId: match.metadata.matchId,
          gc: match.info.gameCreation,
          gd: (match.info.gameEndTimestamp) ? (match.info.gameDuration / 60).toFixed(1) : (match.info.gameDuration / 60000).toFixed(1),
@@ -86,92 +145,88 @@ async function parseMatch(player, match, teamfightData) {
          tId: player.teamId,
       })
 
-   championEmbed = summonerDocument.championData.find(c => c.championId === player.championId)
-   if (!championEmbed) {
-      summonerDocument.championData.push({ championId: player.championId })
-      championEmbed = summonerDocument.championData.find(c => c.championId === player.championId)
-   }
-
-   championEmbed.wins += (player.win) ? 1 : 0
-   championEmbed.games += 1
-   championEmbed.tg += match.info.participants.find(p => p.teamId !== player.teamId).turretsLost
-   championEmbed.tl += player.turretsLost
-   championEmbed.ddtt += player.damageDealtToTurrets
-   championEmbed.fbk += player.firstBloodKill
+   champContainer.wins += (player.win) ? 1 : 0
+   champContainer.games += 1
+   champContainer.tg += match.info.participants.find(p => p.teamId !== player.teamId).turretsLost
+   champContainer.tl += player.turretsLost
+   champContainer.ddtt += player.damageDealtToTurrets
+   champContainer.fbk += player.firstBloodKill
    // color-side wins
-   championEmbed.bw += (player.teamId === 100 && player.win) ? 1 : 0
-   championEmbed.rw += (player.teamId === 200 && player.win) ? 1 : 0
+   champContainer.bw += (player.teamId === 100 && player.win) ? 1 : 0
+   champContainer.rw += (player.teamId === 200 && player.win) ? 1 : 0
    // color-side games
-   championEmbed.rsg += (player.teamId === 200) ? 1 : 0
+   champContainer.rsg += (player.teamId === 200) ? 1 : 0
    // multikills
-   championEmbed.mk.t += player.tripleKills
-   championEmbed.mk.q += player.quadraKills
-   championEmbed.mk.p += player.pentaKills
+   champContainer.mk.t += player.tripleKills
+   champContainer.mk.q += player.quadraKills
+   champContainer.mk.p += player.pentaKills
    // champion spells
-   championEmbed.sc.q += player.spell1Casts
-   championEmbed.sc.w += player.spell2Casts
-   championEmbed.sc.e += player.spell3Casts
-   championEmbed.sc.r += player.spell4Casts
+   champContainer.sc.q += player.spell1Casts
+   champContainer.sc.w += player.spell2Casts
+   champContainer.sc.e += player.spell3Casts
+   champContainer.sc.r += player.spell4Casts
    // summoner spells
-   championEmbed.ss[player.summoner1Id].games++
-   championEmbed.ss[player.summoner1Id].casts += player.summoner1Casts
-   championEmbed.ss[player.summoner2Id].games++
-   championEmbed.ss[player.summoner2Id].casts += player.summoner2Casts
+   champContainer.ss[player.summoner1Id].games++
+   champContainer.ss[player.summoner1Id].casts += player.summoner1Casts
+   champContainer.ss[player.summoner2Id].games++
+   champContainer.ss[player.summoner2Id].casts += player.summoner2Casts
    // pings
-   championEmbed.p.all += player.allInPings
-   championEmbed.p.assist += player.assistMePings
-   championEmbed.p.basic += player.basicPings
-   championEmbed.p.comm += player.commandPings
-   championEmbed.p.danger += player.dangerPings
-   championEmbed.p.enMiss += player.enemyMissingPings
-   championEmbed.p.enVis += player.enemyVisionPings
-   championEmbed.p.back += player.getBackPings
-   championEmbed.p.hold += player.holdPings
-   championEmbed.p.vis += player.needVisionPings
-   championEmbed.p.omw += player.onMyWayPings
-   championEmbed.p.push += player.pushPings
-   championEmbed.p.visClr += player.visionClearedPings
-   championEmbed.matches.push(matchDocument._id)
+   champContainer.p.all += player.allInPings
+   champContainer.p.assist += player.assistMePings
+   champContainer.p.basic += player.basicPings
+   champContainer.p.comm += player.commandPings
+   champContainer.p.danger += player.dangerPings
+   champContainer.p.enMiss += player.enemyMissingPings
+   champContainer.p.enVis += player.enemyVisionPings
+   champContainer.p.back += player.getBackPings
+   champContainer.p.hold += player.holdPings
+   champContainer.p.vis += player.needVisionPings
+   champContainer.p.omw += player.onMyWayPings
+   champContainer.p.push += player.pushPings
+   champContainer.p.visClr += player.visionClearedPings
+   champContainer.matches.push(matchDocument._id)
 
    if (teamfightData) {
       // Average it out on the front end (datum / games)
       for (let i = 0; i < 6; i++) {
          matchDocument.ic[i] = Math.round((matchDocument.ic[i] + teamfightData.ic[i]) * 100) / 100
       }
-      championEmbed.tf.exp += teamfightData.exp
-      championEmbed.tf.cap += teamfightData.cap
-      championEmbed.tf.use += teamfightData.use
-      championEmbed.tf.death += teamfightData.death
-      championEmbed.tf.part += teamfightData.part
-      championEmbed.tf.freq += teamfightData.freq
-      summonerDocument.fs += teamfightData.fs
+
+      champContainer.tf.exp += teamfightData.exp
+      champContainer.tf.cap += teamfightData.cap
+      champContainer.tf.use += teamfightData.use
+      champContainer.tf.death += teamfightData.death
+      champContainer.tf.part += teamfightData.part
+      champContainer.tf.freq += teamfightData.freq
    }
 
+   const participantPuuids = []
+
    for (const participant of match.info.participants) {
-         if (!participant.riotIdGameName) continue
-         participantPuuids.push({
-            updateOne: {
-               filter: { _id: participant.puuid },
-               update: {
-                  _id: participant.puuid,
-                  gn: participant.riotIdGameName,
-                  tl: participant.riotIdTagline,
-               },
-               upsert: true
-            }
-         })
-   
-         if (participant.puuid != player.puuid) {
-            if (player.teamId === participant.teamId) {
-               matchDocument.te.push(participant.puuid)
-               matchDocument.tc.push(participant.championId)
-            } else {
-               matchDocument.ee.push(participant.puuid)
-               matchDocument.ec.push(participant.championId)
-            }
+      if (!participant.riotIdGameName) continue
+      participantPuuids.push({
+         updateOne: {
+            filter: { _id: participant.puuid },
+            update: {
+               _id: participant.puuid,
+               gn: participant.riotIdGameName,
+               tl: participant.riotIdTagline,
+            },
+            upsert: true
+         }
+      })
+
+      if (participant.puuid != player.puuid) {
+         if (player.teamId === participant.teamId) {
+            matchDocument.te.push(participant.puuid)
+            matchDocument.tc.push(participant.championId)
+         } else {
+            matchDocument.ee.push(participant.puuid)
+            matchDocument.ec.push(participant.championId)
          }
       }
-   
+   }
+
    await PuuidModel.bulkWrite(participantPuuids)
       .catch(e => { throw e })
 
@@ -179,7 +234,189 @@ async function parseMatch(player, match, teamfightData) {
    return player.championId
 }
 
-async function parseTimeline(player, timeline, items) {
+function parseTimeline(player, timeline, items) {
+   const CONTIGUITY = 5000
+   const AVG_TEAMFIGHT_DISTANCE = 1300
+   const BUILDING_KILL_WINDOW = 30000
+   let teamfightData = {
+      ic: [0, 0, 0, 0, 0, 0],
+      exp: 0,   // expectation
+      cap: 0,   // capitalization
+      use: 0,   // usefullness
+      death: 0, // death probability
+      part: 0,  // participation
+      freq: 0,  // frequency
+   }
+   let teamfights = []
+   let bin = []
+   let initTimestamp
+   let capFlag
+   let tfPrerequisite = 0
+
+   //  ITER FRAMES
+   for (let i = 0; i < timeline.info.frames.length; i++) {
+      let e = timeline.info.frames[i].events
+
+      // ITER EVENTS
+      for (let j = 0; j < e.length; j++) {
+         if (e[j].type === 'ITEM_PURCHASED' && player.participantId === e[j].participantId) {
+
+            if (items && isLegendary(e[j].itemId, items)) {
+               for (let i = 0; i < 6; i++) {
+                  if (teamfightData.ic[i] > 0) continue
+                  teamfightData.ic[i] = Math.round(e[j].timestamp / 600) / 100
+                  break
+               }
+            }
+         }
+
+         if (e[j].timestamp - capFlag <= BUILDING_KILL_WINDOW && e[j].type === 'BUILDING_KILL' && e[j].teamId !== player.teamId) {
+            teamfightData.cap++
+            capFlag = undefined
+         }
+
+         if (e[j].timestamp - initTimestamp > CONTIGUITY) {
+            if (tfPrerequisite > 1 && bin.length > 3 && averageDistance(bin) < AVG_TEAMFIGHT_DISTANCE) {
+               teamfights.push(bin)
+               capFlag = e[j].timestamp
+            }
+
+            tfPrerequisite = 0
+            initTimestamp = undefined
+            bin = []
+         }
+
+         if (e[j].type === 'CHAMPION_KILL') {
+            if (e[j].timestamp - initTimestamp <= CONTIGUITY) {
+               if ('assistingParticipantIds' in e[j] && e[j].assistingParticipantIds.length >= 2) tfPrerequisite++
+               initTimestamp = e[j].timestamp
+               bin.push(e[j])
+            } else {
+               if ('assistingParticipantIds' in e[j] && e[j].assistingParticipantIds.length >= 2) tfPrerequisite++
+
+               if (!initTimestamp) {
+                  initTimestamp = e[j].timestamp
+                  bin.push(e[j])
+               }
+            }
+         }
+      }
+   }
+
+   // Frequency
+   teamfightData.freq = teamfights.length
+
+   // ITER TEAMFIGHTS
+   for (let i = 0; i < teamfights.length; i++) {
+      let use = []
+      let death = false
+      let part = false
+
+      // exp: 0,   // expectation
+      // cap: 0,   // capitalization
+      // use: 0,   // usefullness
+      // death: 0, // death probability
+      // part: 0,  // participation
+      // freq: 0,  // frequency
+
+      // ITER TEAMFIGHT EVENTS
+      for (let j = 0; j < teamfights[i].length; j++) {
+         const cell = teamfights[i][j]
+
+         if (('assistingParticipantIds' in cell
+            && cell.assistingParticipantIds[player.participantId])
+            || cell.killerId === player.participantId
+            || cell.victimId === player.participantId) {
+
+            // Participation
+            part = true
+
+            // Expectation
+            if ((player.participantId <= 5 && cell.killerId <= 5) || (player.participantId > 5 && cell.killerId > 5)) {
+               teamfightData.exp++
+            } else {
+               teamfightData.exp--
+
+               // Usefullness/Longevity
+               use.push(cell.victimId)
+            }
+
+            // Death Probability
+            if (cell.victimId === player.participantId) death = true
+         }
+      }
+
+      if (part) {
+         // Participation
+         teamfightData.part++
+
+         // Usefullness/Longevity
+         teamfightData.use += (use.findIndex(o => o === player.participantId) + 1) || 6
+      }
+
+      if (death) teamfightData.death++
+   }
 
    return teamfightData
+}
+
+function getKillParticipation(player, participants) {
+   let total = 0
+   participants.forEach((participant) => {
+      if (participant.teamId === player.teamId) {
+         total += participant.kills
+      }
+   })
+   let kp = Math.round((player.kills + player.assists) / total * 100) / 100
+   return kp || 0
+}
+
+function getDamageShare(player, participants) {
+   let total = 0
+   participants.forEach((participant) => {
+      if (participant.teamId === player.teamId) {
+         total += participant.totalDamageDealtToChampions
+      }
+   })
+
+   let cowabunga = Math.round(player.totalDamageDealtToChampions / total * 100) / 100
+   return cowabunga || 0
+}
+
+function getMatchItems(player) {
+   let items = []
+
+   for (let i = 0; i < 6; i++) {
+      items.push(player[`item${i}`])
+   }
+
+   return items
+}
+
+function isLegendary(id, items) {
+   /*
+      Legendary
+         - Item can't build into anything except an Ornn item (items >= 7000 or has requiredAlly: "ornn" in it) 
+         - Item cost >= 2000
+   */
+   return (items[id].gold.total >= 2000 && (!items[id].into || (items[id].into && items[id].into >= 7000))) ? true : false
+}
+
+function averageDistance(bin) {
+   bin = bin.map(x => ({ x: x.position.x, y: x.position.y }))
+
+   let arr = []
+   let avg
+   for (let i = 0; i < bin.length; i++) {
+      for (let j = i + 1; j < bin.length; j++) {
+         arr.push(Math.sqrt(Math.pow(bin[i].x - bin[j].x, 2) + Math.pow(bin[i].y - bin[j].y, 2)))
+      }
+   }
+   avg = arr.reduce((a, b) => a + b, 0) / arr.length
+   return avg
+}
+
+async function computeChampionAverages(champion, updateIds) {
+   
+
 }

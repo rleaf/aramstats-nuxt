@@ -33,8 +33,8 @@ export class Queue {
          'ph',
          'me'
       ])
-      // this.db = generateConnections()
-      // this.initCollection()
+      this.db = generateConnections()
+      this.initCollection()
    }
 
    async initCollection() {
@@ -132,7 +132,7 @@ export class Queue {
    */
    async check(puuid) {
       let position
-
+      
       await this.collection.findOne({ qPuuid: puuid })
          .then(res => position = (res) ? res.position : null)
 
@@ -188,25 +188,22 @@ export async function workQueue(summoner) {
     * Queue management that works via baton passing.
     * Longterm, maybe more reliable to create a separate script that runs via cronjobs to ping the queue for a given region every ~minute. Can build this in python too.
    */
+   console.log('adding summooer to queue')
    const queue = new Queue()
-
+   
    if (queue.inactiveRegions.has(summoner.region)) {
       queue.inactiveRegions.delete(summoner.region)
       let qSummoner = await queue.get(summoner.region)
       let document
       
       while (qSummoner) {
-
+         
          try {
             document = await SummonerModel.findOne({ '_id': qSummoner.qPuuid })
             await queue.update(summoner.region)
-
-            const [matchlist, challenges] = await Promise.all([
-               getSummonerMatches(document._id, document.region),
-               challengeScribe(document._id, document.region)
-            ])
-
-            await parseSummoner(matchlist)
+            
+            console.log('parsing summoner')
+            await parseSummoner(document)
             // await initialParse(document)
             qSummoner = await queue.get(summoner.region)
             if (qSummoner) document = await SummonerModel.findOne({ '_id': qSummoner.qPuuid })
