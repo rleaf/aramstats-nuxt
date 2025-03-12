@@ -7,7 +7,11 @@ const res = reactive({
    error: null
 })
 
-const { data } = await useFetch(`/api/summoner/${route.params.region}/${route.params.gameName}/${route.params.tagLine}`)
+const { data, error } = await useFetch(`/api/summoner/${route.params.region}/${route.params.gameName}/${route.params.tagLine}`)
+
+if (error.value) {
+   throw createError({ statusCode: error.value.statusCode, fatal: true })
+}
 
 if (data.value) {
    res.stage = data.value.stage

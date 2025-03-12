@@ -4,10 +4,13 @@ export default defineEventHandler(async (e) => {
    let summoner
    const routerParams = getRouterParams(e, { decode: true})
    console.log(`[Searching]: ${routerParams.gameName}#${routerParams.tagLine} (${routerParams.region})`)
+
    try {
       summoner = await getParseStatus(routerParams.gameName, routerParams.tagLine)
    } catch (e) {
-      if (!(e instanceof MongooseError)) {
+      if (e instanceof MongooseError) {
+         throw e
+      } else {
          return {
             stage: config.status.DNE,
             data: e.body.status.message || e.body.message || e.message // some wild responses
@@ -16,7 +19,7 @@ export default defineEventHandler(async (e) => {
    }
 
    const queue = new Queue()
-   
+
    switch (summoner.parse.status) {
       case config.status.COMPLETE:
          console.log(`[Found]: ${routerParams.gameName}#${routerParams.tagLine} (${routerParams.region})`)

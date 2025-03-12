@@ -17,6 +17,7 @@
       date: "3/12/25",
       notes: "",
       add: [
+         `Fatal error to user landing.`,
       ],
       remove: [],
       fix: [
