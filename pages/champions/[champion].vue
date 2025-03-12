@@ -9,7 +9,7 @@ await Promise.all([
    store.initRunes(),
    store.initItems(),
    store.initSpells(),
-   store.getChampionDragon(route.params.champion)
+   store.getChampionDragon(route.params.champion.toLowerCase())
 ])
 
 const queryPatch = ref(route.query.patch || store.recentCleanPatch)

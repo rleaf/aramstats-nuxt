@@ -21,7 +21,8 @@
       remove: [],
       fix: [
          `Erroneous 500 message. DB is actually not down that frequently.`,
-         `Refresh stats when updating a summoner profile`,
+         `500 routes on champion pages with Capitalized Names.`,
+         `Refresh stats when updating a summoner profile.`,
          `Forgetting to select region UX.`,
          `Disable rendering attempts on runeid 0's.`, 
          `Rune image assets (just in case).`,

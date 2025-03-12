@@ -7,16 +7,14 @@ export default defineEventHandler(async (e) => {
    try {
       summoner = await getParseStatus(routerParams.gameName, routerParams.tagLine)
    } catch (e) {
-      if (e instanceof MongooseError) {
-         // db connection broken
-      } else {
+      if (!(e instanceof MongooseError)) {
          return {
             stage: config.status.DNE,
             data: e.body.status.message || e.body.message || e.message // some wild responses
          }
       }
    }
-   
+
    const queue = new Queue()
    
    switch (summoner.parse.status) {
