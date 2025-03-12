@@ -5,6 +5,7 @@ const input = ref('')
 const region = ref('RG')
 const inputRef = useTemplateRef('inputBind')
 const championsRef = useTemplateRef('champions')
+const regionButtonRef = useTemplateRef('regionButton')
 const filteredChamps = useChampionFilter(step, input)
 
 onMounted(() => {
@@ -46,7 +47,7 @@ async function summonerSearch() {
       regionButtonRef.value.classList.add('shake')
       setTimeout(() => {
          regionButtonRef.value.classList.remove('shake')
-      }, 1000)
+      }, 750)
       return
    }
 
@@ -299,9 +300,9 @@ button.region {
 }
 
 .shake {
-   background-color: var(--error);
-   color: var(--on-error);
-   animation: shake 0.82s cubic-bezier(.36, .07, .19, .97) both;
+   background-color: var(--tertiary-container);
+   color: var(--tertiary);
+   animation: shake 0.75s cubic-bezier(.36, .07, .19, .97) both;
 }
 
 select:hover {

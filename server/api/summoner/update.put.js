@@ -17,30 +17,17 @@ export default defineEventHandler(async (e) => {
       })
 
    const summonerDocument = await SummonerModel.findById(summoner.puuid)
+   const potato = await parseSummoner(summonerDocument)
 
-   // shouldn't have to do this?
-   // const [matchlist, challenges] = await Promise.all([
-   //    getAllSummonerMatches(summoner.puuid, summoner.region, summonerDocument.lastMatchId),
-   //    getPlayerChallenges(summoner.puuid, summoner.region)
-   // ])
-
-   // const updateFlag = checkForUpdate(summonerDocument, summoner)
-
-   if (!matchlist.length) {
+   if (potato === 204) {
       console.log(`[Already UTD]: ${query.gameName}#${query.tagLine} (${query.region})`)
       summonerDocument.updated = new Date()
+      summonerDocument.gameName = summoner.gameName
+      summonerDocument.tagLine = summoner.tagLine
+      summonerDocument.profileIcon = summoner.profileIconId
       await summonerDocument.save()
-      return { status: 204 }
+      return { status: 204 }   
    }
    
-   summonerDocument.challenges = challenges
-   summonerDocument.gameName = summoner.gameName
-   summonerDocument.tagLine = summoner.tagLine
-   summonerDocument.region = summoner.region
-   summonerDocument.level = summoner.summonerLevel
-   summonerDocument.profileIcon = summoner.profileIconId
-
-   await initialParse(summonerDocument, matchlist)
-
-   return (await aggregateSummoner(summoner.puuid))[0]
+   return { status: 200, payload: (await aggregateSummoner(summoner.puuid))[0] }
 })

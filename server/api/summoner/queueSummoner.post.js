@@ -6,19 +6,7 @@ export default defineEventHandler(async (e) => {
    */
   
    const body = await readBody(e)
-   // let summoner
 
-   // try {
-   //    summoner = await findSummoner(body.gameName, body.tagLine, body.region)
-   // } catch(e) {
-   //    if (e instanceof Error) {
-   //       throw createError({
-   //          status: e.status,
-   //          statusMessage: e.body.status.message
-   //       })
-   //    }
-   // }
-   
    const summoner = await findSummoner(body.gameName, body.tagLine, body.region)
       .catch(e => {
          if (e instanceof Error) {

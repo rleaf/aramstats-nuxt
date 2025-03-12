@@ -13,6 +13,26 @@
   
   const version = [
    {
+      version: "4.1.1",
+      date: "3/12/25",
+      notes: "",
+      add: [
+      ],
+      remove: [],
+      fix: [
+         `Erroneous 500 message. DB is actually not down that frequently.`,
+         `Refresh stats when updating a summoner profile`,
+         `Forgetting to select region UX.`,
+         `Disable rendering attempts on runeid 0's.`, 
+         `Rune image assets (just in case).`,
+      ],
+      adjust: [
+         `De-spaghettify backend.`,
+         `Region shake colors.`,
+      ],
+      known: [],
+   }, 
+   {
       version: "4.1.0",
       date: "3/7/25",
       notes: "",

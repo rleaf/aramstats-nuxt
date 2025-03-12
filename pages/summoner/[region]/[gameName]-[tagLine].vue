@@ -25,8 +25,8 @@ async function queueSummoner() {
       },
    })
 
-   // poll.value = setInterval(ping, 30000);
-   // setTimeout(ping, 3000);
+   poll.value = setInterval(ping, 30000);
+   setTimeout(ping, 5000);
 }
 
 async function ping() {

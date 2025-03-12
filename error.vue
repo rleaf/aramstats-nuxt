@@ -4,13 +4,12 @@ const { error } = defineProps(['error'])
 const roulette = computed(() => useRoulette())
 const msg = computed(() => {
    switch (error.statusCode) {
-      case 500:
-         return 'Aramstats database seems to be down. Feel free to message me in Discord so I can restart it.'
+      // case 500:
+      //    return 'Aramstats database seems to be down. Feel free to message me in Discord so I can restart it.'
       case 404:
          return 'This page does not exist'
       default:
          return 'Something went wrong.'
-         break;
    }
 })
 

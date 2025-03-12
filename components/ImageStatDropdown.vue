@@ -30,6 +30,15 @@ const maxHeight = computed(() => {
    return `max-height: ${Math.round(props.stats.length / 2) * 45}px`
 })
 
+const getStats = computed(() => {
+   if (props.header === 'Secondary Trees' || props.header === 'Keystone Runes') {
+      // some matches don't properly save runeId data, so void it if the value is 0. Lux secondary tree @ EUW1_7001355483 = { ... "style": 0 }
+      return props.stats.filter(o => Number(o[0]) !== 0)
+   } else {
+      return props.stats
+   }
+})
+
 </script>
 
 <template>
@@ -43,8 +52,7 @@ const maxHeight = computed(() => {
    </div>
    <div class="stat-body bordered"  :class="{ 'truncated': state }" :style="maxHeight">
       <div v-if="header !== 'Summoner Spells' && summStore.championPool.size === 0" class="helper">Click on some champions to see this stat</div>
-      <div class="loop" v-for="(s, j) in props.stats" :class="{ 'o': Math.round(j/2) % 2 === 0 }" :key="j">
-
+      <div class="loop" v-for="(s, j) in getStats" :class="{ 'o': Math.round(j/2) % 2 === 0 }" :key="j">
          <div class="stat-wrapper">
             <img :class="imageSize" :src="assetImage(s[0])" alt="">
             <div>

@@ -12,7 +12,7 @@ export default defineEventHandler(async (e) => {
       } else {
          return {
             stage: config.status.DNE,
-            data: e.body.message || e.message
+            data: e.body.status.message || e.body.message || e.message // some wild responses
          }
       }
    }

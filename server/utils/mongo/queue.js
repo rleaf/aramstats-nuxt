@@ -188,7 +188,6 @@ export async function workQueue(summoner) {
     * Queue management that works via baton passing.
     * Longterm, maybe more reliable to create a separate script that runs via cronjobs to ping the queue for a given region every ~minute. Can build this in python too.
    */
-   console.log('adding summooer to queue')
    const queue = new Queue()
    
    if (queue.inactiveRegions.has(summoner.region)) {
@@ -201,17 +200,13 @@ export async function workQueue(summoner) {
          try {
             document = await SummonerModel.findOne({ '_id': qSummoner.qPuuid })
             await queue.update(summoner.region)
-            
-            console.log('parsing summoner')
             await parseSummoner(document)
-            // await initialParse(document)
             qSummoner = await queue.get(summoner.region)
             if (qSummoner) document = await SummonerModel.findOne({ '_id': qSummoner.qPuuid })
          } catch (e) {
             qSummoner = await queue.get(summoner.region)
             queue.inactiveRegions.add(summoner.region)
             throw e
-            // console.log(e, 'rip bozo') // So I'm not scrolling for hours in prod
          }
       }
 

@@ -1,18 +1,17 @@
-export async function parseSummoner(summonerDoc, update = false) {
+export async function parseSummoner(summonerDoc) {
    const val = 50
    let updateIds
-   if (update) {
+   if (summonerDoc.lastMatchId) {
       updateIds = new Set()
    }
 
    const [matchlist, challenges] = await Promise.all([
-      getSummonerMatches(summonerDoc._id, summonerDoc.region),
+      getSummonerMatches(summonerDoc._id, summonerDoc.region, summonerDoc.lastMatchId),
       getPlayerChallenges(summonerDoc._id, summonerDoc.region)
    ])
 
-   if (!matchlist.length) {
-      console.log('Summoner already UTD')
-      return
+   if (!matchlist.length) { // summoner already UTD
+      return 204
    }
 
    // preliminaries
@@ -56,7 +55,7 @@ export async function parseSummoner(summonerDoc, update = false) {
          const teamfightData = parseTimeline(player, zip[j][1], items)
          const champId = await parseMatch(summonerDoc._id, player, zip[j][0], teamfightData, champContainer)
 
-         if (update) {
+         if (updateIds) {
             updateIds.add(champId)
          }
 
@@ -72,7 +71,7 @@ export async function parseSummoner(summonerDoc, update = false) {
 
    // champion averages
    for (const champion of summonerDoc.championData) {
-      if (update && !updateIds.has(champion.championId)) continue
+      if (updateIds && !updateIds.has(champion.championId)) continue
       const matches = await SummonerMatchesModel.find({ '_id': { $in: champion.matches } })
 
       for (const match of matches) {
@@ -100,7 +99,6 @@ export async function parseSummoner(summonerDoc, update = false) {
       for (const [k, v] of Object.entries(champion.avg)) {
          champion.avg[k] = Math.round(v / matches.length)
       }
-      // champion.avg = computeChampionAverages(champion, updateIds)
 
    }
 
@@ -414,9 +412,4 @@ function averageDistance(bin) {
    }
    avg = arr.reduce((a, b) => a + b, 0) / arr.length
    return avg
-}
-
-async function computeChampionAverages(champion, updateIds) {
-   
-
 }

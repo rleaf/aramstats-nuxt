@@ -8,7 +8,8 @@ const store = superStore()                   // Store for global settings
 const summStore = summonerStore()            // Store for summoner settings
 const route = useRoute()
 const props = defineProps(['data']) 
-const { data } = toRefs(props)               // Proxy data so it can mutate on Update click
+const data = ref(null)                       // Maintain reactivity for updating
+data.value = props.data
 const championFilter = ref('')               // Filter for table champion search
 const sortFilter = ref(0)                    // Determine if sort is active
 const sortMod = ref(false)                   // Determine if sort by PER MINUTE variant
@@ -61,22 +62,21 @@ function toggleAll() {
 
 }
 
-function del() {
-   $fetch(`/api/summoner/delete`,{
-      method: 'DELETE',
-      params: {
-         region: route.params.region,
-         gameName: route.params.gameName,
-         tagLine: route.params.tagLine,
-      }
-   })
-}
+// function del() {
+//    $fetch(`/api/summoner/delete`,{
+//       method: 'DELETE',
+//       params: {
+//          region: route.params.region,
+//          gameName: route.params.gameName,
+//          tagLine: route.params.tagLine,
+//       }
+//    })
+// }
 
 async function updateProfile() {
    update.value = true
    updateButton.value.innerHTML = 'Updating...'
-
-   const { data, status } = await $fetch('/api/summoner/update', {
+   const { payload, status } = await $fetch('/api/summoner/update', {
       method: 'PUT',
       params: {
          region: route.params.region,
@@ -89,13 +89,12 @@ async function updateProfile() {
    updateButton.value.innerHTML = 'Update'
 
    if (status === 200) {
-      data.value = data
+      data.value = payload
       store.setNotification('Summoner updated')
-      updateKey++
+      updateKey.value++
    }
 
    if (status === 204) {
-      // hmm
       store.setNotification('Summoner already up to date')
    }
 }
@@ -599,10 +598,6 @@ const updatedDate = computed(() => {
                <div class="buttons">
                   <button :class="{ 'active-update': update }" ref="updateButton" :disabled="update"
                      @click="updateProfile()">Update</button>
-               </div>
-               <div class="buttons">
-                  <button :class="{ 'active-update': update }" ref="updateButton" :disabled="update"
-                     @click="del()">Del</button>
                </div>
                <div class="last-updated">
                   Last updated: {{ updatedDate }}
