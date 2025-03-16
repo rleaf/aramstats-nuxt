@@ -74,32 +74,54 @@ export async function parseSummoner(summonerDoc) {
       if (updateIds && !updateIds.has(champion.championId)) continue
       const matches = await SummonerMatchesModel.find({ '_id': { $in: champion.matches } })
 
+      let proxy = {
+         "ahpm": 0,
+         "a": 0,
+         "dpm": 0,
+         "ds": 0,
+         "dtpm": 0,
+         "d": 0,
+         "ge": 0,
+         "gpm": 0,
+         "hpm": 0,
+         "ah": 0,
+         "as": 0,
+         "kp": 0,
+         "k": 0,
+         "smpm": 0,
+         "tdd": 0,
+         "tdt": 0,
+         "th": 0,
+         "tsm": 0,
+      }
+
       for (const match of matches) {
-         champion.avg.ahpm += Math.round(match.t.ah / match.gd)
-         champion.avg.a += match.a
-         champion.avg.dmg += match.t.dtc
-         champion.avg.dpm += Math.round(match.t.dtc / match.gd)
-         champion.avg.ds += match.ds * 100
-         champion.avg.dtpm += Math.round(match.t.dt / match.gd)
-         champion.avg.d += match.d
-         champion.avg.ge += match.t.g
-         champion.avg.gpm += Math.round(match.t.g / match.gd)
-         champion.avg.hpm += Math.round(match.t.h / match.gd)
-         champion.avg.ah += match.t.ah
-         champion.avg.as += match.t.as
-         champion.avg.kp += match.kp * 100
-         champion.avg.k += match.k
-         champion.avg.smpm += Math.round(match.t.sm / match.gd)
-         champion.avg.tdd += match.t.dtc
-         champion.avg.tdt += match.t.dt
-         champion.avg.th += match.t.h
-         champion.avg.tsm += match.t.sm
+         proxy.ahpm += Math.round(match.t.ah / match.gd)
+         proxy.a += match.a
+         proxy.dmg += match.t.dtc
+         proxy.dpm += Math.round(match.t.dtc / match.gd)
+         proxy.ds += match.ds * 100
+         proxy.dtpm += Math.round(match.t.dt / match.gd)
+         proxy.d += match.d
+         proxy.ge += match.t.g
+         proxy.gpm += Math.round(match.t.g / match.gd)
+         proxy.hpm += Math.round(match.t.h / match.gd)
+         proxy.ah += match.t.ah
+         proxy.as += match.t.as
+         proxy.kp += match.kp * 100
+         proxy.k += match.k
+         proxy.smpm += Math.round(match.t.sm / match.gd)
+         proxy.tdd += match.t.dtc
+         proxy.tdt += match.t.dt
+         proxy.th += match.t.h
+         proxy.tsm += match.t.sm
       }
 
-      for (const [k, v] of Object.entries(champion.avg)) {
-         champion.avg[k] = Math.round(v / matches.length)
+      for (const [k, v] of Object.entries(proxy)) {
+         proxy[k] = Math.round(v / matches.length)
       }
 
+      champion.avg = proxy
    }
 
    summonerDoc.parse.status = config.status.COMPLETE

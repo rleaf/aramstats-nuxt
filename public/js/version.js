@@ -13,6 +13,18 @@
   
   const version = [
    {
+      version: "4.1.2",
+      date: "3/16/25",
+      notes: "There was an issue with computing champion averages in the v4.1.1 update. If you notice wrong average stats for any champion on your profile, hmu and I can reparse your profile.",
+      add: [],
+      remove: [],
+      fix: [
+         `Incorrectly computing champion averages.`,
+      ],
+      adjust: [],
+      known: [],
+   }, 
+   {
       version: "4.1.1",
       date: "3/12/25",
       notes: "",
