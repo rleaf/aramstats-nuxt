@@ -82,6 +82,9 @@ export const superStore = defineStore('super', {
          try {
             const url = `https://cdn.communitydragon.org/${this.patches[0]}/champion/${o}/data.json`;
             ({ data: this.championCDN } = await useFetch(url))
+            // if (!this.championCDN) {
+            //    ({ data: this.championCDN } = await useFetch(`https://cdn.communitydragon.org/${this.patches[1]}/champion/${o}/data.json`))
+            // }
          } catch (e) {
             if (e instanceof Error) console.log(e)
          }
