@@ -1,7 +1,7 @@
 export const utilLoadChampionCollection = async (patch) => {
    const db = generateConnections()
    const list = await db.listCollections().toArray()
-   return db.collection(`15.5_championstats`)
+   // return db.collection(`15.5_championstats`)
    if (list.some(c => c.name === `${patch}_championstats`)) {
       // return db.collection(`${patch}_championstats`)
       const count = await db.collection(`${patch}_championstats`).countDocuments()

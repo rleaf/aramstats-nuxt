@@ -15,14 +15,16 @@
    {
       version: "4.1.3",
       date: "3/18/25",
-      notes: "",
+      notes: "Alleviate some of the backend load to the user to help prevent site crashes. Also I noticed there are loading issues for champion pages when a new patch rolls around. I'm working on a fix for that.",
       add: [],
       remove: [],
-      fix: [
-         `Fetching champion data on new patch release.`,
+      fix: [],
+      adjust: [
+         `CSR on summoner profiles.`
       ],
-      adjust: [],
-      known: [],
+      known: [
+         `Rendering champion data during new patch.`,
+      ],
    }, 
    {
       version: "4.1.2",

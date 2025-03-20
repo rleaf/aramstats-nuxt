@@ -31,6 +31,8 @@ export default defineNuxtConfig({
   routeRules: {
     '/champions': { swr: 1800 },
     '/champions/**': { swr: 1800 },
+    '/summoner/**': { ssr: false},
+    '/api/**': { cors: false },
   },
 
   components: [
