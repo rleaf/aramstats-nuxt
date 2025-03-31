@@ -54,15 +54,14 @@ export default class Experience {
    }
 
    remove() {
-      console.log('removing experience')
+      this.time.off('tick')
       this.sizes.dispose()
       this.mouse.dispose()
       this.renderer.instance.dispose()
       this.world.map.dispose()
+
       while(this.scene.children.length > 0) {
          this.scene.remove(this.scene.children[0])
       }
-
-      // delete this.instance
    }
 }

@@ -13,13 +13,13 @@
   
   const version = [
    {
-      version: "4.2.0",
+      version: "4.1.4",
       date: "3/30/25",
-      notes: "",
+      notes: "Aramstats has been, after some days of uptime, crashing. Fixing some leaks in an attempt to fix the crashes.",
       add: [],
       remove: [],
       fix: [
-         `Memory leaks causing site crashes.`
+         `Dispose Three.js assets`
       ],
       adjust: [],
       known: [],

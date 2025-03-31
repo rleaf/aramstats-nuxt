@@ -14,6 +14,11 @@ onBeforeMount(() => {
 onUnmounted(() => {
    if (experience) {
       experience.remove()
+
+      for (const prop in experience) {
+         delete experience[prop]
+      }
+      
       experience = null
    }
 })
