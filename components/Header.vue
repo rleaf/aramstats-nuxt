@@ -1,5 +1,5 @@
 <script setup>
-import updates from '~/public/js/updates'
+import updates from '~/constants/js/updates'
 </script>
 
 <template>

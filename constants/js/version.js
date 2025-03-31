@@ -13,6 +13,18 @@
   
   const version = [
    {
+      version: "4.2.0",
+      date: "3/30/25",
+      notes: "",
+      add: [],
+      remove: [],
+      fix: [
+         `Memory leaks causing site crashes.`
+      ],
+      adjust: [],
+      known: [],
+   }, 
+   {
       version: "4.1.3",
       date: "3/18/25",
       notes: "Alleviate some of the backend load to the user to help prevent site crashes. Also I noticed there are loading issues for champion pages when a new patch rolls around. I'm working on a fix for that.",

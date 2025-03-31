@@ -35,6 +35,7 @@ export default class Experience {
       this.time.on('tick', () => {
          this.update()
       })
+
    }
 
    resize() {
@@ -53,9 +54,15 @@ export default class Experience {
    }
 
    remove() {
+      console.log('removing experience')
+      this.sizes.dispose()
+      this.mouse.dispose()
+      this.renderer.instance.dispose()
       this.world.map.dispose()
       while(this.scene.children.length > 0) {
          this.scene.remove(this.scene.children[0])
       }
+
+      // delete this.instance
    }
 }

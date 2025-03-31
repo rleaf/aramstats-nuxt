@@ -11,6 +11,13 @@ onBeforeMount(() => {
    }
 })
 
+onUnmounted(() => {
+   if (experience) {
+      experience.remove()
+      experience = null
+   }
+})
+
 onMounted(() => {
    if (+localStorage.getItem('experience') === 1) {
       experience = new Experience(document.querySelector('.webgl'), false)
