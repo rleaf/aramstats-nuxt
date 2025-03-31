@@ -7,7 +7,8 @@
     "dev": "nuxt dev",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
-    "postinstall": "nuxt prepare"
+    "postinstall": "nuxt prepare",
+    "prod-debug": "node --inspect node_modules/nuxt/bin/nuxt.mjs preview"
   },
   "dependencies": {
     "@nuxtjs/sitemap": "^7.2.7",
