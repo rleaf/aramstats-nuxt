@@ -27,10 +27,10 @@ if (error.value) {
 }
 
 useSeoMeta({
-   title: `${championNames[championId.value][1]} | ARAM Stats`,
-   ogTitle: `${championNames[championId.value][1]} | ARAM Stats`,
-   description: `${championNames[championId.value][1]} builds and stats for ARAM on patch ${store.recentCleanPatch}. View data tailored to the most popular core builds.`,
-   ogDescription: `${championNames[championId.value][1]} builds and stats for ARAM on patch ${store.recentCleanPatch}. View data tailored to the most popular core builds.`,
+   title: `${championNames[championId.value][1]} ARAM Builds - ARAM Stats`,
+   ogTitle: `${championNames[championId.value][1]} ARAM Builds - ARAM Stats`,
+   description: `${championNames[championId.value][1]} ARAM builds and stats on patch ${store.recentCleanPatch}. View data tailored to the most popular core builds and more.`,
+   ogDescription: `${championNames[championId.value][1]} ARAM builds and stats on patch ${store.recentCleanPatch}. View data tailored to the most popular core builds and more.`,
    ogImage: `https://ddragon.leagueoflegends.com/cdn/${store.patches[0]}/img/champion/${championNames[championId.value][0]}.png`
 })
 

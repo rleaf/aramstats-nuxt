@@ -2,7 +2,7 @@
 import about from '@/constants/about'
 
 useSeoMeta({
-   title: 'About | ARAM Stats',
+   title: 'About - ARAM Stats',
 })
 </script>
 

@@ -6,6 +6,8 @@ const store = superStore()
 await store.initPatches()
 const { start, finish } = useLoadingIndicator()
 const queryPatch = ref(useRoute().query.patch || store.recentCleanPatch)
+const championData = ref(null)
+const patch = store.recentCleanPatch
 const sort = ref(1)
 const descending = ref(false)
 const winrates = reactive({
@@ -15,20 +17,27 @@ const winrates = reactive({
 })
 
 await store.initPatches()
-const { data: championData, error } = await useAsyncData(
+const { data: payload, error } = await useAsyncData(
    () => $fetch('/api/champions', {
       query: {
          patch: queryPatch.value
       }
    }))
 
+championData.value = payload.value.championData
+
+if (payload.value.meta.patchResponse !== queryPatch.value) {
+   store.setNotification(`Patch ${queryPatch.value} data unavailable. Defaulting to ${payload.value.meta.patchResponse}.`)
+   queryPatch.value = payload.value.meta.patchResponse
+}
+
 if (error.value) {
    throw createError({ statusCode: error.value.statusCode, fatal: true })
 }
 
 useSeoMeta({
-   title: `Champions | ARAM Stats`,
-   ogTitle: `Champions | ARAM Stats`,
+   title: `Champions - ARAM Stats`,
+   ogTitle: `Champions - ARAM Stats`,
    description: `ARAM tier list on patch ${store.recentCleanPatch}.`,
    ogDescription: `ARAM tier list on patch ${store.recentCleanPatch}.`,
 })
@@ -70,6 +79,7 @@ function cleanPatch(patch) {
 }
 
 async function patchChange(patch) {
+   if (cleanPatch(patch) === queryPatch.value) return
    start()
    queryPatch.value = cleanPatch(patch)
    const res = await $fetch('/api/champions', {
@@ -79,7 +89,7 @@ async function patchChange(patch) {
    })
 
    if (res) {
-      championData.value = res
+      championData.value = res.championData
       useRouter().push({ query: { patch: queryPatch.value } })
       computeWinrates()
    } else {
@@ -198,7 +208,7 @@ const getChampionsList = computed(() => {
 
          <div class="patch-wrapper">
             <span class="superscript">Patch:</span>
-            <button class="patch-button">{{ useRoute().query.patch || store.recentCleanPatch }}</button>
+            <button class="patch-button">{{ queryPatch }}</button>
             <div class="patch-options">
                <button @click="patchChange(patch)" v-for="patch in store.patches" :key="patch">{{ cleanPatch(patch) }}</button>
             </div>

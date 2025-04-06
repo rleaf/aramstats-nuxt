@@ -13,13 +13,31 @@
   
   const version = [
    {
+      version: "4.2.0",
+      date: "3/30/25",
+      notes: "",
+      add: [
+         `Improved Runes UI on champion pages.`,
+      ],
+      remove: [],
+      fix: [
+         `Champion data fetching on patch transitions. (versions.json is not in sync with patch release).`,
+         `Notification timing.`,
+         `seo.`,
+      ],
+      adjust: [],
+      known: [
+         `Issues loading champion data on transitioning to new patch.`
+      ],
+   }, 
+   {
       version: "4.1.4",
       date: "3/30/25",
       notes: "Aramstats has been, after some days of uptime, crashing. Fixing some leaks in an attempt to fix the crashes.",
       add: [],
       remove: [],
       fix: [
-         `Dispose Three.js assets`
+         `Dispose Three.js assets.`
       ],
       adjust: [],
       known: [],

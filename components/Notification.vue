@@ -2,26 +2,10 @@
 import { superStore } from '@/stores/superStore'
 
 const store = superStore()
-
-function onBeforeEnter(el) {
-   el.style.opacity = `0`
-   el.style.transform = `translate(-50%,-100%)`
-}
-
-function onAfterEnter(el) {
-   el.style.opacity = `1`
-   el.style.transform = `translate(-50%, 0)`
-}
-
-function onBeforeLeave(el) {
-   el.style.transform = `translate(-50%,-100%)`
-   el.style.opacity = `0`
-}
 </script>
 
 <template>
-
-   <Transition name="fade" @before-enter="onBeforeEnter" @after-enter="onAfterEnter" @before-leave="onBeforeLeave">
+   <Transition name="slide">
       <div v-if="store.notification" @click="store.notification = null" class="notification-main">
          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 -960 960 960">
             <path d="M480-280q17 0 28.5-11.5T520-320t-11.5-28.5T480-360t-28.5 11.5T440-320t11.5 28.5T480-280m-40-160h80v-240h-80zm40 360q-83 0-156-31.5T197-197t-85.5-127T80-480t31.5-156T197-763t127-85.5T480-880t156 31.5T763-763t85.5 127T880-480t-31.5 156T763-197t-127 85.5T480-80m0-80q134 0 227-93t93-227-93-227-227-93-227 93-93 227 93 227 227 93m0-320" />
@@ -48,13 +32,13 @@ h2 {
 
 span {
    position: absolute;
-   height: 5px;
+   height: 2px;
    bottom: 0;
    border-radius: 0 3px 3px 3px;
-   background-color: var(--tertiary-container);
+   background-color: var(--on-tertiary-container);
    left: 0;
+   opacity: 0.8;
    animation: animate 2500ms linear;
-   animation-delay: 500ms;  /* notification duration - transition = animation delay */
 }
 
 @keyframes animate {
@@ -63,12 +47,11 @@ span {
 }
 
 svg {
-   fill: var(--tertiary-container);
+   fill: var(--on-tertiary-container);
 }
 .notification-main {
    cursor: pointer;
    font-family: var(--font-main);
-   font-weight: 600;
    display: flex;
    justify-content: center;
    align-items: center;
@@ -79,11 +62,30 @@ svg {
    left: 50%;
    transform: translateX(-50%);
    z-index: 10;
-   color: var(--on-tertiary);
+   color: var(--on-tertiary-container);
    font-size: 0.85rem;
-   background: var(--tertiary);
+   background: var(--tertiary-container);
    border-radius: 3px;
    padding: 0.75rem 1.5rem;
-   transition: all 500ms ease-in-out;
+}
+
+.slide-enter-active {
+   animation: slide-fade 500ms linear;
+}
+
+.slide-leave-active {
+   animation: slide-fade 500ms reverse;
+}
+
+@keyframes slide-fade {
+   0% {
+      opacity: 0;
+      transform: translate(-50%, -100%);
+   }
+      
+   100% {
+      opacity: 1;
+      transform: translate(-50%, 0);
+   }
 }
 </style>

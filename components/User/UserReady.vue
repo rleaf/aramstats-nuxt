@@ -25,7 +25,7 @@ const championSearch = useTemplateRef('championSearch')
 await store.initPatches()
 
 useSeoMeta({
-   title: `${data.value.gameName}#${data.value.tagLine} | ARAM Stats`
+   title: `${data.value.gameName}#${data.value.tagLine} - ARAM Stats`
 })
 
 onMounted(() => {

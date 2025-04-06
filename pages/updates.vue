@@ -4,7 +4,7 @@ import version from '~/constants/js/version'
 const tab = ref(0)
 
 useSeoMeta({
-   title: 'Updates | ARAM Stats',
+   title: 'Updates - ARAM Stats',
 })
 
 function getImage(fileName) {
