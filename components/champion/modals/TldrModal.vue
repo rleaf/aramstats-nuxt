@@ -37,8 +37,8 @@ function closeModal() {
    <div v-if="showModal" class="modal-main">
       <div class="modal">
          <div class="head">
-            <h1>Tldr</h1>
-            The Tldr section shows what you want to see when you're in champ select. The data shown here is particular to the selected core build and may look different from the sections below.
+            <h1>Overview</h1>
+            The Overview section is designed to show what you want to see when you're in champ select. Data shown in this section is particular to the selected core build and may look different from the sections below.
          </div>
          <div class="setting">
             <div class="setting-head">

@@ -115,7 +115,7 @@ const aramModifiers = computed(() => {
       </Transition>
       <div class="gradient-bg" :style="{ background: background }"></div>
       <div class="header">
-         <div class="header-titles">
+           <div class="header-titles">
 
             <div class="header-lhs">
                <div class="header-lhs-image">
@@ -159,12 +159,6 @@ const aramModifiers = computed(() => {
                   </div>
                </div>
 
-               <!-- <div class="aram-mods" v-if="aramModifiers">
-                  <div v-for="(s, i) in Object.entries(aramModifiers)" :key="i">
-                     <span>{{ s[0] }}</span>
-                     {{ s[1] }}
-                  </div>
-               </div> -->
             </div>
 
          </div>
@@ -191,7 +185,7 @@ const aramModifiers = computed(() => {
       <div class="champion-body">
          <Tldr @scroll="scrollTo" :champion-data="championData" />
          <Items :champion-data="championData" :patch="store.patches[0]" />
-         <Runes :champion-data="championData" />
+         <Runes :data="championData.runes" />
          <StartingSpells :champion-data="championData" />
       </div>
    </div>

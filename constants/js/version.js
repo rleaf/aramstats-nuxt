@@ -14,7 +14,7 @@
   const version = [
    {
       version: "4.2.0",
-      date: "3/30/25",
+      date: "4/6/25",
       notes: "",
       add: [
          `Improved Runes UI on champion pages.`,
@@ -23,12 +23,10 @@
       fix: [
          `Champion data fetching on patch transitions. (versions.json is not in sync with patch release).`,
          `Notification timing.`,
-         `seo.`,
+         `Seo.`,
       ],
       adjust: [],
-      known: [
-         `Issues loading champion data on transitioning to new patch.`
-      ],
+      known: [],
    }, 
    {
       version: "4.1.4",

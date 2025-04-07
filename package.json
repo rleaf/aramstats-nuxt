@@ -16,7 +16,6 @@
     "@sentry/nuxt": "^9.5.0",
     "echarts": "^5.6.0",
     "mongoose": "^8.10.1",
-    "nuxt": "^3.16.0",
     "nuxt-gtag": "^3.0.2",
     "pinia": "^3.0.1",
     "promise-retry": "^2.0.1",
@@ -26,6 +25,7 @@
     "vue-router": "latest"
   },
   "devDependencies": {
+    "nuxt": "^3.16.2",
     "tweakpane": "^4.0.5"
   },
   "overrides": {

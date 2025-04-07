@@ -13,7 +13,7 @@ const showModal = ref(false)
             <h1>Runes</h1>
             The Runes section displays individual rune observations & winrate.
          </div>
-         <div class="setting">
+         <!-- <div class="setting">
             <div class="setting-head">
                <h2>Heatmap</h2>
                <div class="options">
@@ -37,7 +37,7 @@ const showModal = ref(false)
             <p>
                To help with visual clarity.
             </p>
-         </div>
+         </div> -->
       </div>
       <div class="modal-back" @click ="showModal = false" />
    </div>
