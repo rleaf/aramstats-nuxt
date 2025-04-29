@@ -13,6 +13,18 @@
   
   const version = [
    {
+      version: "4.2.1",
+      date: "4/29/25",
+      notes: "",
+      add: [],
+      remove: [],
+      fix: [
+         "Continued fixing on champion data fetching upon patch transitions.",
+      ],
+      adjust: [],
+      known: [],
+   }, 
+   {
       version: "4.2.0",
       date: "4/6/25",
       notes: "",

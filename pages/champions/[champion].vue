@@ -128,6 +128,7 @@ const aramModifiers = computed(() => {
                      <div v-if="store.championCDN" v-for="(id, i) of 'PQWER'"
                         @mouseenter="store.setTooltipData({ event: $event, key: id, mode: 'skills', skillIndex: i })"
                         @mouseleave="store.tooltip.active = false" :key="i">
+                        
                         <img
                            :src="`https://cdn.communitydragon.org/${store.patches[0]}/champion/${store.championCDN.id}/ability-icon/${id.toLowerCase()}`"
                            rel="preload">
