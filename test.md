@@ -37,7 +37,6 @@ export async function matchListTft () {
 }
 
 ```
-[More examples](https://github.com/Sansossio/twisted/tree/master/example)
 
 # Automatic rate limits reattempts
 ```js
@@ -82,11 +81,11 @@ const api = new LolApi({
 ```
 
 # Endpoints 
-Everything should be in the same order as in the official docs.
+Everything should be in the same order as in the [official docs](https://developer.riotgames.com/apis).
 
 <details><summary><b>RIOT</b></summary>
 
-### ACCOUNT-V1
+#### ACCOUNT-V1
 - [x] `Get account by puuid`
 - [ ] `Get account by puuid - ESPORTS`
 - [x] `Get account by riot id`
@@ -99,30 +98,30 @@ Everything should be in the same order as in the official docs.
 
 <details><summary><b>LOL</b></summary>
 
-### CHAMPION-MASTERY-V4
+#### CHAMPION-MASTERY-V4
 - [x] `Get all champion mastery entries sorted by number of champion points descending.`
 - [x] `Get a champion mastery by player ID and champion ID.`
 - [x] `Get a player's total champion mastery score, which is the sum of individual champion mastery levels.`
-### CHAMPION-V3
+#### CHAMPION-V3
 - [x] `Retrieve all champions.`
 - [x] `Retrieve champion by ID.`
-### CLASH
+#### CLASH
 - [x] `Get players by summoner id`
 - [x] `Get team`
 - [x] `Get tournaments`
 - [x] `Get tournaments by team id`
 - [x] `Get tournament by id`
-### MATCH-V5
+#### MATCH-V5
 - [x] `Get match by id`
 - [x] `Get matches by summoner id`
 - [x] `Get match timeline by id`
-### MATCH-V4 (deprecated)
+#### MATCH-V4 (deprecated)
 - [x] `Get matches id by tournament code`
 - [x] `Get match by id`
 - [x] `Get match by tournament code`
 - [x] `Get matches by summoner id`
 - [x] `Get match timeline by id`
-### LEAGUE-V4
+#### LEAGUE-V4
 - [x] `Get the challenger league for given queue.`
 - [x] `Get league entries in all queues by PUUID.`
 - [x] `Get league entries in all queues for a given summoner ID.`
@@ -133,38 +132,38 @@ Everything should be in the same order as in the official docs.
 - [x] `Get the queues that have positional ranks enabled.` (deprecated June 17th and in `v0.9.10`)
 - [x] `Get league positions in all queues for a given summoner ID.` (deprecated June 17th and in `v0.9.10`)
 - [x] `Get all the positional league entries.` (deprecated June 17th and in `v0.9.10`)
-### LOL-CHALLENGES-V1
+#### LOL-CHALLENGES-V1
 - [x] `Get all challenge configurations.`
 - [x] `Get all challenge percentile distributions.`
 - [x] `Get a challenge configuration.`
 - [x] `Get Leaderboards for a challenge (Chall, GM, Masters).`
 - [x] `Get a challenge percentile distribution.`
 - [x] `Get player challenge information.`
-### LOL-STATUS-V3
+#### LOL-STATUS-V3
 - [x] `Get League of Legends status for the given shard.`
 - [x] `Get matchlist for games played on given account ID and platform ID and filtered using given filter parameters, if any.`
 - [x] `Get match timeline by match ID.`
 - [x] `Get match IDs by tournament code.`
 - [x] `Get match by match ID and tournament code.`
-### LOL-STATUS-V4
+#### LOL-STATUS-V4
 - [x] `Get League of Legends status for the given platform.`
-### SPECTATOR-V5
+#### SPECTATOR-V5
 - [x] `Get current game information for the given summoner ID.`
 - [x] `Get list of featured games.`
-### SPECTATOR-V4 (deprecated [April 5](https://twitter.com/RiotGamesDevRel/status/1764780016640852222?t=pHB1GpVotgKnNYU-OH_1HQ&s=19))
+#### SPECTATOR-V4 (deprecated [April 5](https://twitter.com/RiotGamesDevRel/status/1764780016640852222?t=pHB1GpVotgKnNYU-OH_1HQ&s=19))
 - [x] `Get current game information for the given summoner ID.`
 - [x] `Get list of featured games.`
-### SUMMONER-V4
+#### SUMMONER-V4
 - [x] `Get a summoner by account ID.`
 - [x] `Get a summoner by summoner name.` (deprecated Oct 16th, 2023)
 - [x] `Get a summoner by PUUID.` 
 - [x] `Get a summoner by summoner ID.`
-### TOURNAMENT-STUB-V4
+#### TOURNAMENT-STUB-V4
 - [ ] `Create a mock tournament code for the given tournament.`
 - [ ] `Gets a mock list of lobby events by tournament code.`
 - [ ] `Creates a mock tournament provider and returns its ID.`
 - [ ] `Creates a mock tournament and returns its ID.`
-### TOURNAMENT-V4
+#### TOURNAMENT-V4
 - [ ] `Create a tournament code for the given tournament.`
 - [ ] `Returns the tournament code DTO associated with a tournament code string.`
 - [ ] `Update the pick type, map, spectator type, or allowed summoners for a code.`
@@ -175,18 +174,18 @@ Everything should be in the same order as in the official docs.
 
 <details><summary><b>TFT</b></summary>
 
-## TFT-SPECTATOR-V5
+#### TFT-SPECTATOR-V5
 - [x] `Get current game information for the given puuid.`
 - [x] `Get list of featured games.`
-## TFT-SUMMONER-V1
+#### TFT-SUMMONER-V1
 - [x] `Get a summoner by account ID.`
 - [x] `Get a summoner by summoner name.` (deprecated Oct 16th, 2023)
 - [x] `Get a summoner by PUUID.`
 - [x] `Get a summoner by summoner ID.`
-## TFT-MATCH-V1
+#### TFT-MATCH-V1
 - [x] `Get match list by summoner PUUID.`
 - [x] `Get match list details.`
-## TFT-LEAGUE-V1
+#### TFT-LEAGUE-V1
 - [x] `Get the challenger league for given queue.`
 - [x] `Get the grandmaster league for given queue.`
 - [x] `Get the master league for given queue.`
@@ -198,9 +197,9 @@ Everything should be in the same order as in the official docs.
 <br>
 
 # Run examples
-Examples for all endpoints can be found in `/example`.
+All examples can be found in the `/example` directory [linked here](https://github.com/Sansossio/twisted/tree/master/example).
 
-Run all examples: ```$ RIOT_API_KEY={YOUR_KEY} yarn example```
+To run all examples: ```$ RIOT_API_KEY={YOUR_KEY} yarn example```
 
 To run a specific example: ```$ RIOT_API_KEY={YOUR_KEY} yarn example {exampleFunctionName}```
 
