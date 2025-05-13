@@ -84,39 +84,52 @@ const api = new LolApi({
 # Endpoints 
 Everything should be in the same order as in the official docs.
 
-# Riot Endpoints
-## ACCOUNT-V1
-- [x] `Get account by puuid`
-- [x] `Get account by riot id`
-- [ ] `Get active shard for a player`
-- [ ] `Get account by access token`
+## RIOT
+<details><summary>ACCOUNT-V1</summary>
 
-# LOL Endpoints
-## CHAMPION-MASTERY-V4
+- [x] `Get account by puuid`
+- [ ] `Get account by puuid - ESPORTS`
+- [x] `Get account by riot id`
+- [ ] `Get account by riot id - ESPORTS`
+- [ ] `Get active shard for a player`
+- [x] `Get active region (lol and tft)`
+- [ ] `Get account by access token`
+- [ ] `Get account by access token - ESPORTS`
+</details>
+
+## LOL
+<details><summary>CHAMPION-MASTERY-V4</summary>
+
 - [x] `Get all champion mastery entries sorted by number of champion points descending.`
 - [x] `Get a champion mastery by player ID and champion ID.`
 - [x] `Get a player's total champion mastery score, which is the sum of individual champion mastery levels.`
-## CHAMPION-V3
+</details>
+
+<details><summary>CHAMPION-V3</summary>
+
 - [x] `Retrieve all champions.`
 - [x] `Retrieve champion by ID.`
-## CLASH
+</details>
+
+<details><summary>CLASH-V1</summary>
+
 - [x] `Get players by summoner id`
 - [x] `Get team`
 - [x] `Get tournaments`
 - [x] `Get tournaments by team id`
 - [x] `Get tournament by id`
-## MATCH-V5
+</details>
+
+<details><summary>MATCH-V5</summary>
+
 - [x] `Get match by id`
 - [x] `Get matches by summoner id`
 - [x] `Get match timeline by id`
-## MATCH-V4 (deprecated)
-- [x] `Get matches id by tournament code`
-- [x] `Get match by id`
-- [x] `Get match by tournament code`
-- [x] `Get matches by summoner id`
-- [x] `Get match timeline by id`
-## LEAGUE-V4
+</details>
+<details><summary>LEAGUE-V4</summary>
+
 - [x] `Get the challenger league for given queue.`
+- [x] `Get league entries in all queues by PUUID.`
 - [x] `Get league entries in all queues for a given summoner ID.`
 - [x] `Get all the league entries.`
 - [x] `Get the grandmaster league of a specific queue.`
@@ -125,74 +138,94 @@ Everything should be in the same order as in the official docs.
 - [x] `Get the queues that have positional ranks enabled.` (deprecated June 17th and in `v0.9.10`)
 - [x] `Get league positions in all queues for a given summoner ID.` (deprecated June 17th and in `v0.9.10`)
 - [x] `Get all the positional league entries.` (deprecated June 17th and in `v0.9.10`)
-## LOL-CHALLENGES-V1
+</details>
+<details><summary>LOL-CHALLENGES-V1</summary>
+
 - [x] `Get all challenge configurations.`
 - [x] `Get all challenge percentile distributions.`
 - [x] `Get a challenge configuration.`
 - [x] `Get Leaderboards for a challenge (Chall, GM, Masters).`
 - [x] `Get a challenge percentile distribution.`
 - [x] `Get player challenge information.`
-## LOL-STATUS-V3
-- [x] `Get League of Legends status for the given shard.`
-- [x] `Get matchlist for games played on given account ID and platform ID and filtered using given filter parameters, if any.`
-- [x] `Get match timeline by match ID.`
-- [x] `Get match IDs by tournament code.`
-- [x] `Get match by match ID and tournament code.`
-## LOL-STATUS-V4
+</details>
+<details><summary>LOL-STATUS-V4</summary>
+
 - [x] `Get League of Legends status for the given platform.`
-## SPECTATOR-V5
+</details>
+
+<details><summary>SPECTATOR-V5</summary>
+
 - [x] `Get current game information for the given summoner ID.`
 - [x] `Get list of featured games.`
-## SPECTATOR-V4 (deprecated [April 5](https://twitter.com/RiotGamesDevRel/status/1764780016640852222?t=pHB1GpVotgKnNYU-OH_1HQ&s=19))
-- [x] `Get current game information for the given summoner ID.`
-- [x] `Get list of featured games.`
-## SUMMONER-V4
+</details>
+
+<details><summary>SUMMONER-V4</summary>
+
 - [x] `Get a summoner by account ID.`
 - [x] `Get a summoner by summoner name.` (deprecated Oct 16th, 2023)
 - [x] `Get a summoner by PUUID.` 
 - [x] `Get a summoner by summoner ID.`
-## TOURNAMENT-STUB-V4
+</details>
+
+<details><summary>TOURNAMENT-STUB-V4</summary>
+
 - [ ] `Create a mock tournament code for the given tournament.`
 - [ ] `Gets a mock list of lobby events by tournament code.`
 - [ ] `Creates a mock tournament provider and returns its ID.`
 - [ ] `Creates a mock tournament and returns its ID.`
-## TOURNAMENT-V4
+</details>
+
+<details><summary>TOURNAMENT-V4</summary>
+
 - [ ] `Create a tournament code for the given tournament.`
 - [ ] `Returns the tournament code DTO associated with a tournament code string.`
 - [ ] `Update the pick type, map, spectator type, or allowed summoners for a code.`
 - [ ] `Gets a list of lobby events by tournament code.`
 - [ ] `Creates a tournament provider and returns its ID.`
 - [ ] `Creates a tournament and returns its ID.`
+</details>
 
-# TFT Endpoints
-## TFT-SPECTATOR-V5
+
+## TFT
+
+<details><summary>TFT-SPECTATOR-V5</summary>
+
 - [x] `Get current game information for the given puuid.`
 - [x] `Get list of featured games.`
-## TFT-SUMMONER-V1
+</details>
+
+<details><summary>TFT-SUMMONER-V1</summary>
+
 - [x] `Get a summoner by account ID.`
 - [x] `Get a summoner by summoner name.` (deprecated Oct 16th, 2023)
 - [x] `Get a summoner by PUUID.`
 - [x] `Get a summoner by summoner ID.`
-## TFT-MATCH-V1
+</details>
+
+<details><summary>TFT-MATCH-V1</summary>
+
 - [x] `Get match list by summoner PUUID.`
 - [x] `Get match list details.`
-## TFT-LEAGUE-V1
+</details>
+
+<details><summary>TFT-LEAGUE-V1</summary>
+
 - [x] `Get the challenger league for given queue.`
 - [x] `Get the grandmaster league for given queue.`
 - [x] `Get the master league for given queue.`
 - [x] `Get league entries in all queues for a given summoner ID.`
 - [ ] `Get all the league entries.`
 - [ ] `Get league with given ID, including inactive entries.`
+</details>
 
-# Run all examples
+<br>
 
-Download code from git and:
+# Run examples
+Examples for all endpoints can be found in `/example`.
 
-## Simple
-```$ RIOT_API_KEY={YOUR_KEY} yarn example```
+Run all examples: ```$ RIOT_API_KEY={YOUR_KEY} yarn example```
 
-## Specific examples
-```$ RIOT_API_KEY={YOUR_KEY} yarn example {exampleFunctionName}```
+To run a specific example: ```$ RIOT_API_KEY={YOUR_KEY} yarn example {exampleFunctionName}```
 
 ## With docker
 Edit docker-compose.yml with your api key and:
