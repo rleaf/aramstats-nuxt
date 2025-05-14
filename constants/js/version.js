@@ -13,6 +13,21 @@
   
   const version = [
    {
+      version: "4.2.2",
+      date: "5/14/25",
+      notes: "",
+      add: [],
+      remove: [],
+      fix: [
+         `Patch mismatch notification on /champions page.`,
+         `I messed up fetching champion data on patch transitions. Should be good.`
+      ],
+      adjust: [],
+      known: [
+         `Champion data fetching on patch transitions is naive and simply pulls the prior patch if UTD cDragon data DNE. Could be problematic on new champion releases.`
+      ],
+   }, 
+   {
       version: "4.2.1",
       date: "4/29/25",
       notes: "",

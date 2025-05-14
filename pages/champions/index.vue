@@ -7,7 +7,6 @@ await store.initPatches()
 const { start, finish } = useLoadingIndicator()
 const queryPatch = ref(useRoute().query.patch || store.recentCleanPatch)
 const championData = ref(null)
-const patch = store.recentCleanPatch
 const sort = ref(1)
 const descending = ref(false)
 const winrates = reactive({
@@ -25,10 +24,9 @@ const { data: payload, error } = await useAsyncData(
    }))
 
 championData.value = payload.value.championData
-
-if (payload.value.meta.patchResponse !== queryPatch.value) {
-   store.setNotification(`Patch ${queryPatch.value} data unavailable. Defaulting to ${payload.value.meta.patchResponse}.`)
-   queryPatch.value = payload.value.meta.patchResponse
+if (payload.value.patch !== queryPatch.value) {
+   store.setNotification(`Patch ${queryPatch.value} data unavailable. Defaulting to ${payload.value.patch}.`)
+   queryPatch.value = payload.value.patch
 }
 
 if (error.value) {

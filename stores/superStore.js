@@ -69,24 +69,20 @@ export const superStore = defineStore('super', {
          }
       },
 
-      /* 
-         Fired after initPatches is called. Dont need conditional check because needs to be refreshed when clicking between champs.
-      */
       async getChampionDragon(champ) {
+         /* 
+            If future version isn't lazy, maybe segregate fetches from store so it can operate properly as a composable w/ Nuxt functions.
+         */
          const o = (champ === 'wukong') ? 'monkeyking' : champ 
 
-         /*
-            Work on issue where when new patch rolls around, cdragon doesn't update immediately, so roll back to prior cdragon patch. Use while loop with a roller or something
-         */
-
          try {
-            const url = `https://cdn.communitydragon.org/${this.patches[0]}/champion/${o}/data.json`;
-            ({ data: this.championCDN } = await useFetch(url))
-            if (!this.championCDN) {
-                  ({ data: this.championCDN } = await useFetch(`https://cdn.communitydragon.org/${this.patches[1]}/champion/${o}/data.json`))
-            }
+            this.championCDN = await $fetch(`https://cdn.communitydragon.org/${this.patches[0]}/champion/${o}/data.json`)
          } catch (e) {
-            if (e instanceof Error) console.log(e)
+            if (e.statusCode === 404) {
+               this.championCDN = await $fetch(`https://cdn.communitydragon.org/${this.patches[1]}/champion/${o}/data.json`)
+            } else {
+               console.log(e)
+            }
          }
       },
 
