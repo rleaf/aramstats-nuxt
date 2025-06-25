@@ -8,9 +8,13 @@ export const utilLoadChampionCollection = async (patch) => {
       // just return the most recent collection
       let baguette = (await db.listCollections().toArray())
          .filter(c => c.name.includes('championstats'))
-         .map(c => c.name)
-         .sort((a, b) => b.localeCompare(a))[0]
-         
+         .sort((a, b) => {
+            const [aMajor, aMinor] = a.name.split('_')[0].split('.').map(Number);
+            const [bMajor, bMinor] = b.name.split('_')[0].split('.').map(Number);
+            if (aMajor !== bMajor) return bMajor - aMajor;
+            return bMinor - aMinor;
+         })[1].name
+
       return db.collection(`${baguette}`)
    }
 }

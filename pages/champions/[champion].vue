@@ -25,12 +25,11 @@ const { data: championData, error } = await useAsyncData(
 if (error.value) {
    throw createError({ statusCode: error.value.statusCode, fatal: true })
 }
-
 useSeoMeta({
-   title: `${championNames[championId.value][1]} ARAM Builds - ARAM Stats`,
-   ogTitle: `${championNames[championId.value][1]} ARAM Builds - ARAM Stats`,
-   description: `${championNames[championId.value][1]} ARAM builds and stats on patch ${store.recentCleanPatch}. View data tailored to the most popular core builds and more.`,
-   ogDescription: `${championNames[championId.value][1]} ARAM builds and stats on patch ${store.recentCleanPatch}. View data tailored to the most popular core builds and more.`,
+   title: `${championNames[championId.value][1]} ARAM Builds on patch ${championData.value.patch} - ARAM Stats`,
+   ogTitle: `${championNames[championId.value][1]} ARAM Builds on patch ${championData.value.patch} - ARAM Stats`,
+   description: `${championNames[championId.value][1]} ARAM builds and stats on patch ${championData.value.patch}. View data tailored to the most popular core builds and more.`,
+   ogDescription: `${championNames[championId.value][1]} ARAM builds and stats on patch ${championData.value.patch}. View data tailored to the most popular core builds and more.`,
    ogImage: `https://ddragon.leagueoflegends.com/cdn/${store.patches[0]}/img/champion/${championNames[championId.value][0]}.png`
 })
 
@@ -130,7 +129,7 @@ const aramModifiers = computed(() => {
                         @mouseleave="store.tooltip.active = false" :key="i">
                         
                         <img
-                           :src="`https://cdn.communitydragon.org/${store.patches[0]}/champion/${store.championCDN.id}/ability-icon/${id.toLowerCase()}`"
+                           :src="`https://cdn.communitydragon.org/${championData.patch}.1/champion/${store.championCDN.id}/ability-icon/${id.toLowerCase()}`"
                            rel="preload">
                         <div class="spell-letter">
                            {{ id }}

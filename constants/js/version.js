@@ -13,6 +13,19 @@
   
   const version = [
    {
+      version: "4.2.3",
+      date: "6/24/25",
+      notes: "Patch transition fixes.",
+      add: [],
+      remove: [],
+      fix: [
+         `On latest versioning mismatch, properly pull prior patch data.`,
+         `Champion speell images.`
+      ],
+      adjust: [],
+      known: [],
+   }, 
+   {
       version: "4.2.2",
       date: "5/14/25",
       notes: "",
