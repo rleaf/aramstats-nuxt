@@ -124,6 +124,10 @@ function headersExtended(val) {
 }
 
 function championRoute(id) {
+   if (championNames[id]) {
+      // console.warn(`Champion ID ${id} not found in championNames constant.`)
+      // return 'unknown'
+   }
    return (id === 62) ? 'wukong' : championNames[id][0]
 }
 
