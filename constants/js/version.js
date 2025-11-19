@@ -13,6 +13,18 @@
   
   const version = [
    {
+      version: "4.4",
+      date: "11/19/25",
+      notes: "mayhem fun",
+      add: [
+         "Zaahen."
+      ],
+      remove: [],
+      fix: [],
+      adjust: [],
+      known: [],
+   }, 
+   {
       version: "4.3",
       date: "7/16/25",
       notes: "",

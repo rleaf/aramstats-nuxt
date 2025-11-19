@@ -228,6 +228,7 @@ export const championNames = {
    350: ["Yuumi", "Yuumi", ["Enchanter", "Mage"]],                /* +Mage (Artillery?) */
    804: ["Yunara", "Yunara", ["Marksman"]],
    154: ["Zac", "Zac", ["Vanguard"]],
+   904: ["Zaahen", "Zaahen", ["Skirmisher"]],
    238: ["Zed", "Zed", ["Assassin"]],
    221: ["Zeri", "Zeri", ["Marksman"]],
    115: ["Ziggs", "Ziggs", ["Artillery"]],
