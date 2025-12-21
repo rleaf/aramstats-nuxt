@@ -13,6 +13,18 @@
   
   const version = [
    {
+      version: "4.4.1",
+      date: "12/21/25",
+      notes: "",
+      add: [],
+      remove: [],
+      fix: [
+         `Champion pages unavailable when cdrag cdn is down.`
+      ],
+      adjust: [],
+      known: [],
+   }, 
+   {
       version: "4.4",
       date: "11/19/25",
       notes: "mayhem fun",

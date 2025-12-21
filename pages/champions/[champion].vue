@@ -12,6 +12,10 @@ await Promise.all([
    store.getChampionDragon(route.params.champion.toLowerCase())
 ])
 
+if (!store.championCDN) {
+   store.setNotification('Some APIs are experiencing issues. Data may be incomplete or missing.')
+}
+
 const queryPatch = ref(route.query.patch || store.recentCleanPatch)
 const championId = ref(nameToId[route.params.champion.toLowerCase()])
 const { data: championData, error } = await useAsyncData(
@@ -122,7 +126,7 @@ const aramModifiers = computed(() => {
                </div>
                <div class="header-lhs-one">
                   <div class="name">{{ championNames[championId][1] }}</div>
-                  <div class="title">{{ store.championCDN.title }}</div>
+                  <div v-if="store.championCDN" class="title">{{ store.championCDN.title }}</div>
                   <div class="champion-abilities">
                      <div v-if="store.championCDN" v-for="(id, i) of 'PQWER'"
                         @mouseenter="store.setTooltipData({ event: $event, key: id, mode: 'skills', skillIndex: i })"

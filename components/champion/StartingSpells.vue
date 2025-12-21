@@ -68,7 +68,7 @@ function winrate(total, win) {
                      <div class="skill-wrapper" v-for="(o, o2) in i.k.split('')" :key="o2">
                         <div class="skill">
                            <div>{{ o.toUpperCase() }}</div>
-                           <img :src="`https://cdn.communitydragon.org/${store.patches[0]}/champion/${store.championCDN.id}/ability-icon/${o}`">
+                           <img v-if="store.championCDN" :src="`https://cdn.communitydragon.org/${store.patches[0]}/champion/${store.championCDN.id}/ability-icon/${o}`">
                         </div>
                         <svg v-if="o2 < 2" xmlns="http://www.w3.org/2000/svg" width="19" height="36" fill="none" viewBox="0 0 19 12">
                            <path fill="var(--color-font)" stroke="var(--color-background)" d="m4.125 1.825-.427-.445-.33.527L.987 5.722.813 6l.174.278 2.381 3.814.33.528.427-.445 3.663-3.814L8.134 6l-.346-.36-3.663-3.815Z"/>
