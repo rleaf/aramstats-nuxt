@@ -12,6 +12,17 @@
 
 const updates = [
    {
+      title: `Mayhem Data?`,
+      version: "",
+      date: "6/23/26",
+      body: [
+         `Aramstats is currently unable to provide data for Mayhem games due to it being unavailable in the Riot API. Should the data become public, I will probably add it.`,
+      ],
+      links: [],
+      img: [], // Expected webp format
+      imgCaption: ""
+   },
+   {
       title: `"New" Site. Expect Unexpected Downtime.`,
       version: "4.0.0",
       date: "3/5/25",

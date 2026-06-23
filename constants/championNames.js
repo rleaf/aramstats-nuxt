@@ -137,6 +137,7 @@ export const championNames = {
    89:  ["Leona", "Leona", ["Vanguard"]],
    876: ["Lillia", "Lillia", ["Skirmisher"]],
    127: ["Lissandra", "Lissandra", ["Mage"]],
+   805: ["Locke", "Locke", ["Assassin", "Mage"]],
    236: ["Lucian", "Lucian", ["Marksman"]],
    117: ["Lulu", "Lulu", ["Enchanter"]],
    99:  ["Lux", "Lux", ["Burst", "Artillery"]],

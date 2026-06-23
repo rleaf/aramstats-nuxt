@@ -13,6 +13,21 @@
   
   const version = [
    {
+      version: "4.5.0",
+      date: "6/23/26",
+      notes: "",
+      add: [
+         "Locke."
+      ],
+      remove: [],
+      fix: [],
+      adjust: [
+         "About page.",
+         "Late update regarding Mayhem data."
+      ],
+      known: [],
+   }, 
+   {
       version: "4.4.1",
       date: "12/21/25",
       notes: "",
