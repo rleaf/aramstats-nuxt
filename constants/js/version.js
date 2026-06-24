@@ -13,6 +13,20 @@
   
   const version = [
    {
+      version: "4.6.0",
+      date: "6/24/26",
+      notes: "",
+      add: [],
+      remove: [],
+      fix: [],
+      adjust: [
+         "Added colors to  /champions page. Ideas currently: add hpm and add color lerping for champion classes.",
+      ],
+      known: [
+         `On a new patch, /champions/[champion] frequently 404s due to insufficient data.`
+      ],
+   }, 
+   {
       version: "4.5.0",
       date: "6/23/26",
       notes: "",

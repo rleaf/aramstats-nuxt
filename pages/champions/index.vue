@@ -114,9 +114,9 @@ async function patchChange(patch) {
       useRouter().push({ query: { patch: queryPatch.value } })
       // zero colors
       for (const i in colors.value) {
-         colors.value[i][0] = 0
-         colors.value[i][1] = 10100
-         colors.value[i][2] = 0
+         colors.value[i][1] = 0
+         colors.value[i][2] = 10100
+         colors.value[i][3] = 0
       }
 
       computeWinrates()
