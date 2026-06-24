@@ -9,18 +9,18 @@ const queryPatch = ref(useRoute().query.patch || store.recentCleanPatch)
 const championData = ref(null)
 const sort = ref(1)
 const descending = ref(false)
+const showColors = ref(true)
 const colors = ref([ // max, min delta
-   [0, 10100, 0], // winrate
-   [0, 10100, 0], // games
-   [0, 10100, 0], // dpm mu
-   [0, 10100, 0], // dpm sigma
-   [0, 10100, 0], // dtpm mu
-   [0, 10100, 0], // dtpm sigma
-   [0, 10100, 0], // smpm mu
-   [0, 10100, 0], // smpm sigma
-   [0, 10100, 0], // gpm mu
-   [0, 10100, 0]  // gpm sigma
-
+   ['winrate', 0, 10100, 0], // winrate
+   ['games', 0, 10100, 0], // games
+   ['dpm', 0, 10100, 0], // dpm mu
+   ['dpm', 0, 10100, 0], // dpm sigma
+   ['dtpm', 0, 10100, 0], // dtpm mu
+   ['dtpm', 0, 10100, 0], // dtpm sigma
+   ['dmpm', 0, 10100, 0], // dmpm mu
+   ['dmpm', 0, 10100, 0], // dmpm sigma
+   ['gpm', 0, 10100, 0], // gpm mu
+   ['gpm', 0, 10100, 0]  // gpm sigma
 ])
 
 
@@ -62,53 +62,27 @@ function computeWinrates() {
          c[j].v = computeSampleVariance(c.games, c.metrics[j].x, c.metrics[j].xx)
       }
 
-      // Setting floor & ceiling for color interpolation
       delete c.metrics
 
-      if (c.winrate > colors.value[0][0]) colors.value[0][0] = c.winrate
-      if (c.winrate < colors.value[0][1]) colors.value[0][1] = c.winrate
+      for (const j in colors.value) {
 
-      if (c.games > colors.value[1][0]) colors.value[1][0] = c.games
-      if (c.games < colors.value[1][1]) colors.value[1][1] = c.games
+         if (typeof c[colors.value[j][0]] === 'object' && j % 2 === 0) {
 
-      if (c.dpm.m > colors.value[2][0]) colors.value[2][0] = c.dpm.m
-      if (c.dpm.m < colors.value[2][1]) colors.value[2][1] = c.dpm.m
+            // Setting floor & ceiling for color interpolation            
+            if (c[colors.value[j][0]].m > colors.value[j][1]) colors.value[j][1] = c[colors.value[j][0]].m
+            if (c[colors.value[j][0]].m < colors.value[j][2]) colors.value[j][2] = c[colors.value[j][0]].m
 
-      if (c.dpm.v > colors.value[3][0]) colors.value[3][0] = c.dpm.v
-      if (c.dpm.v < colors.value[3][1]) colors.value[3][1] = c.dpm.v
+            if (c[colors.value[j][0]].v > colors.value[+j+1][1]) colors.value[+j+1][1] = c[colors.value[j][0]].v
+            if (c[colors.value[j][0]].v < colors.value[+j+1][2]) colors.value[+j+1][2] = c[colors.value[j][0]].v
+         } else {
+            if (c[colors.value[j][0]] > colors.value[j][1]) colors.value[j][1] = c[colors.value[j][0]]
+            if (c[colors.value[j][0]] < colors.value[j][2]) colors.value[j][2] = c[colors.value[j][0]]
+         }
 
-      if (c.dtpm.m > colors.value[4][0]) colors.value[4][0] = c.dtpm.m
-      if (c.dtpm.m < colors.value[4][1]) colors.value[4][1] = c.dtpm.m
-
-      if (c.dtpm.v > colors.value[5][0]) colors.value[5][0] = c.dtpm.v
-      if (c.dtpm.v < colors.value[5][1]) colors.value[5][1] = c.dtpm.v
-
-      if (c.dmpm.m > colors.value[6][0]) colors.value[6][0] = c.dmpm.m
-      if (c.dmpm.m < colors.value[6][1]) colors.value[6][1] = c.dmpm.m
-
-      if (c.dmpm.v > colors.value[7][0]) colors.value[7][0] = c.dmpm.v
-      if (c.dmpm.v < colors.value[7][1]) colors.value[7][1] = c.dmpm.v
-
-      if (c.gpm.m > colors.value[8][0]) colors.value[8][0] = c.gpm.m
-      if (c.gpm.m < colors.value[8][1]) colors.value[8][1] = c.gpm.m
-
-      if (c.gpm.v > colors.value[9][0]) colors.value[9][0] = c.gpm.v
-      if (c.gpm.v < colors.value[9][1]) colors.value[9][1] = c.gpm.v
-
+         // for the lerp homie.
+         colors.value[j][3] = colors.value[j][1] - colors.value[j][2]
+      }
    }
-
-   
-   // for the lerp homie.
-   colors.value[0][2] = colors.value[0][0] - colors.value[0][1]
-   colors.value[1][2] = colors.value[1][0] - colors.value[1][1]
-   colors.value[2][2] = colors.value[2][0] - colors.value[2][1]
-   colors.value[3][2] = colors.value[3][0] - colors.value[3][1]
-   colors.value[4][2] = colors.value[4][0] - colors.value[4][1]
-   colors.value[5][2] = colors.value[5][0] - colors.value[5][1]
-   colors.value[6][2] = colors.value[6][0] - colors.value[6][1]
-   colors.value[7][2] = colors.value[7][0] - colors.value[7][1]
-   colors.value[8][2] = colors.value[8][0] - colors.value[8][1]
-   colors.value[9][2] = colors.value[9][0] - colors.value[9][1]
 }
 
 function computeSampleMean(o, g) {
@@ -194,7 +168,8 @@ function champIcon(id) {
 }
 
 function computeColor(g, o) {
-   const val = (g - o[1]) / o[2]
+   // const val = (g - o[1]) / o[2]
+   const val = (g - o[2]) / o[3]
    const green = [79, 201, 79]
    const red = [201, 40, 0]
 
@@ -266,7 +241,7 @@ const getChampionsList = computed(() => {
    <div class="champ-list-main">
       <div class="utilities">
 
-         <div class="patch-wrapper">
+         <div class="header-wrapper">
             <span class="superscript">Patch:</span>
             <button class="patch-button">{{ queryPatch }}</button>
             <div class="patch-options">
@@ -274,7 +249,7 @@ const getChampionsList = computed(() => {
             </div>
          </div>
 
-         <div class="sort-wrapper">
+         <div class="header-wrapper">
             <span class="superscript">Sorting by:</span>
             <button v-if="sort < 4" class="sort-button">{{ headers[sort][0] }}</button>
             <button v-else class="sort-button">{{ headersExtended(sort) }}</button>
@@ -290,12 +265,19 @@ const getChampionsList = computed(() => {
             </div>
          </div>
 
-         <button @click="descending = !descending">
-            <svg width="18" height="28" fill="none" xmlns="http://www.w3.org/2000/svg">
-               <rect class="asc-des" x="2" y="8" :width="descending ? '6' : '18'" height="2" />
-               <rect class="asc-des" x="2" y="13" width="11" height="2" />
-               <rect class="asc-des" x="2" y="18" :width="descending ? '18' : '6'" height="2" />
-            </svg>
+         <div class="header-wrapper">
+            <!-- <span class="superscript">{{ descending ? 'Ascending' : 'Descending' }}</span> -->
+            <button @click="descending = !descending">
+               <svg width="18" height="28" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <rect class="asc-des" x="2" y="8" :width="descending ? '6' : '18'" height="2" />
+                  <rect class="asc-des" x="2" y="13" width="11" height="2" />
+                  <rect class="asc-des" x="2" y="18" :width="descending ? '18' : '6'" height="2" />
+               </svg>
+            </button>
+         </div>
+
+         <button>
+            Colors
          </button>
          <UXTooltip class='toads' :align="'left'" :tip="'tierlist'" />
       </div>
@@ -395,21 +377,21 @@ const getChampionsList = computed(() => {
       z-index: 2;
    }
 
-   .patch-wrapper:hover .patch-options {
+   .header-wrapper:hover .patch-options {
       display: flex;
    }
 
-   .sort-wrapper:hover .sort-options {
+   /* .sort-wrapper:hover .sort-options {
       display: flex;
-   }
+   } */
 
-   .patch-wrapper:hover .patch-button {
+   .header-wrapper:hover .patch-button {
       border: 1px solid var(--outline);
    }
 
-   .sort-wrapper:hover .sort-button {
+   /* .sort-wrapper:hover .sort-button {
       border: 1px solid var(--outline);
-   }
+   } */
 
    .utilities>button {
       margin-bottom: 5px;
@@ -434,7 +416,7 @@ const getChampionsList = computed(() => {
       user-select: none;
    }
 
-   .patch-wrapper>button,
+   .header-wrapper>button,
    .sort-wrapper>button {
       margin-bottom: 5px;
    }
