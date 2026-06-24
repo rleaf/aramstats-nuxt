@@ -25,10 +25,12 @@ const { data: championData, error } = await useAsyncData(
          champId: championId.value
       }
    }))
-
+console.log(championData.value,'toads')
 if (error.value) {
+   console.log('weeeee')
    throw createError({ statusCode: error.value.statusCode, fatal: true })
 }
+
 useSeoMeta({
    title: `${championNames[championId.value][1]} ARAM Builds on patch ${championData.value.patch} - ARAM Stats`,
    ogTitle: `${championNames[championId.value][1]} ARAM Builds on patch ${championData.value.patch} - ARAM Stats`,

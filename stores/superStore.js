@@ -70,24 +70,19 @@ export const superStore = defineStore('super', {
       },
 
       async getChampionDragon(champ) {
-         /* 
-            If future version isn't lazy, maybe segregate fetches from store so it can operate properly as a composable w/ Nuxt functions.
-         */
          const o = (champ === 'wukong') ? 'monkeyking' : champ
          const controller = new AbortController()
          const id = setTimeout(() => controller.abort(), 2000)
-
-         try {
-            this.championCDN = await $fetch(`https://cdn.communitydragon.org/${this.patches[0]}/champion/${o}/data.json`, { signal: controller.signal })
-         } catch (e) {
-            if (e.cause instanceof DOMException && e.cause.name === 'AbortError') {
-               console.log('cdrag aborted')
+         let retries = 0
+         
+         while (retries < 2) {
+            try {
+               this.championCDN = await $fetch(`https://cdn.communitydragon.org/${this.patches[retries]}/champion/${o}/data.json`, { signal: controller.signal })   
+               clearTimeout(id)
+               break
+            } catch (e) {
+               retries++
             }
-            else if (e.statusCode === 404) {
-               this.championCDN = await $fetch(`https://cdn.communitydragon.org/${this.patches[1]}/champion/${o}/data.json`)
-            }
-         } finally {
-            clearTimeout(id)
          }
       },
 

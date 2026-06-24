@@ -1,7 +1,7 @@
 <script setup>
 const dayBool = ref(false)
 const route = useRoute()
-
+const error = useError()
 
 onMounted(() => {
    if (JSON.parse(localStorage.getItem('dayMode'))) toggleTheme()   
@@ -21,7 +21,7 @@ function toggleTheme() {
          <NuxtLink class="nav-route" to="/champions">Champions</NuxtLink>
       </div>
 
-      <NavSearch v-if="route.path !== '/'" />
+      <NavSearch v-if="route.path !== '/' || error" />
 
       <div class=" right">
          <button @click="toggleTheme" :class="{ day: dayBool }">

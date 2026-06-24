@@ -1,0 +1,320 @@
+****************************************************************************
+****************************************************************************
+10/22
+
+
+Change data structure for champion data. Currently is an n-nested dictionary where n is the items built for some build. One item (node) can branch into any other item, so if there are 30 items worth storing data for, each initial node has 29 possible branches and then 28 possible branches on the proceeding node. There is a meta dict for every observed item build containing metadata such as games observed, won, friendly team comp, enemy team comp, etc...
+
+Although easy and cost-effective(?) to store, it's a pain in the ass to unfold on the client side because each build requires traversing, in order, the n-nested layers multiple times.
+
+BEFORE:
+With above data structure, average file sizes after parsing 10,290 matches for 165 champions is:
+   "avg_KB": 177.5682181818182,
+   "avg_MB": 0.1775682181818182
+
+AFTER:
+With below data structure.
+   "avg_KB": 179.71912727272726,
+   "avg_MB": 0.1797191272727273
+
+* Make better for CSR *
+
+1. have skills & runes be dependent on builds. 
+   O <int>: observed games
+   W <int>: wins
+   F <list>: friendly championIds
+   E <list>: enemy championIds
+   T <int>: rune tree. 1-5
+   RP <int>: rune path (2231011211) 0-3 primary, 4-6 secondary, 7-9 are those small ones
+   SP <int>: skillpath
+   {
+      name: "sona",
+      games: 3489,
+      wins: 1681,
+      skills: {
+         "1237.1854.4583.5928": [[O, W, SP], [O, W, SP], [O, W, SP]],
+         ...
+      }
+      runes: {
+         "1237.1854.4583.5928": [[O, W, T, RP], [O, W, T, RP], [O, W, T, RP]],
+         "1858.6938.2738.6970.2735.0285" : [[O, W, T, RP], [O, W, T, RP], [O, W, T, RP]],
+         ...
+      }
+      builds: {
+         "1237.1854.4583.5928" : [O, W, F, E],
+         "1858.6938.2738.6970.2735.0285" : [O, W, F, E],
+         "1858.6938.2738.3859.2844" : [O, W, F, E],
+         "1858.6938.2738.6970.4891.4734" : [O, W, F, E],
+      }
+   }
+
+   + Convenient enough to unfold since every skill/rune path associates, using its key, with a build.
+   - Can not see rune/skill stats independent to build.
+   - Big dict?
+
+2. Have skills, runes, and builds independent.
+   Same variables as above. BP <int>: build path
+   {
+      name: "sona",
+      games: 3489,
+      wins: 1681,
+      skills: [
+         [O, W, SP],
+         [O, W, SP],
+         ...
+      ]
+      runes: [
+         [O, W, T, RP],
+         [O, W, T, RP],
+         ...
+      ],
+      builds: [
+         [O, W, BP],
+         [O, W, BP],
+         [O, W, BP],
+         ...
+      ]
+   }
+
+   + Can see independent skill/rune/build stats
+
+3. Have skills/runes/build independent but provide some linkage, w/ items dict, to see item-specific stats.
+   items <dict>: k:v pairs are itemId:list where list elements contain stats pertaining to keystone rune and skill path.
+   
+   items: bounded to total items in game
+   items.XXXX[0]: bounded to keystone runes
+   items.XXXX[1]: bounded to unique skill paths (could be a lot?)
+   
+
+   {
+      name: "sona",
+      games: 3489,
+      wins: 1681,
+      skills: {
+         "SP": [O, W],
+         "SP": [O, W]
+         ...
+      }
+      runes: {
+         "T.RP": [O, W],
+         "T.RP": [O, W],
+         ...
+      }
+      items: {
+         "2398": [
+            {
+               "KS": [O, W],
+               ...
+            },
+            {
+               "SP" [O, W],
+               ...
+            }
+         ]
+         ...
+      },
+      builds: {
+         "BP": [O, W, {"SB": [O, W]}],
+         "BP": [O, W, {"SB": [O, W]}],
+         "BP": [O, W, {"SB": [O, W]}],
+         ...
+      }
+   }
+
+****************************************************************************
+****************************************************************************
+
+10/18
+
+Prob:
+   Crawler does not check for redundancy. Insertmany's on every match parsed and then the db, using unique indices, precludes duplicate matches.
+   Currently have championstat step working within the crawler operating on every parsed match cached. Champion stat function is upserting duplicates because the schema does not use a unique index (makes no sense?).
+
+S1:
+   Add logic to check if the match about to be parsed is already in the database. If is, skip it else parse.
+      + Easy to implement
+      + Everything in one script
+      - +1 more query operation per GET req from Riot.
+      - Slower compared to using unique indices.
+
+S1.5:
+   Keep everything in one script like S1, but use the 11000 mongodb error to filter out dup matchIDs. Feed that into the champion parse.
+      + Everything in one script
+      + Same ~speed as S1 ??
+      + Immediate updating
+
+S2:
+   Segregate championstat step from crawler into own script.
+      - Creates two scripts
+      - Using same API key in multiple spots ???
+         * Need key on championstat to get match_timeline data. Can store.....but a single doc is
+         500kb. prefer not to
+      - hmm
+
+         * cache index (in db?) for championstat to avoid redundancy.
+         * has to fire repeatedly (every hour, day, minute...) to provide updated champion stats
+         * 
+
+****************************************************************************
+****************************************************************************
+
+Best way to aggregate matchdata in db?
+
+---
+Can either:
+   1. Create db.documents for each champion and update those documents as needed with methods
+      below. On each GET for champion stats, send that db.document.
+   2. On each GET for champion stats from frontend, compute & aggregate all champion stats
+      to send to frontend.
+---
+
+1. Dependant on Riot crawl
+   1. After each matchdata respose from Riot, iterate through the champions of that match and
+      mutate/populate champion statistics.
+
+   Pros
+      - Don't need an isolated aggregation step; does everything at once
+      - Summoners will pull "UTD" statistics because of immediate champion stat mutations
+      - Don't have to store matchdata at all? Since computing champion stats immediately
+        after each GET request, only need to store matchId and then throw data away. MatchId
+        will then be used to check redundant matches in crawler.
+   Cons
+      - Makes for a very slow crawl. Each crawl step will have 10 loops for accumulating
+        champion data. Dunno if will make very slow, assuming.
+      - If not storing matchdata, I also lose potential routes for growing.
+
+2. Independent from Riot crawl
+   1. Compute champ stats whenever in own environment. Iterate through all matches in
+      the db and for each match, compute champion statistics.
+
+   Pros
+      - Independent from crawl. Can have both processes running simultaneously making for overall
+        faster time.
+   Cons
+      - Redundant computations. After initial champ aggregation, it will recompute the same data
+        every proceeding aggregation. Inefficient. Can be fixed with indexing such that after
+        each aggregation completion, scribe an index to start the proceeding aggregation on.
+      - Champion stats are only as "UTD" on the most recent aggregation.
+
+
+
+******************************************
+Storing winrates for unique build paths (putting this here so I don't have to make another txt file)
+
+Goals
+   - Small file size. Don't want to store every combination of items (~96c6)...just the popular ones.
+   - Easy to understand. Keep relatively unconvoluted so when I forget I can remember.
+   - In a structure that can be conveniently parsed by the frontend.
+   - I want to store...
+      1. Buildpath (aka Items). Seeing winrate for X build or Y item is nice.
+      2. Friendly & Enemy team composition. Seeing a champions winrate into X comp or with Y comp is also nice.
+      3. Skill leveling order. Also...nice.
+
+      Items, Team comp, skill order can be associated w/ each other.
+         "Oh turns out crit adc has infinitely higher winrate into a tanky comp than leth adc".
+         "Oh so going leth jinx build means you max W first..."
+         "Oh, if I have an enchanter on my team, this adc's winrate goes up by X percent with Y build path."
+         etc...
+
+1. Store every possible build (all combinations)
+   1. Easily increment corresponding build by one for each encounter and if that match was won.
+   + Easy to think
+   + Gives most room to play and represent data
+   - Prohibitively large filesize.
+
+2. Store only observed builds
+   1. Write build and then monitor times encountered and if won.
+   + Smaller file size than ^
+   + Easy to think
+   + Gives same amount of room to play as above
+   - Although smaller, file size is still upper bounded at all possible combinations.
+
+3. Store winrates by item slots. "Item X has Y winrate when built first versus Y winrate when build second"
+   1. This is weird
+   - Even lighter file size (I think).
+   - Obscures combinatorial data. Can't see how item X performs jointly with item Z.
+
+******************************
+Schema could/would look something like...
+
+Champion Schema
+{
+   name: string, # champion name
+   kills?: int,  # kda maybe too ridiculous
+   deaths?: int,
+   assists?: int,
+   games: int, # number of times champ has been seen in
+   wins: int, # number of times champ has won
+
+
+   """
+   builds is an object where each n-nested object (excluding meta) can be interpreted as a BUILD and a BUILDPATH. A BUILDPATH is the order
+   of itemization a player takes to get to their BUILD. A BUILD is the items a player has at game end. For example, where the * is near Runaan's,
+   that means a player has the BUILDPATH IE -> Storm -> LDR -> Runaan's and, if the "meta.games" property in that object is > 0, if that BUILDPATH
+   was ever a final BUILD.
+
+   the meta property in each object contains summed metadata for the number of times a BUILD has been encountered.
+      friendlyTeam: A summed "multi-hot" vector of length n where n is equal to the total champions, ordered by release date. Each index corresponds
+         to a champion where arr[0] is the first champion released and arr[-1] is the most recent (briar atm).
+      enemyTeam: Same as above. friendlyTeam maps the friendly champion encounters with some BUILD and enemyTeam maps the enemy champion encounters with
+         some BUILD. **Important to see that this struct homogenizes champion encounters and does not retain team composition. I think that would be an unbounded constraint and not good for a pequeño database. Another important concern is that I would need to maintain a champion table for the multi-hot vectors (ie add new champ
+         on every release)**
+      games: number of times champ is observed.
+      nah***levelPath: sequence of integers representing leveling path for champion. 18 ints (0-3) long
+      wins: observed times champion has won. 
+   """
+   
+   builds: {
+      # step 1
+      3031: { # IE
+         # step 2
+         3095: { # Storm
+            # step 3
+            3036: { # LDR
+               # step 4
+               3046: {...} # PD
+               3072: {...} # BT
+               3084: {.*.} # Runaan's
+               starting: {...},
+               meta: {...}
+            }
+            starting: {...},
+            meta: {...}
+         },
+         3073: { # BT
+            # step 3
+            3036: { # LDR
+               # step 4
+               ...
+               starting: {...},
+               meta: {...}
+            },
+            starting: {...},
+            meta: {...}
+         }
+         starting: {...},
+         meta: {...}
+      },
+      3095: { # Stormrazor
+         ...
+         starting: {
+            3133: { # Hammer
+               2031: { # Refillable Pot
+                  meta: {...}
+               }
+               meta: {
+                  games: int,
+                  wins: int
+               }
+            }
+         },
+         meta: {
+            friendlyTeam: [int], # summed "multi-hot" vector
+            enemyTeam: [int], # summed "multi-hot" vector
+            ***levelPath: int,
+            games: int,
+            wins: int
+         }
+      },
+   }
+}

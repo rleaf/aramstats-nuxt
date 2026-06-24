@@ -9,11 +9,20 @@ const queryPatch = ref(useRoute().query.patch || store.recentCleanPatch)
 const championData = ref(null)
 const sort = ref(1)
 const descending = ref(false)
-const winrates = reactive({
-   max: 0,
-   min: 101,
-   delta: 0
-})
+const colors = ref([ // max, min delta
+   [0, 10100, 0], // winrate
+   [0, 10100, 0], // games
+   [0, 10100, 0], // dpm mu
+   [0, 10100, 0], // dpm sigma
+   [0, 10100, 0], // dtpm mu
+   [0, 10100, 0], // dtpm sigma
+   [0, 10100, 0], // smpm mu
+   [0, 10100, 0], // smpm sigma
+   [0, 10100, 0], // gpm mu
+   [0, 10100, 0]  // gpm sigma
+
+])
+
 
 await store.initPatches()
 const { data: payload, error } = await useAsyncData(
@@ -53,13 +62,53 @@ function computeWinrates() {
          c[j].v = computeSampleVariance(c.games, c.metrics[j].x, c.metrics[j].xx)
       }
 
+      // Setting floor & ceiling for color interpolation
       delete c.metrics
-      if (c.winrate > winrates.max) winrates.max = c.winrate
-      if (c.winrate < winrates.min) winrates.min = c.winrate
+
+      if (c.winrate > colors.value[0][0]) colors.value[0][0] = c.winrate
+      if (c.winrate < colors.value[0][1]) colors.value[0][1] = c.winrate
+
+      if (c.games > colors.value[1][0]) colors.value[1][0] = c.games
+      if (c.games < colors.value[1][1]) colors.value[1][1] = c.games
+
+      if (c.dpm.m > colors.value[2][0]) colors.value[2][0] = c.dpm.m
+      if (c.dpm.m < colors.value[2][1]) colors.value[2][1] = c.dpm.m
+
+      if (c.dpm.v > colors.value[3][0]) colors.value[3][0] = c.dpm.v
+      if (c.dpm.v < colors.value[3][1]) colors.value[3][1] = c.dpm.v
+
+      if (c.dtpm.m > colors.value[4][0]) colors.value[4][0] = c.dtpm.m
+      if (c.dtpm.m < colors.value[4][1]) colors.value[4][1] = c.dtpm.m
+
+      if (c.dtpm.v > colors.value[5][0]) colors.value[5][0] = c.dtpm.v
+      if (c.dtpm.v < colors.value[5][1]) colors.value[5][1] = c.dtpm.v
+
+      if (c.dmpm.m > colors.value[6][0]) colors.value[6][0] = c.dmpm.m
+      if (c.dmpm.m < colors.value[6][1]) colors.value[6][1] = c.dmpm.m
+
+      if (c.dmpm.v > colors.value[7][0]) colors.value[7][0] = c.dmpm.v
+      if (c.dmpm.v < colors.value[7][1]) colors.value[7][1] = c.dmpm.v
+
+      if (c.gpm.m > colors.value[8][0]) colors.value[8][0] = c.gpm.m
+      if (c.gpm.m < colors.value[8][1]) colors.value[8][1] = c.gpm.m
+
+      if (c.gpm.v > colors.value[9][0]) colors.value[9][0] = c.gpm.v
+      if (c.gpm.v < colors.value[9][1]) colors.value[9][1] = c.gpm.v
+
    }
 
+   
    // for the lerp homie.
-   winrates.delta = winrates.max - winrates.min
+   colors.value[0][2] = colors.value[0][0] - colors.value[0][1]
+   colors.value[1][2] = colors.value[1][0] - colors.value[1][1]
+   colors.value[2][2] = colors.value[2][0] - colors.value[2][1]
+   colors.value[3][2] = colors.value[3][0] - colors.value[3][1]
+   colors.value[4][2] = colors.value[4][0] - colors.value[4][1]
+   colors.value[5][2] = colors.value[5][0] - colors.value[5][1]
+   colors.value[6][2] = colors.value[6][0] - colors.value[6][1]
+   colors.value[7][2] = colors.value[7][0] - colors.value[7][1]
+   colors.value[8][2] = colors.value[8][0] - colors.value[8][1]
+   colors.value[9][2] = colors.value[9][0] - colors.value[9][1]
 }
 
 function computeSampleMean(o, g) {
@@ -89,7 +138,16 @@ async function patchChange(patch) {
    if (res) {
       championData.value = res.championData
       useRouter().push({ query: { patch: queryPatch.value } })
+      // zero colors
+      for (const i in colors.value) {
+         colors.value[i][0] = 0
+         colors.value[i][1] = 10100
+         colors.value[i][2] = 0
+      }
+
       computeWinrates()
+
+      
    } else {
       store.setNotification('Patch data unavailable.')
    }
@@ -135,8 +193,8 @@ function champIcon(id) {
    return `https://ddragon.leagueoflegends.com/cdn/${store.patches[0]}/img/champion/${championNames[id][0]}.png`
 }
 
-function computeColor(g) {
-   const val = (g - winrates.min) / winrates.delta
+function computeColor(g, o) {
+   const val = (g - o[1]) / o[2]
    const green = [79, 201, 79]
    const red = [201, 40, 0]
 
@@ -277,30 +335,30 @@ const getChampionsList = computed(() => {
                   </div>
                </NuxtLink>
             </div>
-            <div :style="{ color: computeColor(champ.winrate) }" class="winrate">
+            <div :style="{ color: computeColor(champ.winrate, colors[0]) }">
                {{ champ.winrate }}%
             </div>
-            <div>
+            <div :style="{ color: computeColor(champ.games, colors[1]) }">
                {{ champ.games }}
             </div>
             <div>
                {{ champ.pickRate }}%
             </div>
             <div class="metric-value">
-               <span>{{ (champ.dpm) ? champ.dpm.m : '-' }}</span>
-               <span>{{ (champ.dpm) ? champ.dpm.v : '-' }}</span>
+               <span :style="{ color: computeColor(champ.dpm.m, colors[2]) }">{{ (champ.dpm.m) ? champ.dpm.m : '-' }}</span>
+               <span :style="{ color: computeColor(champ.dpm.v, colors[3]) }">{{ (champ.dpm.v) ? champ.dpm.v : '-' }}</span>
             </div>
             <div class="metric-value">
-               <span>{{ (champ.dtpm) ? champ.dtpm.m : '-' }}</span>
-               <span>{{ (champ.dtpm) ? champ.dtpm.v : '-' }}</span>
+               <span :style="{ color: computeColor(champ.dtpm.m, colors[4]) }">{{ (champ.dtpm.m) ? champ.dtpm.m : '-' }}</span>
+               <span :style="{ color: computeColor(champ.dtpm.v, colors[5]) }">{{ (champ.dtpm.v) ? champ.dtpm.v : '-' }}</span>
             </div>
             <div class="metric-value">
-               <span>{{ (champ.dmpm) ? champ.dmpm.m : '-' }}</span>
-               <span>{{ (champ.dmpm) ? champ.dmpm.v : '-' }}</span>
+               <span :style="{ color: computeColor(champ.dmpm.m, colors[6]) }">{{ (champ.dmpm.m) ? champ.dmpm.m : '-' }}</span>
+               <span :style="{ color: computeColor(champ.dmpm.v, colors[7]) }">{{ (champ.dmpm.v) ? champ.dmpm.v : '-' }}</span>
             </div>
             <div class="metric-value">
-               <span>{{ (champ.gpm) ? champ.gpm.m : '-' }}</span>
-               <span>{{ (champ.gpm) ? champ.gpm.v : '-' }}</span>
+               <span :style="{ color: computeColor(champ.gpm.m, colors[8]) }">{{ (champ.gpm.m) ? champ.gpm.m : '-' }}</span>
+               <span :style="{ color: computeColor(champ.gpm.v, colors[9]) }">{{ (champ.gpm.v) ? champ.gpm.v : '-' }}</span>
             </div>
          </div>
       </div>
