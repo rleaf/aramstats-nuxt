@@ -47,9 +47,10 @@ const props = defineProps(['tip', 'align'])
    line-height: 1.35;
    font-style: normal;
    color: var(--color-font);
-   background: var(--surface-container);
-   border: 1px solid var(--outline);
-   border-radius: 8px;
+   /* background: var(--surface-container); */
+   background: var(--surface);
+   border: 1px solid var(--outline-variant);
+   border-radius: 3px;
    padding: 0.2rem 1.5rem;
    width: 300px;
    top: 130%;

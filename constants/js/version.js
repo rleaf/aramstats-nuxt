@@ -14,13 +14,19 @@
   const version = [
    {
       version: "4.6.0",
-      date: "6/24/26",
-      notes: "",
-      add: [],
+      date: "6/25/26",
+      notes: `Planning to do a similar visual clean up to /champions/[champion] page as I did here to /champions.`,
+      add: [
+         `Colors to /champions page.`,
+         `Healing per minute stats to /champions page.`,
+         `Ally healing per minute stats to /champions page.`,
+         `Ally shielding per minute stats to /champions page.`,
+      ],
       remove: [],
       fix: [],
       adjust: [
-         "Added colors to  /champions page. Ideas currently: add hpm and add color lerping for champion classes.",
+         `On top of the things in 'Added' to /champions, some minor UI/UX changes like spacing.`,
+         `Tooltip UI.`,
       ],
       known: [
          `On a new patch, /champions/[champion] frequently 404s due to insufficient data.`

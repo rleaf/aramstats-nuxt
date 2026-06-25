@@ -1,6 +1,7 @@
 <script setup>
 import { superStore } from '@/stores/superStore'
 import { championNames } from '~/constants/championNames'
+import { snap } from '~/constants/clean_snapshot'
 
 const store = superStore()
 await store.initPatches()
@@ -20,9 +21,15 @@ const colors = ref([ // max, min delta
    ['dmpm', 0, 10100, 0], // dmpm mu
    ['dmpm', 0, 10100, 0], // dmpm sigma
    ['gpm', 0, 10100, 0], // gpm mu
-   ['gpm', 0, 10100, 0]  // gpm sigma
-])
+   ['gpm', 0, 10100, 0],  // gpm sigma
 
+   ['hpm', 0, 10100, 0],  // hpm mu
+   ['hpm', 0, 10100, 0],  // hpm sigma
+   ['thpm', 0, 10100, 0],  // thpm mu
+   ['thpm', 0, 10100, 0],  // thpm sigma
+   ['spm', 0, 10100, 0],  // spm mu
+   ['spm', 0, 10100, 0],  // spm sigma
+])
 
 await store.initPatches()
 const { data: payload, error } = await useAsyncData(
@@ -58,8 +65,18 @@ function computeWinrates() {
 
       for (const j in c.metrics) {
          c[j] = {}
-         c[j].m = computeSampleMean(c.metrics[j].x, c.games)
-         c[j].v = computeSampleVariance(c.games, c.metrics[j].x, c.metrics[j].xx)
+         // Just for patch 16.13 cause I added this middle of crawl
+         if (queryPatch.value === '16.13' && ['hpm', 'thpm', 'tspm'].includes(j)) {
+
+
+
+            c[j].m = computeSampleMean(c.metrics[j].x, c.games - snap[c._id])
+            c[j].v = computeSampleVariance(c.games - snap[c._id], c.metrics[j].x, c.metrics[j].xx)
+         } else {
+            c[j].m = computeSampleMean(c.metrics[j].x, c.games)
+            c[j].v = computeSampleVariance(c.games, c.metrics[j].x, c.metrics[j].xx)
+         }
+
       }
 
       delete c.metrics
@@ -86,12 +103,12 @@ function computeWinrates() {
 }
 
 function computeSampleMean(o, g) {
-   if (!o) return '-'
+   if (!o) return 0
    return Math.round(o / g)
 }
 
 function computeSampleVariance(games, x, xx) {
-   if (!games) return '-'
+   if (!games) return 0
    return Math.round(Math.sqrt(((xx) - ((x ** 2) / games)) / (games - 1)))
 }
 
@@ -150,6 +167,18 @@ function headersExtended(val) {
          return 'GPM µ'
       case 11:
          return 'GPM σ'
+      case 12:
+         return 'HPM µ'
+      case 13:
+         return 'HPM σ'
+      case 14:
+         return 'AHPM µ'
+      case 15:
+         return 'AHPM σ'
+      case 16:
+         return 'ASPM µ'
+      case 17:
+         return 'ASPM σ'
       default:
          return '-'
    }
@@ -183,10 +212,13 @@ const headers = computed(() => {
       ['Winrate', 'winrate'],
       ['Games', 'games'],
       ['Pickrate', 'pickRate'],
-      ['DPM', 'dpm'],
-      ['DTPM', 'dtpm'],
-      ['SMPM', 'dmpm'],
-      ['GPM', 'gpm'],
+      ['Damage', 'dpm'],
+      ['Damage Taken', 'dtpm'],
+      ['Mitigated', 'dmpm'],
+      ['Gold', 'gpm'],
+      ['Healing', 'hpm'],
+      ['Ally Healing', 'thpm'],
+      ['Ally Shielding', 'tspm'],
    ]
 })
 
@@ -229,6 +261,27 @@ const getChampionsList = computed(() => {
          case sort.value === 11 && typeof (championData.value[0].gpm) === 'object':
             return (descending.value) ? championData.value.sort((a, b) => (a.gpm.v) - (b.gpm.v)) :
                championData.value.sort((a, b) => (b.gpm.v) - (a.gpm.v))
+
+         case sort.value === 12 && typeof (championData.value[0].hpm) === 'object':
+            return (descending.value) ? championData.value.sort((a, b) => (a.hpm.m) - (b.hpm.m)) :
+               championData.value.sort((a, b) => (b.hpm.m) - (a.hpm.m))
+         case sort.value === 13 && typeof (championData.value[0].hpm) === 'object':
+            return (descending.value) ? championData.value.sort((a, b) => (a.hpm.v) - (b.hpm.v)) :
+               championData.value.sort((a, b) => (b.hpm.v) - (a.hpm.v))
+
+         case sort.value === 14 && typeof (championData.value[0].thpm) === 'object':
+            return (descending.value) ? championData.value.sort((a, b) => (a.thpm.m) - (b.thpm.m)) :
+               championData.value.sort((a, b) => (b.thpm.m) - (a.thpm.m))
+         case sort.value === 15 && typeof (championData.value[0].thpm) === 'object':
+            return (descending.value) ? championData.value.sort((a, b) => (a.thpm.v) - (b.thpm.v)) :
+               championData.value.sort((a, b) => (b.thpm.v) - (a.thpm.v))
+
+         case sort.value === 16 && typeof (championData.value[0].tspm) === 'object':
+            return (descending.value) ? championData.value.sort((a, b) => (a.tspm.m) - (b.tspm.m)) :
+               championData.value.sort((a, b) => (b.tspm.m) - (a.tspm.m))
+         case sort.value === 17 && typeof (championData.value[0].tspm) === 'object':
+            return (descending.value) ? championData.value.sort((a, b) => (a.tspm.v) - (b.tspm.v)) :
+               championData.value.sort((a, b) => (b.tspm.v) - (a.tspm.v))
          default:
             return championData.value.sort((a, b) => championNames[a._id][1].localeCompare(championNames[b._id][1]))
       }
@@ -256,7 +309,7 @@ const getChampionsList = computed(() => {
             <div class="sort-options">
                <div v-for="(h, i) in headers" :key="i">
                   <button v-if="i < 4" @click="sort = i">{{ h[0] }}</button>
-                  <div class="sort-metrics" v-else>
+                  <div v-else class="sort-metrics">
                      <span>{{ h[0] }}:</span>
                      <button @click="sort = (Math.floor(i / 4) - 1) * 4 + i + (i % 4)">µ</button>
                      <button @click="sort = (Math.floor(i / 4) - 1) * 4 + i + (i % 4) + 1">σ</button>
@@ -276,9 +329,9 @@ const getChampionsList = computed(() => {
             </button>
          </div>
 
-         <button>
+         <!-- <button>
             Colors
-         </button>
+         </button> -->
          <UXTooltip class='toads' :align="'left'" :tip="'tierlist'" />
       </div>
 
@@ -289,9 +342,11 @@ const getChampionsList = computed(() => {
                   <h2 :class="{ 'highlight': sort === i }" @click="headerSort(i)">{{ h[0] }}</h2>
                </div>
                <div v-else class="metrics">
-                  <div>
+                  <div style="margin-bottom: 10px;">
                      <h3 @click="headerSort(i)">{{ h[0] }}</h3>
-                     <hr>
+                     <h3 @click="headerSort(i)">{{ `/ Minute` }}</h3>
+                     <!-- <h3 @click="headerSort(i)">{{ `Damage per \n minute` }}</h3> -->
+                     <!-- <hr> -->
                   </div>
                   <div>
                      <h2 :class="{ 'highlight': sort === (Math.floor(i / 4) - 1) * 4 + i + (i % 4) }"
@@ -302,20 +357,21 @@ const getChampionsList = computed(() => {
                </div>
             </div>
          </div>
-         <div :class="{ 'o': i % 2 === 0 }" class="champion"
+         <NuxtLink :class="{ 'o': i % 2 === 0 }" class="champion"
+            :to="{ name: 'champions-champion', params: { champion: championRoute(champ._id) } }"
             v-for="(champ, i) in getChampionsList" :key="i">
             <div class="index">
                {{ i + 1 }}
             </div>
             <div>
-               <NuxtLink :to="{ name: 'champions-champion', params: { champion: championRoute(champ._id) } }">
-                  <div class="image-wrapper">
-                     <img rel="preload" :src="champIcon(champ._id)" alt="">
-                  </div>
-                  <div>
-                     <span class="name">{{ championNames[champ._id][1] }}</span>
-                  </div>
-               </NuxtLink>
+               <div class="image-wrapper">
+                  <img rel="preload" :src="champIcon(champ._id)" alt="">
+               </div>
+               <div>
+                  <span class="name">{{ championNames[champ._id][1] }}</span>
+               </div>
+               <!-- <NuxtLink :to="{ name: 'champions-champion', params: { champion: championRoute(champ._id) } }">
+               </NuxtLink> -->
             </div>
             <div :style="{ color: computeColor(champ.winrate, colors[0]) }">
                {{ champ.winrate }}%
@@ -342,7 +398,37 @@ const getChampionsList = computed(() => {
                <span :style="{ color: computeColor(champ.gpm.m, colors[8]) }">{{ (champ.gpm.m) ? champ.gpm.m : '-' }}</span>
                <span :style="{ color: computeColor(champ.gpm.v, colors[9]) }">{{ (champ.gpm.v) ? champ.gpm.v : '-' }}</span>
             </div>
-         </div>
+            <div class="metric-value">
+               <div v-if="champ.hpm"> <!--#PATCH 16.13 THINGS. remove these things only when 16.13 is the oldest patch data avail in DB -->
+                  <span :style="{ color: computeColor(champ.hpm.m, colors[10]) }">{{ (champ.hpm.m) ? champ.hpm.m : '-' }}</span>
+                  <span :style="{ color: computeColor(champ.hpm.v, colors[11]) }">{{ (champ.hpm.v) ? champ.hpm.v : '-' }}</span>
+            </div>
+               <span v-else>
+                  <span>-</span>
+                  <span>-</span>
+               </span>
+            </div>
+            <div class="metric-value">
+               <div v-if="champ.thpm">
+                  <span :style="{ color: computeColor(champ.thpm.m, colors[12]) }">{{ (champ.thpm.m) ? champ.thpm.m : '-' }}</span>
+                  <span :style="{ color: computeColor(champ.thpm.v, colors[13]) }">{{ (champ.thpm.v) ? champ.thpm.v : '-' }}</span>
+               </div>
+               <span v-else>
+                  <span>-</span>
+                  <span>-</span>
+               </span>
+            </div>
+            <div class="metric-value">
+               <div v-if="champ.tspm">
+                  <span :style="{ color: computeColor(champ.tspm.m, colors[14]) }">{{ (champ.tspm.m) ? champ.tspm.m : '-' }}</span>
+                  <span :style="{ color: computeColor(champ.tspm.v, colors[15]) }">{{ (champ.tspm.v) ? champ.tspm.v : '-' }}</span>
+               </div>
+               <span v-else>
+                  <span>-</span>
+                  <span>-</span>
+               </span>
+            </div>
+         </NuxtLink>
       </div>
    </div>
 
@@ -353,7 +439,8 @@ const getChampionsList = computed(() => {
       display: flex;
       align-items: center;
       gap: 10px;
-      width: 950px;
+      /* width: 950px; */
+      align-self: flex-start;
    }
 
    .toads {
@@ -362,7 +449,7 @@ const getChampionsList = computed(() => {
    }
 
    .highlight {
-      color: var(--surface-tint);
+      color: var(--tertiary);
    }
 
    .patch-options,
@@ -372,26 +459,27 @@ const getChampionsList = computed(() => {
       flex-direction: column;
       background: var(--surface);
       padding: 4px 5px;
+      gap: 3px;
       border-radius: 3px;
       border: 1px solid var(--outline-variant);
       z-index: 2;
    }
 
-   .header-wrapper:hover .patch-options {
+   .sort-options div {
+      display: flex;
+      align-items: center;
+      /* gap: 5px; */
+   }
+
+   .header-wrapper:hover .patch-options,
+   .header-wrapper:hover .sort-options {
       display: flex;
    }
 
-   /* .sort-wrapper:hover .sort-options {
-      display: flex;
-   } */
-
-   .header-wrapper:hover .patch-button {
+   .header-wrapper:hover .patch-button,
+   .header-wrapper:hover .sort-button {
       border: 1px solid var(--outline);
    }
-
-   /* .sort-wrapper:hover .sort-button {
-      border: 1px solid var(--outline);
-   } */
 
    .utilities>button {
       margin-bottom: 5px;
@@ -453,7 +541,7 @@ const getChampionsList = computed(() => {
       font-weight: normal;
       font-size: 0.7rem;
       padding-left: 10px;
-      width: 40px;
+      width: 50px;
       color: var(--color-font-faded);
    }
 
@@ -472,12 +560,15 @@ const getChampionsList = computed(() => {
       display: flex;
       flex-direction: column;
       align-items: center;
-      margin-top: 6vh;
+      padding-top: 10vh;
+      width: 1100px;
+      margin: 0 auto;
    }
 
    .champ-table {
-      width: 950px;
+      /* width: 950px; */
       padding-bottom: 15vh;
+      align-self: flex-start;
       color: var(--color-font)
    }
 
@@ -510,9 +601,9 @@ const getChampionsList = computed(() => {
       transform: scale(1.1);
    }
 
-   .o {
-      background: var(--surface-container);
-   }
+   /* .o {
+      background: var(--surface-container-lowest);
+   } */
 
    .header h2 {
       font-size: 0.85rem;
@@ -534,10 +625,11 @@ const getChampionsList = computed(() => {
       /* Non-prefixed version, currently supported by Chrome, Edge, Opera and Firefox */
    }
 
-   .header h3 {
-      display: inline-block;
-      text-wrap: nowrap;
-      font-size: 0.7rem;
+   /* .header h3 { */
+   .metrics h3 {
+      /* display: inline-block; */
+      /* text-wrap: nowrap; */
+      font-size: 0.68rem;
       color: var(--color-font-faded);
       font-weight: normal;
       margin: 0;
@@ -558,24 +650,26 @@ const getChampionsList = computed(() => {
    .metrics hr {
       border: none;
       background-color: var(--outline-variant);
-      display: inline-block;
-      width: 60%;
+      /* display: inline-block; */
+      /* width: 60%; */
       height: 1px;
+      /* padding-top: 2px; */
       margin: 0;
+      margin-top: 5px;
    }
 
    .metrics {
-      width: 120px;
+      width: 90px;
    }
 
-   .metrics>div {
+   .metrics>div:nth-child(2) {
       display: flex;
       align-items: center;
       gap: 2px;
    }
 
    .metrics>div h2 {
-      width: 59px;
+      width: 45px;
    }
 
    svg.triangle {
@@ -591,12 +685,19 @@ const getChampionsList = computed(() => {
    }
 
    .champion {
+      text-decoration: none;
+      color: var(--color-font);
       display: flex;
       padding-left: 20px;
       align-items: center;
       height: 40px;
       border-radius: 3px;
       font-size: 0.85rem;
+      transition: 200ms;
+   }
+
+   .champion:hover {
+      background: var(--surface-container);
    }
 
    .champion div {
@@ -615,6 +716,11 @@ const getChampionsList = computed(() => {
 
    .champion div {
       position: relative;
+   }
+
+   .champion:hover span.name {
+      /* color: var(--color-font-focus); */
+      color: var(--primary);
    }
 
    span.name {
@@ -650,51 +756,65 @@ const getChampionsList = computed(() => {
    /* WINRATE */
    .champion>div:nth-child(3),
    .header>div:nth-child(2) {
-      min-width: 90px;
+      min-width: 75px;
    }
 
    /* GAMES */
    .champion>div:nth-child(4),
    .header>div:nth-child(3) {
-      min-width: 90px;
+      min-width: 70px;
    }
 
    /* PICKRATE */
    .champion>div:nth-child(5),
    .header>div:nth-child(4) {
-      min-width: 90px;
+      min-width: 75px;
    }
 
    /* DPM */
    .champion>div:nth-child(6),
    .header>div:nth-child(5) {
-      min-width: 120px;
+      width: 105px;
    }
 
    /* DTPM */
    .champion>div:nth-child(7),
    .header>div:nth-child(6) {
-      min-width: 120px;
+      min-width: 105px;
    }
 
    /* SMPM */
    .champion>div:nth-child(8),
    .header>div:nth-child(7) {
-      min-width: 120px;
+      min-width: 105px;
    }
 
    /* GPM */
    .champion>div:nth-child(9),
    .header>div:nth-child(8) {
-      min-width: 120px;
+      min-width: 105px;
    }
 
-   .metric-value {
-      gap: 2px;
+   /* HPM */
+   .champion>div:nth-child(10),
+   .header>div:nth-child(9) {
+      min-width: 105px;
+   }
+
+   /* THPM */
+   .champion>div:nth-child(11),
+   .header>div:nth-child(10) {
+      min-width: 105px;
+   }
+
+   /* TSPM */
+   .champion>div:nth-child(12),
+   .header>div:nth-child(11) {
+      min-width: 105px;
    }
 
    .metric-value span {
-      width: 59px;
+      width: 45px;
    }
 
    .loading-champ-list {

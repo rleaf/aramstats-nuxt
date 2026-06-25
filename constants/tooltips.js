@@ -9,6 +9,9 @@ export default {
       `<b>DTPM</b>: Damage taken per minute.`,
       `<b>DMPM</b>: Damage mitigated per minute.`,
       `<b>GPM</b>: Gold per minute.`,
+      `<b>HPM</b>: Healing per minute.`,
+      `<b>AHPM</b>: Ally healing per minute.`,
+      `<b>ASPM</b>: Ally shielding per minute.`,
    ],
 
    /**
