@@ -81,7 +81,28 @@ champion_schema = {
                         "x": { "bsonType": "long" },
                         "xx": { "bsonType": "long" },
                      }
-                  }
+                  },
+                  "hpm": {
+                     "bsonType": "object",
+                     "properties": {
+                        "x": { "bsonType": "long" },
+                        "xx": { "bsonType": "long" },
+                     }
+                  },
+                  "thpm": {
+                     "bsonType": "object",
+                     "properties": {
+                        "x": { "bsonType": "long" },
+                        "xx": { "bsonType": "long" },
+                     }
+                  },
+                  "tspm": {
+                     "bsonType": "object",
+                     "properties": {
+                        "x": { "bsonType": "long" },
+                        "xx": { "bsonType": "long" },
+                     }
+                  },
                }
             }
          }

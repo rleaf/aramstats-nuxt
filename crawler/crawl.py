@@ -33,7 +33,7 @@ class Crawler():
    def __init__(self, config: object) -> None:
       load_dotenv()
 
-      db = MongoClient(os.environ['DB_CONNECTION_STRING'])['aramstats']
+      db = MongoClient(os.environ['MONGODB_URI'])['aramstats']
       collection_list = db.list_collection_names()
       region = config.region
       patch = util.get_latest_patch(two=True)

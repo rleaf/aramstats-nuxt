@@ -15,7 +15,7 @@ load_dotenv()
 
 class ChampionParser():
    def __init__(self) -> None:
-      db = MongoClient(os.environ['DB_CONNECTION_STRING'])['aramstats']
+      db = MongoClient(os.environ['MONGODB_URI'])['aramstats']
       patch = util.get_latest_patch(two=True)
       collection_list = db.list_collection_names()
       match_collection_name = f"{patch[0]}_matches"
@@ -251,6 +251,9 @@ def forward(match, items):
             'dtpm': int(participant['totalDamageTaken'] / game_duration_min),
             'dmpm': int(participant['damageSelfMitigated'] / game_duration_min),
             'gpm': int(participant['goldEarned'] / game_duration_min),
+            'hpm': int(participant['totalHeal'] / game_duration_min),
+            'thpm': int(participant['totalHealsOnTeammates'] / game_duration_min),
+            'tspm': int(participant['totalDamageShieldedOnTeammates'] / game_duration_min),
          }
          
          update["$inc"][f"skills.{level_order}.games"] = 1
@@ -265,6 +268,12 @@ def forward(match, items):
          update["$inc"]["metrics.dmpm.xx"] = Int64(metrics["dmpm"] ** 2)
          update["$inc"]["metrics.gpm.x"] = Int64(metrics["gpm"])
          update["$inc"]["metrics.gpm.xx"] = Int64(metrics["gpm"] ** 2)
+         update["$inc"]["metrics.hpm.x"] = Int64(metrics["hpm"])
+         update["$inc"]["metrics.hpm.xx"] = Int64(metrics["hpm"] ** 2)
+         update["$inc"]["metrics.thpm.x"] = Int64(metrics["thpm"])
+         update["$inc"]["metrics.thpm.xx"] = Int64(metrics["thpm"] ** 2)
+         update["$inc"]["metrics.tspm.x"] = Int64(metrics["tspm"])
+         update["$inc"]["metrics.tspm.xx"] = Int64(metrics["tspm"] ** 2)
 
          if core:
             update["$inc"][f"core.{core}.games"] = 1
