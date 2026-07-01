@@ -27,8 +27,8 @@ const colors = ref([ // max, min delta
    ['hpm', 0, 10100, 0],  // hpm sigma
    ['thpm', 0, 10100, 0],  // thpm mu
    ['thpm', 0, 10100, 0],  // thpm sigma
-   ['spm', 0, 10100, 0],  // spm mu
-   ['spm', 0, 10100, 0],  // spm sigma
+   ['tspm', 0, 10100, 0],  // spm mu
+   ['tspm', 0, 10100, 0],  // spm sigma
 ])
 
 await store.initPatches()

@@ -18,11 +18,10 @@
 
 .sub-section-header {
    display: flex;
-   justify-content: space-between;
-   align-items: center;
-   padding-bottom: 0.3rem;
-   margin-bottom: 0.8rem;
-   border-bottom: 1px solid var(--outline-variant);
+   gap: 15px;
+   /* justify-content: space-between; */
+   margin-bottom: 6px;
+   align-items: flex-end;
 }
 
 .sub-section-header img {
@@ -40,45 +39,42 @@
    align-items: center;
 }
 
+   
+.runes-wrapper .misc img {
+   filter: saturate(1);
+   opacity: 1;
+   display: inline-block;
+   width: 19px;
+   margin-right: 9px;
+   margin-bottom: 3px;
+}
+
 .misc {
-   margin-right: 1rem;
-   display: flex;
-   align-items: center;
+   margin-bottom: 0px;
 }
 
 .misc div {
-   display: flex;
-   align-items: center;
-   padding-left: 20px;
-}
-
-.misc div h3:nth-child(2) {
-   color: var(--color-font);
-}
-
-.misc img {
-   width: 18px;
+   display: inline-block;
 }
 
 .misc h3 {
-   display: inline-block;
+   font-size: 0.80rem;
    font-weight: normal;
-   font-size: 0.75rem;
-   text-align: center;
+   color: var(--color-font);
    margin: 0;
-
 }
 
-.misc h3:not(:first-child) {
+.misc h3:last-child {
+   font-size: 0.70rem;
    color: var(--color-font-faded);
-   font-style: italic;
-   margin-left: 0.4rem;
 }
 
 .sub-section-header .title {
-   font-family: 'Thestral';
+   font-family: var(--header-font);
+   font-weight: bold;
    margin: 0;
-   font-size: 1.3rem;
+   font-size: 1.4rem;
+   line-height: 1.4rem;
    color: var(--color-font);
 }
 .sub-section-header a {
@@ -89,8 +85,4 @@
 }
 .sub-section-header a:hover {
    color: var(--color-font-focus);
-}
-.sub-section-header .misc {
-   padding-left: 15px;
-   color: var(--color-font);
 }

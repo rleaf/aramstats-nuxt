@@ -108,9 +108,7 @@ const aramModifiers = computed(() => {
 </script>
 
 <template>
-   <Transition name="tooltip-fade">
-      <DataTooltip v-if="store.tooltip.active" />
-   </Transition>
+   <DataTooltip v-if="store.tooltip.active" />
 
    <div class="champion-ready-main">
       <Transition name="fade">

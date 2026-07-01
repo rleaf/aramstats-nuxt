@@ -39,44 +39,43 @@ const reg = (str) => {
 </script>
 
 <template>
-   <div ref="tip" class="item-tooltip-main">
-
-      <div v-if="store.tooltip.mode === 'items'">
-         <div class="header">
-            <h1>{{ data.name }}</h1>
-            <h2>{{ data.gold.total }}g</h2>
+      <div ref="tip" class="item-tooltip-main">
+         
+         <div v-if="store.tooltip.mode === 'items'">
+            <div class="header">
+               <h1>{{ data.name }}</h1>
+               <h2>{{ data.gold.total }}g</h2>
+            </div>
+            <div class="plain-text">{{ data.plaintext }}</div>
+            <div class="description" v-html="data.description" />
          </div>
-         <div class="plain-text">{{ data.plaintext }}</div>
-         <div class="description" v-html="data.description" />
-      </div>
-
-      <div v-else-if="store.tooltip.mode === 'skills'">
-         <div class="header">
-            <h1>{{ skill.name }}</h1>
-            <h2 v-if="skill.cooldownCoefficients">
-               <span v-if="store.tooltip.skillIndex !== 4">{{ skill.cooldownCoefficients.slice(0, 5).join('/') }}s</span>
-               <span v-else>{{ skill.cooldownCoefficients.slice(0, 3).join('/') }}s</span>
-            </h2>
+   
+         <div v-else-if="store.tooltip.mode === 'skills'">
+            <div class="header">
+               <h1>{{ skill.name }}</h1>
+               <h2 v-if="skill.cooldownCoefficients">
+                  <span v-if="store.tooltip.skillIndex !== 4">{{ skill.cooldownCoefficients.slice(0, 5).join('/') }}s</span>
+                  <span v-else>{{ skill.cooldownCoefficients.slice(0, 3).join('/') }}s</span>
+               </h2>
+            </div>
+            <div v-html="skill.description"></div>
          </div>
-         <div v-html="skill.description"></div>
-      </div>
-
-      <div v-else-if="store.tooltip.mode === 'spells'">
-         <div class="header">
-            <h1>{{ spell.name }}</h1>
-            <h2>{{ spell.cooldown }}s</h2>
+   
+         <div v-else-if="store.tooltip.mode === 'spells'">
+            <div class="header">
+               <h1>{{ spell.name }}</h1>
+               <h2>{{ spell.cooldown }}s</h2>
+            </div>
+            <div class="description">{{ spell.description }}</div>
          </div>
-         <div class="description">{{ spell.description }}</div>
-      </div>
-
-      <div v-else-if="store.tooltip.mode === 'runes'">
-         <div class="header">
-            <h1>{{ rune.name }}</h1>
+   
+         <div v-else-if="store.tooltip.mode === 'runes'">
+            <div class="header">
+               <h1>{{ rune.name }}</h1>
+            </div>
+            <div v-html="reg(rune.longDesc)" class="description" />
          </div>
-         <div v-html="reg(rune.longDesc)" class="description" />
       </div>
-      
-   </div>
 </template>
 
 <style scoped>
@@ -84,7 +83,7 @@ const reg = (str) => {
    position: absolute;
    z-index: 5;
    color: var(--color-font);
-   background: var(--surface-container);
+   background: var(--surface);
    border: 1px solid var(--outline);
    padding: 0.5rem 1rem;
    font-size: 0.8rem;

@@ -13,6 +13,20 @@
   
   const version = [
    {
+      version: "4.7.0",
+      date: "7/1/26",
+      notes: ``,
+      add: [],
+      remove: [],
+      fix: [
+         `Color lerping for ally shielding per minute on /champions page.`,
+      ],
+      adjust: [
+         `Slight UI changes to overview section on /champions/[champion].`,
+      ],
+      known: [],
+   }, 
+   {
       version: "4.6.0",
       date: "6/25/26",
       notes: `Planning to do a similar visual clean up to /champions/[champion] page as I did here to /champions.`,

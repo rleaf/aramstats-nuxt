@@ -113,6 +113,25 @@ const startingItems = computed(() => {
    return masterSort(organizedCore.value[coreFocus.value].starting)
 })
 
+function romanNumerals(i) {
+   switch (i) {
+      case 1:
+         return 'I'
+      case 2:
+         return 'II'
+      case 3:
+         return 'III'
+      case 4:
+         return 'IV'
+      case 5:
+         return 'V'
+      case 6:
+         return 'VI'
+      default:
+         break;
+   }
+}
+
 const startingSpells = computed(() => {
    return masterSort(organizedCore.value[coreFocus.value].spells)
 })
@@ -165,6 +184,7 @@ const secondaryRunes = computed(() => {
 })
 
 const levels = computed(() => {
+   console.log(organizedCore.value)
    if (config.winrateSort) {
       let potato
       let roll = 0
@@ -210,84 +230,40 @@ const levels = computed(() => {
                </div>
             </div>
          </div>
-         <div>
-            <div class="items">
-               <div class="sub-section-header">
-                  <div class="sub-lhs">
-                     <a @click="$emit('scroll', 'items')" class="title">Items</a>
-                  </div>
-                  <UXTooltip :tip="'items'" />
-               </div>
-               <div class="items-wrapper">
+         <div class="tldr-wrapper">
 
-                  <div class="items-column" :class="{ 'column-bg': (i + 1) % 2 === 0 }" v-for="i in 6" :key="i">
-                     <span>{{ i }}</span>
-                     <div v-for="(i, k) in itemSort(organizedCore[coreFocus].items[i]).slice(0, 2)" :key="k">
-                        <img @mouseenter="store.setTooltipData({ event: $event, key: i[0], mode: 'items' })"
-                           @mouseleave="store.tooltip.active = false" :src="itemImage(i[0])" alt="">
-                        <div class="winrate">{{ filteredWinrate(i[2] / i[1]) }}</div>
-                        <div class="total">{{ i[1] }}</div>
+            <div>
+               <div class="items">
+                  <!-- <div class="sub-section-header">
+                     <div class="sub-lhs">
+                        <a @click="$emit('scroll', 'items')" class="title">Items</a>
+                     </div>
+                     <UXTooltip :tip="'items'" />
+                  </div> -->
+                  <div class="items-wrapper">
+   
+                     <div class="items-column" :class="{ 'column-bg': (i + 1) % 2 === 0 }" v-for="i in 6" :key="i">
+                        <span>{{ i }}</span>
+                        <!-- <span>{{ romanNumerals(i)}}</span> -->
+                        <div v-for="(j, k) in itemSort(organizedCore[coreFocus].items[i]).slice(0, 2)" :key="k">
+                           <img @mouseenter="store.setTooltipData({ event: $event, key: j[0], mode: 'items' })"
+                              @mouseleave="store.tooltip.active = false" :src="itemImage(j[0])" alt="">
+                           <div class="winrate">{{ filteredWinrate(j[2] / j[1]) }}</div>
+                           <div class="total">{{ j[1] }} games</div>
+                        </div>
                      </div>
                   </div>
-               </div>
-
-            </div>
-            <div class="starting-spells">
-               <div class="starting">
-                  <div class="sub-section-header">
-                     <a @click="$emit('scroll', 'spells')" class="title">Starting</a>
-                     <div class="sub-rhs">
-                        <div class="misc">
-                           <h3>{{ filteredWinrate(startingItems[2] / startingItems[1]) }}</h3>
-                           <h3>{{ startingItems[1] }}</h3>
-                        </div>
-                        <UXTooltip :tip="'starting'" />
-                     </div>
-                  </div>
-                  <img v-if="(typeof startingItems[0] === 'string')" v-for="(i, j) in startingItems[0].split('_')"
-                     :src="itemImage(i)" @mouseenter="store.setTooltipData({ event: $event, key: i, mode: 'items' })"
-                     @mouseleave="store.tooltip.active = false" class="starting-image" alt="" :key="j">
-                  <p class="no-data" v-else> Not enough data :(</p>
-               </div>
-               <div class="spells">
-                  <div class="sub-section-header">
-                     <a @click="$emit('scroll', 'spells')" class="title">Spells</a>
-                     <div class="sub-rhs">
-                        <div class="misc">
-                           <h3>{{ filteredWinrate(startingSpells[2] / startingSpells[1]) }}</h3>
-                           <h3>{{ startingSpells[1] }}</h3>
-                        </div>
-                        <UXTooltip :tip="'spells'" />
-                     </div>
-                  </div>
-                  <img class="starting-image" v-for="(id, i) in startingSpells[0].split('_')"
-                     @mouseenter="store.setTooltipData({ event: $event, key: id, mode: 'spells' })"
-                     @mouseleave="store.tooltip.active = false" :src="`/spells/${id}.webp`" alt="" :key="i">
-               </div>
-            </div>
-         </div>
-         <div class="runes-leveling">
-            <div class="runes">
-               <div class="sub-section-header">
-                  <a @click="$emit('scroll', 'runes')" class="title">Runes</a>
-                  <div class="sub-rhs">
-                     <!-- <div class="misc">
-                        <div>
-                           <img :src="`/runes/${primaryRunes[0]}.png`" />
-                           <h3>{{ filteredWinrate(primaryRunes[2] / primaryRunes[1]) }}</h3>
-                           <h3>{{ primaryRunes[1] }}</h3>
-                        </div>
-                        <div>
-                           <img :src="`/runes/${secondaryRunes[0]}.png`" />
-                           <h3>{{ filteredWinrate(secondaryRunes[2] / secondaryRunes[1]) }}</h3>
-                           <h3>{{ secondaryRunes[1] }}</h3>
-                        </div>
-                     </div> -->
-                     <UXTooltip :align="'right'" :tip="'runes'" />
-                  </div>
+   
                </div>
                <div class="runes-wrapper">
                   <div class="tldr-primary">
+                     <div class="misc">
+                        <img :src="`/runes/${primaryRunes[0]}.png`" />
+                        <div>
+                           <h3>{{ filteredWinrate(primaryRunes[2] / primaryRunes[1]) }}</h3>
+                           <h3>{{ primaryRunes[1] }} games</h3>
+                        </div>
+                     </div>
                      <div class="rune-row" alt="" v-for="(row, i) in _runes[primaryRunes[0]]" :key="i">
                         <img :class="{ 'active-rune': rune == activePrimaryRunes[i] }" v-for="(rune, j) in row"
                            :src="`/runes/${rune}.png`" alt=""
@@ -297,9 +273,16 @@ const levels = computed(() => {
                   </div>
                   <div>
                      <div class="tldr-secondary">
+                        <div class="misc">
+                           <img :src="`/runes/${secondaryRunes[0]}.png`" />
+                           <div>
+                              <h3>{{ filteredWinrate(secondaryRunes[2] / secondaryRunes[1]) }}</h3>
+                              <h3>{{ secondaryRunes[1] }} games</h3>
+                           </div>
+                        </div>
                         <div class="rune-row" v-for="(row, i) in _runes[secondaryRunes[0]].slice(1)" :key="i">
-                           <img :class="{ 'active-rune': activeSecondaryRunes.includes(rune) }" v-for="(rune, j) in row"
-                              :src="`/runes/${rune}.png`" alt=""
+                           <img :class="{ 'active-rune': activeSecondaryRunes.includes(rune) }"
+                              v-for="(rune, j) in row" :src="`/runes/${rune}.png`" alt=""
                               @mouseenter="store.setTooltipData({ event: $event, key: rune, mode: 'runes', runeTree: secondaryRunes[0], runeRow: i + 1 })"
                               @mouseleave="store.tooltip.active = false" :key="j">
                         </div>
@@ -314,25 +297,66 @@ const levels = computed(() => {
                      </div>
                   </div>
                </div>
+               
             </div>
-            <div class="leveling">
-               <div class="sub-section-header">
-                  <a @click="$emit('scroll', 'spells')" class="title">Level Order</a>
-                  <div class="sub-rhs">
+            <div class="runes-leveling">
+               <div class="leveling">
+                  <div class="sub-section-header">
+                     <a @click="$emit('scroll', 'spells')" class="title">Level Order</a>
                      <div class="misc">
                         <h3>{{ filteredWinrate(levels[2] / levels[1]) }}</h3>
-                        <h3>{{ levels[1] }}</h3>
+                        <h3>{{ levels[1] }} games</h3>
                      </div>
-                     <UXTooltip :align="'right'" :tip="'levels'" />
+                     <!-- <div class="sub-rhs">
+                        <UXTooltip :align="'right'" :tip="'levels'" />
+                     </div> -->
+                  </div>
+                  <div class="ylabels">
+                     <span v-for="i in 18" :key="i">{{ i }}</span>
+                  </div>
+                  <div class="level-wrapper">
+                     <div class="level-column" v-for="i in 18" :key="i">
+                        <div class="level-row" :class="{ 'active-level': levels[0][i - 1] == j }" v-for="j in 4"
+                           :key="j">
+                           {{ activeSkill(i, j) }}
+                        </div>
+                     </div>
                   </div>
                </div>
-               <div class="level-wrapper">
-                  <div class="level-column" v-for="i in 18" :key="i">
-                     <div class="level-row" :class="{ 'active-level': levels[0][i - 1] == j }" v-for="j in 4" :key="j">
-                        {{ activeSkill(i, j) }}
+              <div class="starting-spells">
+                  <div class="starting">
+                     <div class="sub-section-header">
+                        <a @click="$emit('scroll', 'spells')" class="title">Starting</a>
+                        <div class="misc">
+                           <h3>{{ filteredWinrate(startingItems[2] / startingItems[1]) }}</h3>
+                           <h3>{{ startingItems[1] }} games</h3>
+                        </div>
+                        <!-- <div class="sub-rhs">
+                           <UXTooltip :tip="'starting'" />
+                        </div> -->
                      </div>
+                     <img v-if="(typeof startingItems[0] === 'string')" v-for="(i, j) in startingItems[0].split('_')"
+                        :src="itemImage(i)" @mouseenter="store.setTooltipData({ event: $event, key: i, mode: 'items' })"
+                        @mouseleave="store.tooltip.active = false" class="starting-image" alt="" :key="j">
+                     <p class="no-data" v-else> Not enough data :(</p>
+                  </div>
+                  <div class="spells">
+                     <div class="sub-section-header">
+                        <a @click="$emit('scroll', 'spells')" class="title">Spells</a>
+                        <div class="misc">
+                           <h3>{{ filteredWinrate(startingSpells[2] / startingSpells[1]) }}</h3>
+                           <h3>{{ startingSpells[1] }} games</h3>
+                        </div>
+                        <!-- <div class="sub-rhs">
+                           <UXTooltip :tip="'spells'" />
+                        </div> -->
+                     </div>
+                     <img class="starting-image" v-for="(id, i) in startingSpells[0].split('_')"
+                        @mouseenter="store.setTooltipData({ event: $event, key: id, mode: 'spells' })"
+                        @mouseleave="store.tooltip.active = false" :src="`/spells/${id}.webp`" alt="" :key="i">
                   </div>
                </div>
+               
             </div>
          </div>
       </div>
@@ -350,11 +374,27 @@ const levels = computed(() => {
 
 .section {
    display: flex;
-   justify-content: space-between;
+   /* justify-content: space-evenly; */
+   gap: 30px;
    height: 405px;
    color: var(--color-font);
 }
 
+/* .section > div { */
+.tldr-wrapper > div {
+   display: flex;
+   flex-direction: row;
+   gap: 40px;
+   align-items: center;
+   /* justify-content: space-between; */
+}
+
+.tldr-wrapper {
+   display: flex;
+   min-width: 800px;
+   flex-direction: column;
+   justify-content: space-between;
+}
 .combination-tooltip {
    display: flex;
    justify-content: space-between;
@@ -400,9 +440,10 @@ const levels = computed(() => {
 
 .starting-spells {
    display: flex;
-   padding-top: 30px;
-   gap: 50px;
-   align-items: center;
+  flex-direction: column;
+   justify-content: space-between;
+   /* gap: 50px; */
+   height: 160px;
 }
 
 .starting {
@@ -414,13 +455,15 @@ const levels = computed(() => {
    /* margin-top: 80px; */
 }
 
-.runes-leveling {
-   width: 360px;
+div.runes-leveling {
+   gap: 120px;
+   /* width: 360px; */
 }
 
 .runes-wrapper {
    display: flex;
-   justify-content: space-evenly;
+   gap: 20px;
+   justify-content: space-between;
 }
 
 .runes-wrapper img {
@@ -441,7 +484,12 @@ img.active-rune {
    align-items: center;
 }
 
-.tldr-primary .rune-row:first-child img {
+.tldr-primary .misc,
+.tldr-secondary .misc {
+   margin-bottom: 10px;
+}
+
+.tldr-primary .rune-row:nth-child(2) img {
    width: 40px;
 }
 
@@ -449,11 +497,11 @@ img.active-rune {
    width: 28px;
 }
 
-.tldr-primary .rune-row:not(:first-child) img {
+.tldr-primary .rune-row:not(:nth-child(2)) img {
    padding: 6px;
 }
 
-.tldr-secondary img {
+.tldr-secondary img:not(:first-child) {
    padding: 1px 2px;
 }
 
@@ -472,24 +520,33 @@ img.active-rune {
    display: inline-block;
 }
 
-.leveling {
-   padding-top: 30px;
-}
-
 .level-wrapper {
    display: flex;
 }
 
+.ylabels {
+   font-size: 0.7rem;
+   color: var(--color-font-faded);
+   margin-bottom: 2px;
+}
+
+.ylabels span {
+   display: inline-block;
+   text-align: center;
+   width: 24px;
+}
+
 .level-row {
-   width: 16px;
-   height: 16px;
+   width: 22px;
+   height: 20px;
    margin: 2px 1px;
-   border: 1px solid transparent;
+   /* border: 2px solid transparent; */
    border-radius: 2px;
    background: var(--surface-container);
+   /* background: var(--surface-container); */
    text-align: center;
    font-size: 0.7rem;
-   line-height: 1.5;
+   line-height: 20px;
 }
 
 .active-level {
@@ -509,7 +566,8 @@ img.starting-image:not(:nth-child(2)) {
 }
 
 .items-column span {
-   font-weight: bold;
+   /* font-weight: bold; */
+   font-family: 'Thestral';
    font-size: 1rem;
 }
 
@@ -526,15 +584,14 @@ img.starting-image:not(:nth-child(2)) {
    gap: 10px;
 }
 
-
 .items-column {
    display: flex;
    flex-direction: column;
    gap: 20px;
    align-items: center;
-   padding: 20px 20px;
-   width: 35px;
-   border-radius: 5px;
+   padding: 15px 3px;
+   width: 70px;
+   border-radius: 3px;
 }
 
 .items-column img {
@@ -599,7 +656,7 @@ img.starting-image:not(:nth-child(2)) {
 }
 
 .total {
-   font-size: 0.75rem;
+   font-size: 0.70rem;
    text-align: center;
    color: var(--color-font-faded);
 }
