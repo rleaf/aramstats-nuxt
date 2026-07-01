@@ -184,7 +184,6 @@ const secondaryRunes = computed(() => {
 })
 
 const levels = computed(() => {
-   console.log(organizedCore.value)
    if (config.winrateSort) {
       let potato
       let roll = 0
@@ -209,12 +208,12 @@ const levels = computed(() => {
       <div class="section-header">
          <h1>Overview</h1>
          <TldrModal />
+         <UXTooltip :tip="'tldr'" :size="'big'" />
       </div>
       <div class="section">
          <div class="core-selection">
             <div class="combination-tooltip">
                <p>Select a <b>combination</b></p>
-               <UXTooltip :tip="'core'" />
             </div>
             <div class="combinations">
                <div class="core" :class="{ 'core-focus': coreFocus === i }" @click="coreFocus = i"
@@ -234,17 +233,10 @@ const levels = computed(() => {
 
             <div>
                <div class="items">
-                  <!-- <div class="sub-section-header">
-                     <div class="sub-lhs">
-                        <a @click="$emit('scroll', 'items')" class="title">Items</a>
-                     </div>
-                     <UXTooltip :tip="'items'" />
-                  </div> -->
                   <div class="items-wrapper">
    
                      <div class="items-column" :class="{ 'column-bg': (i + 1) % 2 === 0 }" v-for="i in 6" :key="i">
                         <span>{{ i }}</span>
-                        <!-- <span>{{ romanNumerals(i)}}</span> -->
                         <div v-for="(j, k) in itemSort(organizedCore[coreFocus].items[i]).slice(0, 2)" :key="k">
                            <img @mouseenter="store.setTooltipData({ event: $event, key: j[0], mode: 'items' })"
                               @mouseleave="store.tooltip.active = false" :src="itemImage(j[0])" alt="">
@@ -385,7 +377,7 @@ const levels = computed(() => {
    display: flex;
    flex-direction: row;
    gap: 40px;
-   align-items: center;
+   align-items: flex-end;
    /* justify-content: space-between; */
 }
 
@@ -397,6 +389,7 @@ const levels = computed(() => {
 }
 .combination-tooltip {
    display: flex;
+   align-items: center;
    justify-content: space-between;
    color: var(--color-font-faded);
    font-size: 0.75rem;

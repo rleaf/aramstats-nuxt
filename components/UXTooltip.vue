@@ -1,12 +1,12 @@
 <script setup>
 import tooltips from '@/constants/tooltips'
 
-const props = defineProps(['tip', 'align'])
+const props = defineProps(['tip', 'align', 'size'])
 </script>
 
 <template>
    <div class="tooltip">
-      <img src="/svg/information.svg" alt="">
+      <img :class="props.size" src="/svg/questionping.svg" alt="help">
       <div :class="props.align" class="tip">
          <ul>
             <li v-for="(t, i) in tooltips[props.tip]" :key="i">
@@ -20,6 +20,8 @@ const props = defineProps(['tip', 'align'])
 <style scoped>
 .tooltip img {
    cursor: pointer;
+   filter: saturate(0.3);
+   transition: 200ms;
    z-index: 1;
    -webkit-touch-callout: none; /* iOS Safari */
    -webkit-user-select: none; /* Safari */
@@ -29,10 +31,14 @@ const props = defineProps(['tip', 'align'])
    user-select: none; /* Non-prefixed version, currently supported by Chrome, Edge, Opera and Firefox */
 }
 
+.tooltip img:hover {
+   filter: saturate(1);
+}
+
 .tooltip {
    position: relative;
    display: inline-block;
-   height: 16px;
+   /* height: 16px; */
 }
 
 .tooltip:hover .tip {
@@ -43,8 +49,8 @@ const props = defineProps(['tip', 'align'])
    visibility: hidden;
    position: absolute;
    z-index: 10;
-   font-size: 0.8rem;
-   line-height: 1.35;
+   font-size: 0.85rem;
+   /* line-height: .85rem; */
    font-style: normal;
    color: var(--color-font);
    /* background: var(--surface-container); */
@@ -52,7 +58,7 @@ const props = defineProps(['tip', 'align'])
    border: 1px solid var(--outline-variant);
    border-radius: 3px;
    padding: 0.2rem 1.5rem;
-   width: 300px;
+   width: 400px;
    top: 130%;
    left: 50%;
    margin-left: -150px;
@@ -76,5 +82,11 @@ const props = defineProps(['tip', 'align'])
 
 .tip ul li:not(:last-child) { 
    margin-bottom: 0.7rem;  
+}
+
+.big {
+   /* margin-top: 5px; */
+   width: 25px;
+   /* height: 25px; */
 }
 </style>

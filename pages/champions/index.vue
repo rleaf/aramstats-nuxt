@@ -319,7 +319,6 @@ const getChampionsList = computed(() => {
          </div>
 
          <div class="header-wrapper">
-            <!-- <span class="superscript">{{ descending ? 'Ascending' : 'Descending' }}</span> -->
             <button @click="descending = !descending">
                <svg width="18" height="28" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <rect class="asc-des" x="2" y="8" :width="descending ? '6' : '18'" height="2" />
@@ -329,10 +328,7 @@ const getChampionsList = computed(() => {
             </button>
          </div>
 
-         <!-- <button>
-            Colors
-         </button> -->
-         <UXTooltip class='toads' :align="'left'" :tip="'tierlist'" />
+         <UXTooltip class='toads' :align="'left'" :tip="'tierlist'" :size="'big'" />
       </div>
 
       <div class="champ-table">
@@ -345,8 +341,6 @@ const getChampionsList = computed(() => {
                   <div style="margin-bottom: 10px;">
                      <h3 @click="headerSort(i)">{{ h[0] }}</h3>
                      <h3 @click="headerSort(i)">{{ `/ Minute` }}</h3>
-                     <!-- <h3 @click="headerSort(i)">{{ `Damage per \n minute` }}</h3> -->
-                     <!-- <hr> -->
                   </div>
                   <div>
                      <h2 :class="{ 'highlight': sort === (Math.floor(i / 4) - 1) * 4 + i + (i % 4) }"
@@ -370,8 +364,6 @@ const getChampionsList = computed(() => {
                <div>
                   <span class="name">{{ championNames[champ._id][1] }}</span>
                </div>
-               <!-- <NuxtLink :to="{ name: 'champions-champion', params: { champion: championRoute(champ._id) } }">
-               </NuxtLink> -->
             </div>
             <div :style="{ color: computeColor(champ.winrate, colors[0]) }">
                {{ champ.winrate }}%

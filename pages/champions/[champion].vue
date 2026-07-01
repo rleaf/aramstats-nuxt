@@ -67,7 +67,7 @@ function cleanPatch(patch) {
 }
 
 const background = computed(() => {
-   return `radial-gradient(ellipse at top, rgba(var(--surface-rgb), 0.8), rgba(var(--surface-rgb), 1) 73%), no-repeat -10% 25%/100% url('/champion_splash/${championNames[championId.value][0].toLowerCase()}.webp')` 
+   return `radial-gradient(ellipse at top, rgba(var(--surface-rgb), 0.8), rgba(var(--surface-rgb), 1) 73%), no-repeat -10% 15%/100% url('/champion_splash/${championNames[championId.value][0].toLowerCase()}.webp')` 
    
 })
 
@@ -144,22 +144,18 @@ const aramModifiers = computed(() => {
             </div>
 
             <div class="header-rhs">
-               <div class="main-stats">
+               <div class="header-stats">
                   <div>
                      <span>Rank</span>
-                     {{ championData.rank }}
-                  </div>
-                  <div>
                      <span>Pickrate</span>
-                     {{ championData.pickRate }}%
-                  </div>
-                  <div>
                      <span>Winrate</span>
-                     {{ `${Math.round((championData.wins / championData.games) * 1000) / 10}%` }}
+                     <span>Games</span>
                   </div>
                   <div>
-                     <span>Games</span>
-                     {{ championData.games }}
+                     <span>{{ championData.rank }}</span>
+                     <span>{{ championData.pickRate }}%</span>
+                     <span>{{ `${Math.round((championData.wins / championData.games) * 1000) / 10}%` }}</span>
+                     <span>{{ championData.games }}</span>
                   </div>
                </div>
 
@@ -245,7 +241,7 @@ const aramModifiers = computed(() => {
       }
 
       .header {
-         margin-bottom: 5vh;
+         margin-bottom: 3vh;
       }
 
       .header-titles {
@@ -260,23 +256,31 @@ const aramModifiers = computed(() => {
          background: radial-gradient(ellipse at top, var(--surface), var(--surface-rgb) 25%);
       }
 
-      .main-stats {
+      .header-stats {
          display: flex;
-         margin-bottom: 20px;
-         gap: 40px;
-         font-size: 1.1rem;
+         /* gap: 40px; */
+         gap: 20px;
+         /* font-size: 0.9rem; */
+         font-size: 0.95rem;
       }
 
-      .main-stats div {
-         font-weight: bold;
+      .header-stats div {
+         /* font-weight: bold; */
+         display: flex;
+         flex-direction: column;
+         align-items: left;
+         gap: 2px;
          color: var(--color-font-focus);
       }
 
-      .header-rhs span {
-         font-size: 0.9rem;
-         display: block;
-         padding-bottom: 5px;
+      .header-stats div:first-child {
+         font-weight: bold;
+         /* font-size: 0.9rem; */
          color: var(--color-font-faded);
+      }
+
+      .header-rhs span {
+         /* color: var(--color-font); */
          font-weight: normal;
       }
 

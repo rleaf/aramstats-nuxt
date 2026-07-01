@@ -51,13 +51,16 @@
 
 .misc {
    margin-bottom: 0px;
+   display: flex;
+   align-items: baseline;
 }
 
 .misc div {
-   display: inline-block;
+   /* display: inline-block; */
 }
 
 .misc h3 {
+   display: inline-block;
    font-size: 0.80rem;
    font-weight: normal;
    color: var(--color-font);
@@ -65,6 +68,7 @@
 }
 
 .misc h3:last-child {
+   margin-left: 10px;
    font-size: 0.70rem;
    color: var(--color-font-faded);
 }

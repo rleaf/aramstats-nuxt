@@ -17,11 +17,14 @@ export default {
    /**
    * Champion Tooltips  
    */
+   'tldr': [
+      `This section provides an overview of the relevant information for a champion - <i>"just show me the important stuff"</i>.`,
+      `On the left are the 10 most observed core builds where clicking anyone shows the full build path, level order, runes, starting items, and spells with each datum accompanied with the winrate and total games observed.`,
+      `The core builds represent <b>combinations</b> - they are builds irrespective of buy order. This means <b>[boots, kraken, ie]</b> is the same as <b>[kraken, ie, boots]</b> and any other arrangement of those items. The boot icon represents all boots.`,
+      `Items are laid left-to-right representing buy order and top-down representing popularity for that specific item slot.`
 
+   ],
    'core': [
-      `The 10 most observed core builds are shown here, with their winrate & total games, in descending order and are clickable.`,
-      `To consolidate data, these selections represent <b>combinations</b> of core builds - they are core builds irrespective of buy order. This means <b>[boots, kraken, ie]</b> is the same as <b>[kraken, ie, boots]</b> and any other arrangement of those items.`,
-      `The boot icon represents all boots.`
    ],
    'items': [
       `Purchase order is laid out going left to right with each purchase showing the two most popular items. Every item is accompanied with the winrate and the total games observed.`,

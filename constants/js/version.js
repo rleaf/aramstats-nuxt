@@ -15,14 +15,20 @@
    {
       version: "4.7.0",
       date: "7/1/26",
-      notes: ``,
-      add: [],
+      notes: `Decent UX/UI changes to overview section on /champions/[champion] sprinkled with some minor/random changes elsewhere.`,
+      add: [
+         `(m/d/y) to updates & versioning so I stop getting confused.`
+      ],
       remove: [],
       fix: [
          `Color lerping for ally shielding per minute on /champions page.`,
       ],
       adjust: [
-         `Slight UI changes to overview section on /champions/[champion].`,
+         `Compacted spacing on /champions/[champion] overview to better fit on load.`,
+         `Realigned core build overview elements.`,
+         `Changed 'info' indicator to ? ping.`,
+         `Cleaned up overview tooltip.`
+
       ],
       known: [],
    }, 

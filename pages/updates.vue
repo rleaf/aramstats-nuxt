@@ -21,13 +21,13 @@ function getImage(fileName) {
          <div @click="tab = 1" :class="{ active: tab }">Versioning</div>
       </div>
       <div class="updates" v-show="tab === 0">
-         <div class="block" v-for="u in updates">
+         <div class="block" v-for="(u, i) in updates" :key="i">
             <div class="header">
                <div>
                   <h2>{{ u.title }}</h2>
                   <h3 v-if="u.version">v{{ u.version }}</h3>
                </div>
-               <h3>{{ u.date }}</h3>
+               <h3><span v-if="i === 0">(m/d/y)</span>{{ u.date }}</h3>
             </div>
             <div class="body">
 
@@ -44,10 +44,10 @@ function getImage(fileName) {
          </div>
       </div>
       <div class="versioning" v-show="tab === 1">
-         <div class="block" v-for="v in version">
+         <div class="block" v-for="(v, i) in version" :key="i">
             <div class="header">
                <h2>{{ v.version }}</h2>
-               <h3>{{ v.date }}</h3>
+               <h3><span v-if="i === 0">(m/d/y)</span>{{ v.date }}</h3>
             </div>
             <div class="body">
                <div class="notes" v-if="v.notes && v.notes.length">
@@ -218,6 +218,9 @@ div.active {
    align-items: flex-end;
 }
 
+.header span {
+   margin-right: 20px;
+}
 a {
    color: var(--color-font);
 }
